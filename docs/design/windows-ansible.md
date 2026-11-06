@@ -35,7 +35,26 @@
 | SSH | 公開鍵認証、Goクライアント、ホスト鍵照合を共通化できる | 対象にOpenSSH Serverが必要。初期案に採用 |
 | WinRM / PSRP | Windowsの既存リモート管理と統合しやすい | 認証方式、証明書、ドメイン環境の検証が増えるため後続候補 |
 
-対象はOpenSSH Server、TCP 22、公開鍵認証、PowerShell 5.1以上を準備する。SSHの既定シェルはWindowsのcmd.exeに固定して検証し、別シェルは初期対応外とする。リモート起動は固定形式の`powershell.exe -NoLogo -NoProfile -NonInteractive -EncodedCommand <base64>`を使う。スクリプトはUTF-16LEで符号化する。タスク値はJSONとして符号化して固定ラッパー内で復元し、PowerShellコードへ直接補間しない。
+対象はOpenSSH Server、TCP 22、公開鍵認証、PowerShell 5.1以上を準備する。SSHの既定シェルはWindowsのcmd.exeに固定して検証し、別シェルは初期対応外とする。リモート起動は固定形式の`powershell.exe -NoLogo -NoProfile -NonInteractive -EncodedCommand <base64>`を使う。固定ラッパーのスクリプトだけをUTF-16LE/base64で符号化する。タスク値はこのコマンドラインへ含めず、下記のSSH標準入力で渡す。PowerShellコードへ直接補間しない。
+
+### タスクデータの転送とサイズ制限
+
+1タスクにつきSSHのexecセッションを1つ開く（SSH接続自体はホスト内で再利用）。exec要求のコマンドは同じモジュールなら全ホスト・全引数で同一の固定ラッパーとし、PTYは要求しない。展開済みのmodule/argsを含む単一JSONオブジェクトを、BOMなしUTF-8でセッションのstdinへ書き、全バイト送信後にstdinだけを閉じてEOFを送る。ラッパーは`Console.OpenStandardInput()`から上限付きでEOFまで読み、厳密UTF-8として復号してJSONを検証し、処理を開始する。既定コードページやPowerShellの行単位読込には依存しない。タスク値を環境変数、EncodedCommand、一時スクリプトへ埋め込まない。
+
+送信とstdout/stderrの読取を並行し、stdin送信・EOF待ちもタスクのtimeoutに含める。途中切断・期限切れは再送せず、変更有無をnullとする。受信側はサイズ超過、不正UTF-8、JSON不正ならモジュールを実行せずfailedを返す。入力データや生の解析エラーをログへ出さない。
+
+以下は初期実装用の上限案であり、全選択ホストの全タスクを変数展開した後、**最初のSSH接続より前**に検査する。いずれかの入力上限超過は終了2、接続0回とし、ホスト名・タスク番号・上限・実サイズだけを診断する。JSONのサイズは空白なしの実際に送るシリアライズ結果で測定し、エスケープによる増加も含める。
+
+| 対象 | 許容上限（上限と同値は受理） | 測定方法 |
+| --- | --- | --- |
+| `file_content.content` | 1,048,576バイト（1MiB） | 変数展開後のBOMなしUTF-8。書込予定バイト列の長さ |
+| 1タスクのstdin JSON全体 | 2,097,152バイト（2MiB） | module/args等を含むUTF-8送信バイト数。受信側も上限+1バイトまでで超過検出 |
+| 固定ラッパーのリモート起動行 | 8,000 UTF-16コード単位 | cmd.exe起動の接頭辞・引用符を含む、対応OpenSSH構成で実際に解釈される行全体。base64化後に測定 |
+| `command`の子プロセス起動行 | 終端NULを除いて32,766 UTF-16コード単位 | executableの引用符・区切り・CRT規則で符号化した全argvを含む最終行 |
+
+cmd.exeの上限8,191文字に対し、固定起動行には8,000の保守的上限を置く（[Microsoftの制限説明](https://learn.microsoft.com/en-au/troubleshoot/windows-client/shell-experience/command-line-string-limitation)、確認日2026-11-07）。接頭辞を推測して省略せず、後続実装で対象OpenSSH版の起動形式を確認して計数式を固定する。固定ラッパーにはタスク値・パス・環境変数展開を含めない。ラッパー自体が上限を超えた場合は利用者の入力エラーではなく配布物の不備として、接続前に終了3とする。ビルド時と実行時の両方で検査し、実機でも起動を確認する。ラッパーを分割送信する等の未設計の回避動作は行わない。
+
+stdinを使っても`command`が起動する子プロセスには別の長さ制限があるため、制御側は対象と同じCRT引数エンコーダで最終行を事前計算し、受信側も再検査する。32,766の根拠は[CreateProcessWの32,767文字（終端NUL込み）制限](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw)。cmd.exeやバッチファイル等、さらに短い独自制限・シェル構文を持つ呼出しは初期のcommand対応外とする。10KiBのASCII contentや8,191文字を超えるargvデータ自体はSSH起動行を伸ばさず、上記各上限内なら転送できる。
 
 Go依存候補は`golang.org/x/crypto/ssh`と`ssh/knownhosts`。導入時にバージョン、脆弱性、ライセンスを確認してgo.mod/go.sumへ固定する。WinRM採用時はHTTPSと証明書・ホスト名検証を必須とし、検証無効化は提供しない。現時点ではWinRMライブラリを採用しない。[Windows SSHの前提](https://docs.ansible.com/projects/ansible/latest/os_guide/windows_ssh.html)も参照するが、Ansibleの対応宣言を本製品の実機検証の代わりにしない。
 
@@ -116,11 +135,11 @@ type Module interface {
 }
 ```
 
-`Host`は検証済み接続情報、`Request`は固定ラッパーと符号化済みデータ、`Response`は通信状態とプロセス結果を分離する。engineはSSH実装を参照せず、模擬Sessionを注入できる。context、標準JSON、flag、signal、同期は標準ライブラリを優先する。
+`Host`は検証済み接続情報、`Request`は固定ラッパーの起動行と別フィールドのstdin用UTF-8 JSONバイト列、`Response`は通信状態とプロセス結果を分離する。transportはstdinの送信・EOFと出力の並行読取を担当する。engineはSSH実装を参照せず、模擬Sessionを注入できる。context、標準JSON、flag、signal、同期は標準ライブラリを優先する。
 
 ## 実行フローと失敗時動作
 
-1. 入力全体を読込・検証し、ホスト選択と全タスクの変数を確定する。副作用はまだ起こさない。
+1. 入力全体を読込・検証し、ホスト選択と全タスクの変数を確定する。全ホスト分の送信JSON、content、子プロセス起動行のサイズと固定ラッパー起動長を検査する。副作用はまだ起こさない。
 2. ホスト名の辞書順のキューから最大forks個を処理する。各ホストは一接続を開き、タスクを定義順で実行する。
 3. 接続タイムアウトは10秒。各タスクは接続後からtimeoutを適用し、出力読込も期限に含める。
 4. 失敗したホストの後続タスクはskippedにし、他ホストは続行する。接続はdefer相当で必ず閉じる。
