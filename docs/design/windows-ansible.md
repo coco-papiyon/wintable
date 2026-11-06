@@ -11,7 +11,7 @@
 | REQ-002 | Windows上で動作する制御側を作成する方針 | 対象環境、接続、Windows運用 |
 | REQ-003 | Go言語を使用する | パッケージ、インターフェース、ビルド・配布 |
 
-本Issueでは実行コードを作らず、後続実装が参照できる設計を成果物とする。以下は初期実装の提案仕様であり、利用者が承認した製品要件とは区別する。Ansible本体の移植や完全互換を保証しない。「サーバ」は処理を指示する制御ノードを意味し、管理対象ホストとは別である。
+Issue #1は設計成果物を対象とした。以下の提案はIssue #3（I-01）の実装で末尾の決定表のとおり初期仕様に採用した。仕様採用と実接続の検証成功は区別する。Ansible本体の移植や完全互換を保証しない。「サーバ」は処理を指示する制御ノードを意味し、管理対象ホストとは別である。
 
 ## 対象環境と互換範囲
 
@@ -111,6 +111,7 @@ Inventory内の相対パスはInventoryのディレクトリ、CLIファイル�
 
 ```text
 cmd/wintable          CLIフラグ、シグナル、終了コード
+internal/cli          テスト可能な引数検証とExecutorへのcontext引渡し
 internal/config       JSON厳密読込、スキーマ検証
 internal/inventory    選択、変数マージ・展開
 internal/engine       並列制御、ホスト内順序、集計
@@ -166,7 +167,7 @@ type Module interface {
 
 ## ビルドと配布
 
-後続実装はGo 1.27系の最新修正版を候補とし、採用時点のサポートと依存互換性を再確認してCIで固定する。現時点ではgo.modもバイナリもない。[Go公式導入手順](https://go.dev/doc/install)、[Windows対応](https://go.dev/wiki/Windows)、[配布版](https://go.dev/dl/)を参照。
+I-01ではgo.modの言語版を1.27.0、toolchainをGo 1.27.3に固定する。2026-11-07に[公式配布JSON](https://go.dev/dl/?mode=json)の安定版、[サポート方針](https://go.dev/doc/devel/release)、[Windows対応](https://go.dev/wiki/Windows)を確認した。1.27はサポート期間内で、対象OS/amd64はGoのWindows対応範囲に含まれる。標準ライブラリのみで外部依存の最低Go版・ライセンス競合はない。SSH依存は導入時に再確認する。[Go公式導入手順](https://go.dev/doc/install)も参照。
 
 実装後のPowerShell用ビルド案:
 
@@ -183,4 +184,22 @@ Windows CIでテスト後、exe、サンプルJSON、利用手順、依存ライ
 
 ## 決定事項と未確定事項
 
-Issueで確定しているのは設計、Windows制御側、Goの3点。独自JSON、SSH、対象OS、モジュール、CLI仕様は本書の提案として一貫した最小案を示した。後続実装開始時に利用者と初期範囲を確定する。実運用の管理対象、ドメイン認証、既存Playbook移行、WinRM、arm64、署名配布は未確定。後続の順序と合格条件は[検証計画](windows-ansible-validation.md)に記載する。
+### I-01 初期仕様の採否（2026-11-07）
+
+Issue #3 の実装依頼と本文計画に基づき、次を採用する。設計提案からの仕様変更はなく、CLIの省略値と基盤の暫定動作を具体化した。
+
+| 項目 | 採否・理由 | 検証への影響 |
+| --- | --- | --- |
+| OS | Windows 11 / Server 2022以降のamd64制御・対象を採用。検証対象を限定 | 実機は両OSが必要。Goビルドだけでは合格にしない |
+| 接続 | SSH公開鍵、known_hosts必須、cmd.exe既定、PowerShell 5.1以上を採用。固定起動形式で検証可能 | V-05〜10/14/16/18。WinRM/PSRP・他シェルは非採用 |
+| 入力・モジュール | 独自JSON v1、静的Inventory、文字列変数、command/file_contentを採用。最小範囲を明確化 | V-01〜03/07〜10/14〜18。読込と実行は後続Issue |
+| 上限 | content 1MiB、stdin JSON 2MiB、固定起動行8,000 UTF-16単位、子プロセス32,766単位、各出力保持1MiBを採用。測定・同値受理・超過時の区分は本書どおり | V-11/15〜18。入力超過=2、配布物不備=3。検査実装は後続Issue |
+| 非対応 | Ansible YAML/Jinja/collections、roles/handlers/facts/become/vault、動的Inventory、check mode、再試行、ロールバック、Linux対象、arm64、GUIを非採用。初期実装を限定 | CLIで対応しないフラグは終了2。JSON内指定の拒否は後続入力検証 |
+| CLI | inventory/tasks必須。forks=5（1〜64）、timeout=60s（正のduration）、format=text（text/json）、include-output=false、limit省略=選択ホスト全体、vars-file省略=CLI変数なしを採用 | helpと単体テストで既定値・型・範囲を検証 |
+| Go | 公式情報確認後Go 1.27.3を採用。標準ライブラリのみ | 同版でtest/vet/Windows amd64 buildを行う |
+
+基盤段階では有効なrunも `execution_not_implemented` と終了3を返す。JSON解析・接続・実行・結果描画は未実装で、成功結果は生成しない。`cmd/wintable` はsignal.NotifyContextを作り、`cli.Run` が検証後Executorへ渡す。後続engine統合時にnil Executorを置き換える。
+
+依存方向はcmd → cli → 注入Executor（将来engine）、engine → config/inventory/module/transport/result、module → transport/result、inventory → configとする。transport/resultは上位層に依存しない。未実装パッケージはdoc.goで境界のみを示す。Host/Request/ResponseとConnector/Sessionはtransport、TaskResultはresultに配置した。TaskResultのtask_indexは0始まり、duration_msはミリ秒、changed/exit_codeのnilはJSON null、未実行はchanged=falseとexit_code=null。任意の下位エラーや接続資格情報を結果へ入れない。
+
+実運用対象、ドメイン認証、Playbook移行、WinRM、arm64、署名配布は将来検討として保留し、初期範囲には含めない。後続の順序と合格条件は[検証計画](windows-ansible-validation.md)に記載する。

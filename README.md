@@ -1,8 +1,28 @@
 # wintable
 
-Windowsネイティブで動作するGo製の構成管理CLIを設計しています。現在は設計段階で、実行可能なCLIやAnsible互換機能は未実装です。
+Windowsネイティブで動作するGo製の構成管理CLIです。Issue #3 で初期仕様とCLI基盤を実装しました。現在はhelpと引数検証が動作し、入力ファイル読込・SSH接続・モジュール実行・結果描画は後続Issueで実装します。
 
 - [Windows版Ansible相当ツールの設計](docs/design/windows-ansible.md)
 - [検証計画と後続実装](docs/design/windows-ansible-validation.md)
 
-Issue #1 の成果物は上記の設計資料です。初期実装案はWindows制御ノードからWindows管理対象へのSSH接続と、独自JSON形式のタスク定義です。既存Ansible Playbookの直接実行は対象外です。
+初期仕様はWindows 11 / Windows Server 2022以降のamd64制御・対象、SSH公開鍵認証とknown_hosts必須、cmd.exe既定シェル、PowerShell 5.1以上、独自JSON v1、command/file_contentです。採否・上限・非対応範囲は設計書のI-01決定表を参照してください。
+
+Go **1.27.3** に固定しています（外部依存なし）。Goの自動ツールチェーン取得には初回ネットワークアクセスが必要です。既存のGo 1.22.5ではビルドせず、go.modに従うツールチェーンを使用してください。
+
+```powershell
+$env:GOTOOLCHAIN = 'go1.27.3'
+go version
+go test ./...
+go vet ./...
+# 別OS上での開発時も対象はWindows amd64。専用シェル内で設定する。
+$env:GOOS = 'windows'
+$env:GOARCH = 'amd64'
+$env:CGO_ENABLED = '0'
+go build -trimpath -o dist/wintable.exe ./cmd/wintable
+.\dist\wintable.exe help
+.\dist\wintable.exe run --inventory inventory.json --tasks tasks.json
+```
+
+helpは終了0、不正引数は終了2。有効なrunも現段階では `execution_not_implemented` を標準エラーに出して終了3となり、ファイルやネットワークにはアクセスしません。`internal/cli.Run` のExecutor引数を後続engineへ接続する箇所として用意しています。Ctrl+Cのcontextを伝播します。
+
+`--include-output` は既定falseです。有効にすると任意コマンドの出力に秘密が含まれ得ます。完全な自動マスキングは保証しません。実接続・PowerShell互換性・Windows CI・ZIP配布は未検証・未実装です。
