@@ -4,7 +4,7 @@ param(
     [string]$BaseImage = 'mcr.microsoft.com/windows/servercore:ltsc2022',
     [ValidateSet('hyperv','process')][string]$Isolation = 'hyperv',
     [string]$OpenSSHDirectory = "$env:WINDIR\System32\OpenSSH",
-    [string]$ModuleTestPattern = '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?)$',
+    [string]$ModuleTestPattern = '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows)$',
     [string]$OutputDirectory
 )
 $ErrorActionPreference = 'Stop'
