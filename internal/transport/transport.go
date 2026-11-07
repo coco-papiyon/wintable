@@ -15,6 +15,9 @@ type Host struct {
 type Request struct {
 	Command string
 	Stdin   []byte
+	// StdoutLimit is bounded by WrapperResponseLimit; zero uses CaptureLimit.
+	// Module JSON contains two base64-encoded 1MiB streams plus framing.
+	StdoutLimit int
 }
 
 type CommunicationState string

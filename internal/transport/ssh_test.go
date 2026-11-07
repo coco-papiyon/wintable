@@ -376,3 +376,14 @@ func TestBoundedOutputBoundary(t *testing.T) {
 		}
 	}
 }
+
+func TestWrapperEnvelopeBoundary(t *testing.T) {
+	for _, n := range []int{WrapperResponseLimit - 1, WrapperResponseLimit, WrapperResponseLimit + 1} {
+		b := boundedOutput{limit: WrapperResponseLimit}
+		p := bytes.Repeat([]byte("x"), n)
+		count, e := b.Write(p)
+		if count != n || e != nil || len(b.data) != min(n, WrapperResponseLimit) || b.truncated != (n > WrapperResponseLimit) {
+			t.Fatal(n)
+		}
+	}
+}

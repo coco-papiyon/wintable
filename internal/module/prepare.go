@@ -7,6 +7,7 @@ import (
 	"github.com/coco-papiyon/wintable/internal/transport"
 	"strings"
 	"unicode/utf16"
+	"unicode/utf8"
 )
 
 const ContentLimit = 1048576
@@ -52,7 +53,8 @@ func QuoteCRT(s string) string {
 	return b.String()
 }
 func CommandLine(exe string, argv []string) string {
-	a := []string{QuoteCRT(exe)}
+	// ProcessStartInfo always quotes FileName, even when it has no spaces.
+	a := []string{`"` + exe + `"`}
 	for _, s := range argv {
 		a = append(a, QuoteCRT(s))
 	}
@@ -81,7 +83,7 @@ func (p Prepared) Request(finalLine string) (transport.Request, error) {
 	if e := ValidateWrapper(finalLine); e != nil {
 		return transport.Request{}, e
 	}
-	return transport.Request{Command: finalLine, Stdin: p.JSON()}, nil
+	return transport.Request{Command: finalLine, Stdin: p.JSON(), StdoutLimit: transport.WrapperResponseLimit}, nil
 }
 func Prepare(host string, task int, kind string, args map[string]any) (Prepared, error) {
 	bad := func() (Prepared, error) {
@@ -99,7 +101,7 @@ func Prepare(host string, task int, kind string, args map[string]any) (Prepared,
 	switch kind {
 	case "command":
 		exe, ok := args["executable"].(string)
-		if !ok || !config.WindowsAbsolute(exe) {
+		if !ok || !utf8.ValidString(exe) || !config.WindowsAbsolute(exe) {
 			return bad()
 		}
 		base := strings.ToLower(exe[strings.LastIndex(exe, "\\")+1:])
@@ -113,7 +115,7 @@ func Prepare(host string, task int, kind string, args map[string]any) (Prepared,
 		argv := []string{}
 		for _, x := range values {
 			s, ok := x.(string)
-			if !ok || strings.ContainsRune(s, 0) {
+			if !ok || !utf8.ValidString(s) || strings.ContainsRune(s, 0) {
 				return bad()
 			}
 			argv = append(argv, s)

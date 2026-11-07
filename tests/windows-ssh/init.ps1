@@ -1,4 +1,6 @@
 $ErrorActionPreference = 'Stop'
+$crtName = -join [char[]](0x65e5,0x672c,0x8a9e,0x20,0x7a7a,0x767d)
+Add-Type -Path C:/fixture/CRTReceiver.cs -OutputAssembly ("C:/fixture/$crtName.exe") -OutputType ConsoleApplication
 New-Item C:/ProgramData/ssh -ItemType Directory -Force | Out-Null
 # ContainerAdministrator is a synthetic container identity and cannot be
 # resolved by sshd's normal local-user logon. Create an isolated real SAM user.
@@ -24,7 +26,7 @@ KbdInteractiveAuthentication no
 PermitTTY no
 AllowUsers wintablessh
 AuthorizedKeysFile C:/ProgramData/ssh/administrators_authorized_keys
-LogLevel VERBOSE
+LogLevel DEBUG3
 SyslogFacility LOCAL0
 '@ | Set-Content C:/ProgramData/ssh/sshd_config -Encoding ascii
 # ContainerAdministrator has a container-specific SID. Use the well-known

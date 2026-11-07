@@ -2,7 +2,9 @@
 
 Issue #8のtransportを、Go模擬サーバーではなくWindows Server Core LTSC 2022内の
 Win32-OpenSSH・cmd.exe・PowerShell 5.1に接続して検証するためのfixtureです。
-製品のcommand/file_contentラッパーは使用しません。
+command-test.logの試験では製品の固定commandラッパーと実CRTパーサーを使用します。
+その後のtest.logのtransport単体試験は従来のreceiver.ps1を使用します。
+file_contentは対象外です。
 
 ## 前提と実行
 
