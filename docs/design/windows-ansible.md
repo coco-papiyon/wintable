@@ -242,3 +242,11 @@ transport/moduleは既知の原因をこのコードへ分類し、下位のerro
 
 `cli.RunResults` は検証済みOptionsを受けるResultExecutorからタスク配列と分類済みerrorを取得し、指定format/include-outputでFinishへ渡す。既存Runの整数Executorも維持する。
 実エンジンの接続は#7の範囲であり、実バイナリのnil Executorは引き続き終了3。
+
+## ホスト実行engine（I-05）
+
+`engine.Runtime.Execute` は検証済みPlan、Connector、固定起動行、モジュール応答解釈器を受け取ります。辞書順キューから最大forksホストを処理し、各ホストの一接続をタスク定義順で再利用します。割当順は辞書順ですが、並列Connectの呼出し・完了順は保証しません。
+接続は10秒、各タスクは接続後に独立したtimeoutを持ちます。失敗ホストの後続はskipped、他ホストは続行し、自動再試行しません。
+接続失敗は先頭unreachable・後続skipped（changed=false）。実行中の通信断・期限切れはfailed・changed=null。親キャンセル時は確定済み結果を保持し、実行中はcancelled・null、未開始はcancelled・falseです。結果はホスト名・task_index順です。Close失敗は内部エラーですが、終了130が優先します。
+Ctrl+Cで新規処理を止め接続を解放します。切断で対象プロセス停止は保証できません。変更不明時は対象状態を確認してから手動で再実行してください。
+`cli.RunEngine` が全件事前検証から結果描画まで接続します。SSHと実モジュールは後続Issueのため、本番mainは引き続き未実装終了3です。模擬V-04/06を実機SSH検証の合格とは扱いません。
