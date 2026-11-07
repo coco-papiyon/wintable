@@ -1,6 +1,6 @@
 # wintable
 
-Windowsネイティブで動作するGo製の構成管理CLIです。CLI基盤、JSON v1の厳密な入力検証、結果集計・描画を実装済みです。SSH接続・モジュール実行は後続Issueで実装します。
+Windowsネイティブで動作するGo製の構成管理CLIです。CLI基盤、JSON v1の厳密な入力検証、ホスト選択・変数展開・全件事前検証、結果集計・描画を実装済みです。SSH接続・モジュール実行は後続Issueで実装します。
 
 - [Windows版Ansible相当ツールの設計](docs/design/windows-ansible.md)
 - [検証計画と後続実装](docs/design/windows-ansible-validation.md)
