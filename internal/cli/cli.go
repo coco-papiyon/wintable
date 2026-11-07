@@ -3,9 +3,12 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/coco-papiyon/wintable/internal/config"
+	"github.com/coco-papiyon/wintable/internal/engine"
+	"github.com/coco-papiyon/wintable/internal/module"
 	"io"
 	"path/filepath"
 	"strings"
@@ -20,6 +23,7 @@ type Options struct {
 	Format                            string
 	IncludeOutput                     bool
 	Config                            *config.Bundle
+	Plan                              *engine.Plan
 }
 
 // Executor receives validated options and the signal-aware parent context.
@@ -55,6 +59,12 @@ Exit codes: 0 success/help, 1 target failure, 2 input, 3 internal, 130 cancelled
 
 // Run parses without network access. A nil executor is the explicit foundation stub.
 func Run(ctx context.Context, args []string, stdout, stderr io.Writer, execute Executor) int {
+	return RunWithWrappers(ctx, args, stdout, stderr, execute, nil)
+}
+
+// RunWithWrappers is the integration entry for distribution-provided final
+// OpenSSH/cmd launch lines. All are checked before the executor can connect.
+func RunWithWrappers(ctx context.Context, args []string, stdout, stderr io.Writer, execute Executor, wrapperLines []string) int {
 	showHelp := func() int {
 		if _, err := io.WriteString(stdout, help); err != nil {
 			return 3
@@ -110,6 +120,24 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer, execute E
 		return 2
 	}
 	o.Config = bundle
+	limitSet := false
+	fs.Visit(func(f *flag.Flag) {
+		if f.Name == "limit" {
+			limitSet = true
+		}
+	})
+	o.Plan, err = engine.Build(bundle, o.Limit, limitSet, wrapperLines...)
+	if err != nil {
+		fmt.Fprintln(stderr, err)
+		var size *module.SizeError
+		if errors.As(err, &size) && size.Internal {
+			return 3
+		}
+		if strings.HasPrefix(err.Error(), "internal_error:") {
+			return 3
+		}
+		return 2
+	}
 	if execute == nil {
 		fmt.Fprintln(stderr, "execution_not_implemented: engine integration pending")
 		return 3

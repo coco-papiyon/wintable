@@ -278,14 +278,14 @@ func LoadTasks(path string) (map[string]any, error) {
 		case "command":
 			g := v.obj(t["args"], p+".args", "executable", "argv")
 			s := v.str(g["executable"], p+".args.executable", false)
-			if !WindowsAbsolute(s) {
+			if !strings.Contains(s, "${") && !WindowsAbsolute(s) {
 				v.fail(p+".args.executable", "expected Windows drive absolute path")
 			}
 			v.strings(g["argv"], p+".args.argv", true)
 		case "file_content":
 			g := v.obj(t["args"], p+".args", "path", "content")
 			s := v.str(g["path"], p+".args.path", false)
-			if !WindowsAbsolute(s) {
+			if !strings.Contains(s, "${") && !WindowsAbsolute(s) {
 				v.fail(p+".args.path", "expected Windows drive absolute path")
 			}
 			v.str(g["content"], p+".args.content", true)
