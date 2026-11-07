@@ -105,3 +105,20 @@ Windows 11ホスト上で動かしても対象ユーザーランドはServer Cor
 
 参考: [Windowsコンテナの互換性](https://learn.microsoft.com/en-us/virtualization/windowscontainers/deploy-containers/version-compatibility)、
 [公式Win32-OpenSSH導入](https://github.com/PowerShell/Win32-OpenSSH/wiki/Install-Win32-OpenSSH)。
+
+## Issue #9の製品ラッパー検証（2026-11-08）
+
+同じ固定digest・Hyper-V環境で製品試験も実行しました。証跡は
+`.cache/windows-ssh/4726fe503440/`です。実cmdとSSHでCRT argv、子起動長、
+stdinサイズ、不正入力の実行抑止、非UTF-8生出力と各1MiB保持を確認しました。
+受信の小断片化により、長い要求で再現したstdinの停止を解消しています。
+詳細と未確認範囲は`docs/command-module.md`を参照してください。
+
+`wrapper-launch.json`はCIMで採取した実cmd起動行（7,401 UTF-16単位）です。
+7,999/8,000単位の実ラッパー起動と8,001のローカル拒否、UTF-8途中分割送信、
+未完JSON送信中の切断と副作用なしも試験します。失敗時の調査用に
+`processes.json`を保存します。fixture.jsonのContainerはこのスクリプトで
+生成した専用コンテナを指定してください。
+
+この成功はServer Core 2022の製品試験に限定します。Windows 11 SSH対象と
+フルServer 2022の未確認は残り、両OS受け入れ全体の合格ではありません。

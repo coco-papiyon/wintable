@@ -72,19 +72,20 @@ func TestCommandWindows(t *testing.T) {
 				defer session.Close()
 				target = `C:\fixture\日本語 空白.exe`
 			}
-			run := func(input []byte) transport.Response {
+			command := CommandWrapper()
+			run := func(t *testing.T, input []byte) transport.Response {
 				t.Helper()
 				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 				defer cancel()
 				if session != nil {
-					r, e := session.Run(ctx, transport.Request{Command: CommandWrapper(), Stdin: input, StdoutLimit: transport.WrapperResponseLimit})
+					r, e := session.Run(ctx, transport.Request{Command: command, Stdin: input, StdoutLimit: transport.WrapperResponseLimit})
 					if e != nil {
 						t.Fatal(e)
 					}
 					return r
 				}
 				c := exec.CommandContext(ctx, "cmd.exe")
-				c.SysProcAttr = rawCommand(CommandWrapper())
+				c.SysProcAttr = rawCommand(command)
 				c.Stdin = bytes.NewReader(input)
 				if len(input) < 4096 {
 					c.Stdin = &sevenBytes{bytes.NewReader(input)}
@@ -114,9 +115,27 @@ func TestCommandWindows(t *testing.T) {
 				}
 				return p.JSON()
 			}
+			t.Run("wrapper_launch_boundaries", func(t *testing.T) {
+				defer func() { command = CommandWrapper() }()
+				for _, n := range []int{7999, 8000, 8001} {
+					command = CommandWrapper() + strings.Repeat(" ", n-UTF16Len(WrapperLaunchLine(CommandWrapper())))
+					err := ValidateWrapper(WrapperLaunchLine(command))
+					if (err == nil) != (n <= 8000) {
+						t.Fatalf("wrapper line %d: %v", n, err)
+					}
+					if err != nil {
+						continue
+					} // rejected before SSH execution
+					row := DecodeCommand(run(t, payload([]string{})), false)
+					if row.Status != result.Changed {
+						t.Fatalf("wrapper line %d: %+v", n, row)
+					}
+					t.Logf("real wrapper launch accepted: %d UTF-16 units mode=%s", n, mode)
+				}
+			})
 			t.Run("CRT_roundtrip", func(t *testing.T) {
 				args := []string{"", "a b", "日本語", `a"b`, `a\\"b`, `trailing space\`, `\\`, "😀", "& | < > ^ %PATH% !x! $();`\r\n", strings.Repeat("x", 9000)}
-				r := run(payload(args))
+				r := run(t, payload(args))
 				row := DecodeCommand(r, true)
 				if row.Status != result.Changed || row.ExitCode == nil || *row.ExitCode != 0 {
 					t.Fatalf("%+v outer=%+v", row, r)
@@ -143,11 +162,11 @@ func TestCommandWindows(t *testing.T) {
 				}
 			})
 			t.Run("nonzero_and_bytes", func(t *testing.T) {
-				row := DecodeCommand(run(payload([]string{"--exit", "13"})), false)
+				row := DecodeCommand(run(t, payload([]string{"--exit", "13"})), false)
 				if row.Status != result.Failed || row.Changed != nil || row.ExitCode == nil || *row.ExitCode != 13 {
 					t.Fatal(row)
 				}
-				r := run(payload([]string{"--flood"}))
+				r := run(t, payload([]string{"--flood"}))
 				row = DecodeCommand(r, true)
 				if row.ExitCode == nil || *row.ExitCode != 7 || !row.StdoutTruncated || !row.StderrTruncated {
 					t.Fatalf("%+v response bytes=%d", row, len(r.Stdout))
@@ -172,7 +191,7 @@ func TestCommandWindows(t *testing.T) {
 				for _, n := range []int{32765, 32766, 32767} {
 					arg := strings.Repeat("x", n-UTF16Len(`"`+target+`"`)-1)
 					input, _ := json.Marshal(map[string]any{"module": "command", "args": map[string]any{"executable": target, "argv": []string{arg}}})
-					row := DecodeCommand(run(input), false)
+					row := DecodeCommand(run(t, input), false)
 					if (row.Status == result.Changed) != (n <= 32766) {
 						t.Fatalf("line %d: %+v", n, row)
 					}
@@ -180,7 +199,7 @@ func TestCommandWindows(t *testing.T) {
 				seed := payload([]string{})
 				for _, n := range []int{JSONLimit - 1, JSONLimit, JSONLimit + 1} {
 					input := append(append([]byte{}, seed...), bytes.Repeat([]byte(" "), n-len(seed))...)
-					row := DecodeCommand(run(input), false)
+					row := DecodeCommand(run(t, input), false)
 					if (row.Status == result.Changed) != (n <= JSONLimit) {
 						t.Fatalf("JSON %d: %+v", n, row)
 					}
@@ -194,7 +213,7 @@ func TestCommandWindows(t *testing.T) {
 				valid := payload([]string{"--marker", marker})
 				invalid := [][]byte{nil, []byte("[]"), []byte("null"), []byte(`{"module":"command","args":null}`), []byte(`{"module":"command","module":"command"}`), append(append([]byte{}, valid...), []byte(" {}")...), append([]byte{0xef, 0xbb, 0xbf}, valid...), append([]byte{0xff}, valid...), bytes.Replace(valid, []byte(`"module"`), []byte(`"unknown"`), 1), bytes.Replace(valid, []byte(`"module"`), []byte(`"args":{},"module"`), 1), bytes.Replace(valid, []byte(`"command"`), []byte(`"\u+001"`), 1), bytes.Replace(valid, []byte(`"command"`), []byte(`"\ud800"`), 1), bytes.Replace(valid, []byte(`"argv"`), []byte(`"argv":[],"argv"`), 1), []byte(`{"module":"command","args":{"executable":"C:\\Windows\\System32\\cmd.exe","argv":[]}}`)}
 				for i, input := range invalid {
-					r := run(input)
+					r := run(t, input)
 					if string(r.Stdout) != `{"error":"invalid_request"}` || len(r.Stderr) != 0 {
 						t.Fatalf("case %d: outer=%+v", i, r)
 					}
@@ -204,7 +223,7 @@ func TestCommandWindows(t *testing.T) {
 						t.Fatal("invalid input executed child")
 					}
 				} else {
-					row := DecodeCommand(run(payload([]string{"--assert-absent", marker})), false)
+					row := DecodeCommand(run(t, payload([]string{"--assert-absent", marker})), false)
 					if row.ExitCode == nil || *row.ExitCode != 0 {
 						t.Fatal("invalid input executed remote child")
 					}

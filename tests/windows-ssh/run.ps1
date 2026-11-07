@@ -97,8 +97,8 @@ try {
     "${address} $($pub[0]) $($pub[1])" | Set-Content "$output/known_hosts" -Encoding utf8NoBOM
     @{ Address=$address; Port=22; User='wintablessh'; Container=$name } | ConvertTo-Json | Set-Content "$output/fixture.json" -Encoding utf8NoBOM
     $env:WINTABLE_SSH_FIXTURE = $output
-    $manifest.command_test_command = 'go test ./internal/module -run ^TestCommandWindows$ -count=1 -v -timeout=4m'
-    & go test ./internal/module -run '^TestCommandWindows$' -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/command-test.log"
+    $manifest.command_test_command = 'go test ./internal/module -run ^TestCommand(Windows|SSHLaunchAndDisconnect)$ -count=1 -v -timeout=4m'
+    & go test ./internal/module -run '^TestCommand(Windows|SSHLaunchAndDisconnect)$' -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/command-test.log"
     $manifest.command_test_exit_code = $LASTEXITCODE
     if ($LASTEXITCODE) { throw 'command module acceptance failed' }
     $manifest.test_command = 'go test ./internal/transport -run ^TestWindowsOpenSSH$ -count=1 -v -timeout=4m'
@@ -111,6 +111,7 @@ try {
 } finally {
     $env:WINTABLE_SSH_FIXTURE = $oldFixture
     if ($created) {
+        try { Invoke-Docker exec $name powershell.exe -NoProfile -Command 'Get-CimInstance Win32_Process | Select-Object Name,ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Depth 3' | Set-Content "$output/processes.json" } catch { Write-Warning $_ }
         try { Invoke-Docker logs $name | Set-Content "$output/container.log" } catch { Write-Warning $_ }
         try { Invoke-Docker stop --time 1 $name | Out-Null } catch { Write-Warning $_ }
         foreach ($entry in @(@('C:/fixture/execs.log','execs.log'),@('C:/fixture/received-transfer.json','received-transfer.json'),@('C:/fixture/received-wait.json','received-wait.json'),@('C:/ProgramData/ssh/sshd.log','sshd.log'))) {
