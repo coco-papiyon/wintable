@@ -63,6 +63,12 @@ target state before manually repeating an interrupted task.
 
 ## Verification and remaining acceptance work
 
+Reproducible Windows Server Core/OpenSSH container fixtures and instructions:
+[tests/windows-ssh](../tests/windows-ssh/README.md). The 2026-11-07 attempt was
+blocked before SSH by Docker `hcsshim::ExpandScratchSize` (also reproducible
+with plain `cmd /c ver` containers); container acceptance is not yet confirmed.
+Server Core results do not substitute for a Windows 11 target.
+
 Automated tests use actual TCP/SSH protocol connections to an in-process Go SSH
 server on Windows. They cover plaintext/encrypted keys, wrong/missing
 passphrases, invalid key, unknown/changed trust, missing trust, bad public-key
