@@ -36,7 +36,7 @@ func TestWindowsOpenSSH(t *testing.T) {
 		t.Fatal(err)
 	}
 	host := Host{Address: cfg.Address, Port: cfg.Port, User: cfg.User, PrivateKeyFile: filepath.Join(dir, "client"), KnownHostsFile: filepath.Join(dir, "known_hosts")}
-	docker := func(args ...string) []byte {
+	docker := func(t *testing.T, args ...string) []byte {
 		t.Helper()
 		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 		defer cancel()
@@ -46,8 +46,10 @@ func TestWindowsOpenSSH(t *testing.T) {
 		}
 		return data
 	}
-	remote := func(path string) []byte { return docker("exec", cfg.Container, "cmd.exe", "/c", "type", path) }
-	connect := func(h Host) Session {
+	remote := func(t *testing.T, path string) []byte {
+		return docker(t, "exec", cfg.Container, "cmd.exe", "/c", "type", path)
+	}
+	connect := func(t *testing.T, h Host) Session {
 		t.Helper()
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
@@ -102,10 +104,10 @@ func TestWindowsOpenSSH(t *testing.T) {
 		if err != nil || !bytes.Equal(before, after) {
 			t.Fatal("trust modified")
 		}
-		docker("exec", cfg.Container, "powershell.exe", "-NoProfile", "-Command", `if (Test-Path C:\fixture\execs.log) { throw 'unexpected execution' }`)
+		docker(t, "exec", cfg.Container, "powershell.exe", "-NoProfile", "-Command", `if (Test-Path C:\fixture\execs.log) { throw 'unexpected execution' }`)
 	})
 	t.Run("V11_V18_transfer_EOF_drain_reuse", func(t *testing.T) {
-		s := connect(host)
+		s := connect(t, host)
 		defer s.Close()
 		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 		r, e := s.Run(ctx, Request{Command: command("version")})
@@ -133,7 +135,7 @@ func TestWindowsOpenSSH(t *testing.T) {
 				SHA256 string
 				EOF    bool
 			}
-			if err := json.Unmarshal(remote(`C:\fixture\received.json`), &got); err != nil {
+			if err := json.Unmarshal(remote(t, `C:\fixture\received-transfer.json`), &got); err != nil {
 				t.Fatal(err)
 			}
 			if got.Bytes != len(payload) || got.SHA256 != hex.EncodeToString(sum[:]) || !got.EOF {
@@ -143,7 +145,7 @@ func TestWindowsOpenSSH(t *testing.T) {
 	})
 	for _, mode := range []string{"blocked", "wait", "cancel", "close", "disconnect"} {
 		t.Run("V06_V18_"+mode, func(t *testing.T) {
-			s := connect(host)
+			s := connect(t, host)
 			defer s.Close()
 			ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
 			defer cancel()
@@ -195,7 +197,7 @@ func TestWindowsOpenSSH(t *testing.T) {
 	}
 	// Fixed expected receiver count also catches implicit reconnect/replay and
 	// rejection paths accidentally reaching exec. The disconnect case stops sshd.
-	lines := strings.Fields(string(remote(`C:\fixture\execs.log`)))
+	lines := strings.Fields(string(remote(t, `C:\fixture\execs.log`)))
 	want := []string{"version", "transfer", "transfer", "blocked", "wait", "blocked", "blocked", "disconnect"}
 	if strings.Join(lines, ",") != strings.Join(want, ",") {
 		t.Fatalf("unexpected execs: %v", lines)

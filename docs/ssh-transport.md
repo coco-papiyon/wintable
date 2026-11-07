@@ -64,9 +64,12 @@ target state before manually repeating an interrupted task.
 ## Verification and remaining acceptance work
 
 Reproducible Windows Server Core/OpenSSH container fixtures and instructions:
-[tests/windows-ssh](../tests/windows-ssh/README.md). The 2026-11-07 attempt was
-blocked before SSH by Docker `hcsshim::ExpandScratchSize` (also reproducible
-with plain `cmd /c ver` containers); container acceptance is not yet confirmed.
+[tests/windows-ssh](../tests/windows-ssh/README.md). After repulling the base
+image, all seven real OpenSSH container subtests passed on 2026-11-07 using
+Server Core 2022, PowerShell 5.1.20348.5773 and OpenSSH_for_Windows_9.5.
+Evidence includes byte/hash/EOF checks, capture limits, deadlines, cancellation,
+disconnect, exact execution counts and cleanup. The original Docker scratch
+error no longer blocks Hyper-V testing. See the fixture README for image digest.
 Server Core results do not substitute for a Windows 11 target.
 
 Automated tests use actual TCP/SSH protocol connections to an in-process Go SSH

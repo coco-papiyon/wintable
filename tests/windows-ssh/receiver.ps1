@@ -37,6 +37,6 @@ public static class FixtureIO {
 $received = [FixtureIO]::Exchange()
 $sha = [Security.Cryptography.SHA256]::Create()
 $digest = [BitConverter]::ToString($sha.ComputeHash($received)).Replace('-', '').ToLowerInvariant()
-[IO.File]::WriteAllText('C:\fixture\received.json', (@{ bytes = $received.Length; sha256 = $digest; eof = $true } | ConvertTo-Json -Compress))
+[IO.File]::WriteAllText("C:\fixture\received-$Mode.json", (@{ bytes = $received.Length; sha256 = $digest; eof = $true } | ConvertTo-Json -Compress))
 if ($Mode -eq 'wait') { Start-Sleep 120 }
 exit 7

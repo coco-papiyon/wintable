@@ -28,15 +28,19 @@ Win32-OpenSSH・cmd.exe・PowerShell 5.1に接続して検証するためのfixt
 
 出力は毎回新しい`.cache/windows-ssh/<実行ID>/`へ保存します。`-OutputDirectory`は
 存在しないパスだけを受け付けます。`manifest.json`にソースSHA／変更状態、fixtureの
-SHA-256、全OpenSSHファイルの版とSHA-256、Docker・Go版、ベースと完成イメージID、
+SHA-256、Go試験ソースのSHA-256、全OpenSSHファイルの版とSHA-256、Docker・Go版、ベースと完成イメージID、
 分離方式、実行コマンド、終了値、削除結果を記録します。`test.log`に対象OS・PowerShell・
 既定シェル、各ケースの結果を残します。版の違うOpenSSHで実行した結果を同一視しないでください。
 
 秘密鍵は実行ごとに生成し、ビルドコンテキストには入れず、finallyで削除します。
-公開鍵だけを`docker cp`でコンテナへ入れます。ホスト鍵も認証されたDocker管理経路の
-`docker cp`で取得してknown_hostsへ固定し、ssh-keyscanの自動信頼は使いません。
+公開鍵だけを起動前の`docker cp`でコンテナへ入れます。ホスト鍵も認証されたDocker管理経路の
+`docker exec`で取得してknown_hostsへ固定し、ssh-keyscanの自動信頼は使いません。
+実行中のHyper-Vコンテナでは`docker cp`を使えないため、証跡ファイルは停止後にコピーします。
 ポート公開・ホストディレクトリのマウントは行わず、ホストからコンテナNATアドレスへ接続します。
-コンテナ専用のContainerAdministratorを使うため、既存の対象機には流用しないでください。
+合成IDのContainerAdministratorはOpenSSHログインに使えないため、コンテナ専用の実ローカルユーザー
+`wintablessh`を管理者グループへ追加します。ランダムパスワードを生成しますが、SSHは公開鍵認証だけです。
+鍵ファイルはSYSTEM／Administratorsだけがアクセスできる厳密なACLに設定します。
+既存の対象機にはこの初期化スクリプトを流用しないでください。
 
 ## 検証内容
 
@@ -61,6 +65,9 @@ UTF-8の分割は受信側7バイト読取で確認します。TCPパケット�
 
 成功はスクリプト終了0、失敗は例外による非0です。通常の失敗でもfinallyでログ取得、
 専用コンテナと専用タグ、試験用秘密鍵の削除を実施します。ベースイメージは保持します。
+Dockerのbuildは10分、その他の管理呼出しは30秒で待機を打ち切ります。停止直後のexecが
+応答しなくなる場合も、無期限には待ちません。受信証跡は`received-transfer.json`と
+`received-wait.json`に分け、後続試験で転送結果を上書きしません。`sshd.log`も保存します。
 強制終了・ホスト再起動でfinallyが走らなかった場合は、該当実行IDだけを確認して削除します。
 
 ```powershell
@@ -73,19 +80,22 @@ Remove-Item -LiteralPath .cache/windows-ssh/<実行ID>/client
 
 ## 確認範囲と2026-11-07の実行結果
 
-Docker 29.9.2、ホストWindows build 26300.9818、既存Server Core LTSC 2022イメージ
-`sha256:652b2805d507...`で、Hyper-V／process分離ともビルドStep 3で次のエラーになりました。
+Docker 29.9.2、ホストWindows build 26300.9818、Go 1.27.3、Hyper-V分離で
+**全7サブテスト合格**を確認しました。ベースイメージはpullし直した次のdigestです。
 
 ```text
-hcsshim::ExpandScratchSize failed in Win32: The system cannot find the file specified. (0x2)
+mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09
 ```
 
-SSHを使わない最小の`docker run --rm --isolation=process ... cmd.exe /c ver`でも、
-Server Coreと既存winrmイメージの両方で同じエラーを確認しました。
-SSH試験以前のDockerストレージ／コンテナ作成段階の失敗です。ホスト側Docker設定や
-既存イメージを削除して修復する操作はしていません。**コンテナSSH試験は未実行・未合格**です。
-ビルド失敗のログとmanifestは`.cache/windows-ssh/046b345aeb94`（hyperv）、
-`83cc53bdee56`（process）へ保存されています。これらはローカル証跡でGitには含めません。
+対象: Server Core 2022（`cmd /c ver`: 10.0.20348.5773）、PowerShell 5.1.20348.5773、
+既定シェルcmd.exe、OpenSSH_for_Windows_9.5（sshd.exeファイル版9.5.6.4）。
+初回合格実行の証跡は`.cache/windows-ssh/db13ca82aaba/`。試験全体38.28秒、Goコマンド終了0、
+receiver実行履歴8件一致、専用コンテナ・専用イメージ・試験用秘密鍵削除を確認しました。
+これらはローカル証跡でGitには含めません。
+
+前回の`hcsshim::ExpandScratchSize`エラーはベースイメージ再pull後に解消しました。
+今回の動作確認で、サービス権限・鍵の厳密なACL・実ローカルユーザー作成・Hyper-Vの
+ファイル取得制約を修正しました。process分離は今回再検証していません。
 
 このfixtureの成功後も、Server Coreコンテナの結果をWindows 11対象の合格にはしません。
 Windows 11ホスト上で動かしても対象ユーザーランドはServer Coreです。

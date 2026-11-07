@@ -18,8 +18,27 @@ New-Item $output -ItemType Directory -Force | Out-Null
 $context = Join-Path $output 'context'
 New-Item "$context/OpenSSH" -ItemType Directory -Force | Out-Null
 function Invoke-Docker {
-    & docker @args
-    if ($LASTEXITCODE) { throw "docker failed ($LASTEXITCODE): $($args[0])" }
+    $info = [Diagnostics.ProcessStartInfo]::new('docker')
+    $info.UseShellExecute = $false
+    $info.CreateNoWindow = $true
+    $info.RedirectStandardOutput = $true
+    $info.RedirectStandardError = $true
+    foreach ($arg in $args) { $info.ArgumentList.Add([string]$arg) }
+    $process = [Diagnostics.Process]::Start($info)
+    $stdout = $process.StandardOutput.ReadToEndAsync()
+    $stderr = $process.StandardError.ReadToEndAsync()
+    $timeout = if ($args[0] -eq 'build') { 600000 } else { 30000 }
+    if (!$process.WaitForExit($timeout)) {
+        $process.Kill($true)
+        throw "docker timed out: $($args[0])"
+    }
+    $code = $process.ExitCode
+    $text = $stdout.GetAwaiter().GetResult()
+    $errors = $stderr.GetAwaiter().GetResult()
+    $process.Dispose()
+    if ($errors) { Write-Host $errors.TrimEnd() }
+    if ($text) { $text.TrimEnd() }
+    if ($code) { throw "docker failed ($code): $($args[0])" }
 }
 $oldFixture = $env:WINTABLE_SSH_FIXTURE
 $created = $false
@@ -37,6 +56,7 @@ try {
     $manifest = @{
         source_sha = (git rev-parse HEAD)
         source_status = @(git status --short)
+        test_sha256 = (Get-FileHash (Join-Path $repo 'internal/transport/ssh_windows_container_test.go') -Algorithm SHA256).Hash
         started_utc = [DateTime]::UtcNow.ToString('o')
         base_image = $BaseImage
         isolation = $Isolation
@@ -60,17 +80,19 @@ try {
     $ready = $false
     for ($i=0; $i -lt 60; $i++) {
         Start-Sleep 1
-        $status = & docker exec $name powershell.exe -NoProfile -Command '(Get-Service sshd).Status.ToString()' 2>$null
-        if ($LASTEXITCODE -eq 0 -and $status -eq 'Running') { $ready=$true; break }
+        if ((Invoke-Docker inspect $name --format '{{.State.Running}}') -ne 'true') { throw 'Container exited during sshd startup; see container.log' }
+        $status = Invoke-Docker exec $name powershell.exe -NoProfile -Command '(Get-Service sshd).Status.ToString()'
+        if ($status -eq 'Running') { $ready=$true; break }
     }
     if (!$ready) { throw 'sshd did not start; see container.log' }
     $address = (Invoke-Docker inspect $name --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}').Trim()
     if (!$address) { throw 'Container has no reachable NAT address' }
     # Trust comes through Docker, never unauthenticated ssh-keyscan or auto-enrolment.
-    Invoke-Docker cp "${name}:C:/ProgramData/ssh/ssh_host_ed25519_key.pub" "$output/host.pub"
+    # Hyper-V containers do not support docker cp while running.
+    Invoke-Docker exec $name cmd.exe /c type C:\ProgramData\ssh\ssh_host_ed25519_key.pub | Set-Content "$output/host.pub" -Encoding ascii
     $pub = (Get-Content "$output/host.pub" -Raw).Trim().Split(' ')
     "${address} $($pub[0]) $($pub[1])" | Set-Content "$output/known_hosts" -Encoding utf8NoBOM
-    @{ Address=$address; Port=22; User='ContainerAdministrator'; Container=$name } | ConvertTo-Json | Set-Content "$output/fixture.json" -Encoding utf8NoBOM
+    @{ Address=$address; Port=22; User='wintablessh'; Container=$name } | ConvertTo-Json | Set-Content "$output/fixture.json" -Encoding utf8NoBOM
     $env:WINTABLE_SSH_FIXTURE = $output
     $manifest.test_command = 'go test ./internal/transport -run ^TestWindowsOpenSSH$ -count=1 -v -timeout=4m'
     & go test ./internal/transport -run '^TestWindowsOpenSSH$' -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/test.log"
@@ -82,13 +104,14 @@ try {
 } finally {
     $env:WINTABLE_SSH_FIXTURE = $oldFixture
     if ($created) {
-        & docker logs $name 2>&1 | Set-Content "$output/container.log"
-        & docker cp "${name}:C:/fixture/execs.log" "$output/execs.log" 2>$null
-        & docker cp "${name}:C:/fixture/received.json" "$output/received.json" 2>$null
-        & docker rm -f $name | Out-Null
-        $containerRemoved = $LASTEXITCODE -eq 0
+        try { Invoke-Docker logs $name | Set-Content "$output/container.log" } catch { Write-Warning $_ }
+        try { Invoke-Docker stop --time 1 $name | Out-Null } catch { Write-Warning $_ }
+        foreach ($entry in @(@('C:/fixture/execs.log','execs.log'),@('C:/fixture/received-transfer.json','received-transfer.json'),@('C:/fixture/received-wait.json','received-wait.json'),@('C:/ProgramData/ssh/sshd.log','sshd.log'))) {
+            try { Invoke-Docker cp "${name}:$($entry[0])" "$output/$($entry[1])" } catch { Write-Warning $_ }
+        }
+        try { Invoke-Docker rm -f $name | Out-Null; $containerRemoved = $true } catch { $containerRemoved = $false; Write-Warning $_ }
     }
-    if ($built) { & docker image rm $image | Out-Null; $imageRemoved=$LASTEXITCODE -eq 0 }
+    if ($built) { try { Invoke-Docker image rm $image | Out-Null; $imageRemoved=$true } catch { $imageRemoved=$false; Write-Warning $_ } }
     # Only remove this run's known credential files, never directories supplied by a caller.
     if (Test-Path "$output/client") { Remove-Item -LiteralPath "$output/client" -Force }
     if ($manifest) {
