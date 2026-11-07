@@ -24,6 +24,8 @@ func TestClassifiedTransportErrors(t *testing.T) {
 		}{
 			{"authentication", result.PublicError("authentication_failed"), "authentication_failed", 1},
 			{"host_key", result.PublicError("host_key_failed"), "host_key_failed", 1},
+			{"unknown_host_key", result.PublicError("host_key_unknown"), "host_key_unknown", 1},
+			{"changed_host_key", result.PublicError("host_key_changed"), "host_key_changed", 1},
 			{"internal", result.PublicError("internal_error"), "internal_error", 3},
 			{"wrapped", fmt.Errorf("SECRET: %w", result.PublicError("host_key_failed")), "host_key_failed", 1},
 			{"unknown_code", &result.Error{Code: "SECRET"}, "internal_error", 3},
