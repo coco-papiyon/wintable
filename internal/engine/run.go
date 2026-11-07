@@ -93,6 +93,16 @@ func unstarted(h HostPlan, start int, status result.Status, code string) []resul
 	return rows
 }
 
+// transportError preserves explicit classifications, including wrapped errors,
+// but never uses lower-layer error text as a public code.
+func transportError(err error, fallback string) *result.Error {
+	var classified *result.Error
+	if errors.As(err, &classified) && classified != nil {
+		return result.PublicError(classified.Code)
+	}
+	return result.PublicError(fallback)
+}
+
 func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, output bool) (rows []result.TaskResult, failure error) {
 	if ctx.Err() != nil {
 		return unstarted(h, 0, result.Cancelled, "cancelled"), nil
@@ -138,7 +148,10 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 		}
 		rows = unstarted(h, 0, result.Skipped, "")
 		rows[0].Status = result.Unreachable
-		rows[0].Error = result.PublicError(code)
+		rows[0].Error = transportError(err, code)
+		if expired {
+			rows[0].Error = result.PublicError(code)
+		}
 		return rows, nil
 	}
 	for i, t := range h.Tasks {
@@ -173,7 +186,7 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 			row.Error = result.PublicError("deadline_exceeded")
 		case runErr != nil || response.Communication != transport.CommunicationComplete:
 			row.Status = result.Failed
-			row.Error = result.PublicError("connection_lost")
+			row.Error = transportError(runErr, "connection_lost")
 		default:
 			row.Status, row.Changed, row.Error = r.Decode(t, response)
 			if row.Status != result.OK && row.Status != result.Changed && row.Status != result.Failed {

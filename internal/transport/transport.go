@@ -37,6 +37,10 @@ type Response struct {
 }
 
 type Connector interface {
+	// Connect and Run may return a result.Error (also wrapped) to supply an
+	// explicit public classification. The engine sanitizes its Code through
+	// result.PublicError; unknown codes become internal_error. Unclassified
+	// errors use operation-specific connection defaults; raw text is never public.
 	// Connect must honor ctx and release partial resources on failure. A returned
 	// Session must outlive the connect context; the caller cancels it immediately.
 	Connect(context.Context, Host) (Session, error)

@@ -8,10 +8,70 @@ import (
 	"github.com/coco-papiyon/wintable/internal/module"
 	"github.com/coco-papiyon/wintable/internal/result"
 	"github.com/coco-papiyon/wintable/internal/transport"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 )
+
+func TestClassifiedTransportErrors(t *testing.T) {
+	for _, phase := range []string{"connect", "run"} {
+		for _, tc := range []struct {
+			name string
+			err  error
+			code string
+			exit int
+		}{
+			{"authentication", result.PublicError("authentication_failed"), "authentication_failed", 1},
+			{"host_key", result.PublicError("host_key_failed"), "host_key_failed", 1},
+			{"internal", result.PublicError("internal_error"), "internal_error", 3},
+			{"wrapped", fmt.Errorf("SECRET: %w", result.PublicError("host_key_failed")), "host_key_failed", 1},
+			{"unknown_code", &result.Error{Code: "SECRET"}, "internal_error", 3},
+			{"raw", errors.New("SECRET"), map[string]string{"connect": "connection_failed", "run": "connection_lost"}[phase], 1},
+		} {
+			t.Run(phase+"/"+tc.name, func(t *testing.T) {
+				p, r := fixture(t, 2)
+				closed, runs := 0, 0
+				r.Connector = connectorFunc(func(_ context.Context, h transport.Host) (transport.Session, error) {
+					if h.Name == "h000" && phase == "connect" {
+						return nil, tc.err
+					}
+					return &session{run: func(context.Context, transport.Request) (transport.Response, error) {
+						runs++
+						if h.Name == "h000" {
+							return transport.Response{}, tc.err
+						}
+						code := 0
+						return transport.Response{Communication: transport.CommunicationComplete, ExitCode: &code}, nil
+					}, close: func() error { closed++; return nil }}, nil
+				})
+				ctx := context.Background()
+				rows, err := r.Execute(ctx, p, 1, time.Second, false)
+				wantStatus, wantRuns, wantClosed := result.Unreachable, 3, 1
+				if phase == "run" {
+					wantStatus, wantRuns, wantClosed = result.Failed, 4, 2
+				}
+				if err != nil || len(rows) != 6 || rows[0].Status != wantStatus || rows[0].Error.Code != tc.code || runs != wantRuns || closed != wantClosed {
+					t.Fatalf("rows=%+v err=%v runs=%d closed=%d", rows, err, runs, closed)
+				}
+				if (phase == "run") != (rows[0].Changed == nil) || rows[1].Status != result.Skipped || rows[2].Status != result.Skipped || rows[5].Status != result.Changed {
+					t.Fatal(rows)
+				}
+				for _, format := range []string{"json", "text"} {
+					var out, diag bytes.Buffer
+					if exit := result.Finish(ctx, &out, &diag, rows, format, false, err); exit != tc.exit || strings.Contains(out.String()+diag.String(), "SECRET") {
+						t.Fatalf("exit=%d output=%s diagnostic=%s", exit, out.String(), diag.String())
+					}
+					cancelled, cancel := context.WithCancel(ctx)
+					cancel()
+					if exit := result.Finish(cancelled, &out, &diag, rows, format, false, err); exit != 130 {
+						t.Fatal(exit)
+					}
+				}
+			})
+		}
+	}
+}
 
 type connectorFunc func(context.Context, transport.Host) (transport.Session, error)
 
