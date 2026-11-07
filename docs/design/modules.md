@@ -67,7 +67,7 @@ JSON v1は未知キー・重複キー・型違いを拒否する。対象ホス�
 | executable | string、必須、既定なし | ドライブ絶対パスの.exe。UNC/device、制御文字、cmd.exeを拒否 |
 | argv | string配列、必須、既定なし | 空配列・空要素可、NUL不可。CRT規則で引用 |
 
-`ProcessStartInfo`のUseShellExecute=falseで直接起動。シェル演算子は文字列であり、バッチ/.com/.ps1や独自引数解析exeは対応外。作業ディレクトリ指定・子stdin入力はなく子stdinは閉じる。非冪等で、正常起動して終了0ならok/changed=true、非0ならfailed/changed=nullで子exit_codeを返す。拒否・起動失敗・不正応答は失敗とし、詳細なnull判定とプロトコルはcommand詳細を正本とする。
+`ProcessStartInfo`のUseShellExecute=falseで直接起動。シェル演算子は文字列であり、バッチ/.com/.ps1や独自引数解析exeは対応外。作業ディレクトリ指定・子stdin入力はなく子stdinは閉じる。非冪等で、正常起動して終了0ならstatus=changed / changed=true、非0ならfailed/changed=nullで子exit_codeを返す。拒否・起動失敗・不正応答は失敗とし、詳細なnull判定とプロトコルはcommand詳細を正本とする。
 
 最終子起動行は32,766 UTF-16単位以下（終端NUL除外、非BMPは2単位）。stdout/stderrは各1MiB保持後も読み捨てて回収し、固定ラッパー応答には最大3MiBのtransport枠を使う。不正base64、外側stderr/非0、応答超過等はfailed/null。外側PowerShellと子の終了値を混同しない。
 
@@ -77,13 +77,13 @@ JSON v1は未知キー・重複キー・型違いを拒否する。対象ホス�
 {"version":1,"hosts":"windows","tasks":[{"name":"実行者確認","module":"command","args":{"executable":"C:\\Windows\\System32\\whoami.exe","argv":[]}}]}
 ```
 
-成功はok/true/exit_code=0。失敗例として存在しない `C:\\missing.exe` は起動失敗、`cmd.exe`指定は接続前の入力不正、32,767単位の子起動行は接続前の上限超過。実機確認はWindows 11ローカルとServer Core 2022コンテナSSHまでで、Windows 11のSSH対象・フルServer 2022は未確認。詳細の試験項目・証跡はcommand詳細参照。
+成功はstatus=changed / changed=true / exit_code=0。失敗例として存在しない `C:\\missing.exe` は起動失敗、`cmd.exe`指定は接続前の入力不正、32,767単位の子起動行は接続前の上限超過。実機確認はWindows 11ローカルとServer Core 2022コンテナSSHまでで、Windows 11のSSH対象・フルServer 2022は未確認。詳細の試験項目・証跡はcommand詳細参照。
 
 ## file_content：入力検証のみ／別ブランチ実装中
 
 mainにはconfigとPrepareのpath/content検証とサイズ検査があるが、標準CLIのWrappersはcommandのみ。下記は採用済み設計と[Issue #10](https://github.com/coco-papiyon/wintable/issues/10)の実装案であり、mainの実行保証ではない。参照ブランチ `feature/issue_#10`、SHA `ea05cf966443cf95383c61e6a5d7857f1fd2ffc3` の [仕様書](https://github.com/coco-papiyon/wintable/blob/ea05cf966443cf95383c61e6a5d7857f1fd2ffc3/docs/file-content-module.md) を参照。取り込み後に対応状態を更新する。
 
-pathは必須stringのドライブ絶対パス、contentは必須string（空可）、既定値なし。contentのUTF-8は1MiB以下、JSON全体2MiB以下。BOMを付加せず、LF/CRLF・末尾改行を保持しバイト比較する。同値はok/false、未存在は空内容でも新規作成でok/true、差分置換はok/trueを目指す。
+pathは必須stringのドライブ絶対パス、contentは必須string（空可）、既定値なし。contentのUTF-8は1MiB以下、JSON全体2MiB以下。BOMを付加せず、LF/CRLF・末尾改行を保持しバイト比較する。同値はok/false、未存在は空内容でも新規作成でchanged/true、差分置換はchanged/trueを目指す。
 
 親ディレクトリは既存必須。対象・祖先のreparse point、通常ファイル以外、曖昧なWin32パスを拒否する。同一ディレクトリの排他的tempへ書込み・flush後、既存はFile.Replace、新規は上書きしないMoveで確定する。既存DACL保持、所有者管理なし。比較時点のCASは保証せず並行置換は最後の成功内容が残る。確定前の拒否はfailed/false、確定API以降の失敗・清掃失敗・通信断は変更不明null。自動再送なし。外部プロセスとの全競合、全ACLエラー経路、Windows 11 SSH・フルServerの実機確認は未完了。
 
@@ -97,7 +97,7 @@ pathは必須stringのドライブ絶対パス、contentは必須string（空可
 
 以降はすべて提案であり現行JSON v1で受理されるモジュールではない。固定コード＋stdinデータの境界、接続前全件検証、出力非公開と上限、失敗後のホスト停止を継承する。各引数は表記した必須以外は任意、既定は明記の通り。state列挙以外・未知キーは拒否する。対象OSは現行と同じで、管理操作にはSSHユーザー自身の必要権限を要求し、昇格は行わない。
 
-状態を読んで差分がなければok/false、変更して再読取が期待値と一致したらok/true。副作用前の拒否はfailed/false、書込み後の確証喪失はfailed/null。複数資源のトランザクションや自動ロールバックは保証しない。読み取り専用は常にchanged=false。facts/statの構造化データとreboot_requiredは現行結果契約にないため、上限・秘密除外を含む結果スキーマ拡張を別途決定する。
+以下のstatus/changed表記は現行結果契約を継承する。状態を読んで差分がなければok/false、変更して再読取が期待値と一致したらchanged/true。副作用前の拒否はfailed/false、書込み後の確証喪失はfailed/null。複数資源のトランザクションや自動ロールバックは保証しない。読み取り専用は常にchanged=false。facts/statの構造化データとreboot_requiredは現行結果契約にないため、上限・秘密除外を含む結果スキーマ拡張を別途決定する。
 
 ### P1：基本構成
 
