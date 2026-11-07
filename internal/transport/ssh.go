@@ -109,15 +109,21 @@ type sshSession struct {
 func (s *sshSession) Close() error { s.once.Do(func() { _ = s.client.Close() }); return nil }
 
 const CaptureLimit = 1 << 20
+const WrapperResponseLimit = 3 << 20
 
 type boundedOutput struct {
 	data      []byte
 	truncated bool
+	limit     int
 }
 
 func (b *boundedOutput) Write(p []byte) (int, error) {
 	n := len(p)
-	keep := CaptureLimit - len(b.data)
+	limit := b.limit
+	if limit == 0 {
+		limit = CaptureLimit
+	}
+	keep := limit - len(b.data)
 	if len(p) > keep {
 		b.truncated = true
 		p = p[:keep]
@@ -130,6 +136,9 @@ func (s *sshSession) Run(ctx context.Context, req Request) (Response, error) {
 	s.run.Lock()
 	defer s.run.Unlock()
 	response := Response{Communication: CommunicationInterrupted}
+	if req.StdoutLimit < 0 || req.StdoutLimit > WrapperResponseLimit {
+		return response, result.PublicError("internal_error")
+	}
 	if ctx.Err() != nil {
 		return response, contextError(ctx, "connection_lost")
 	}
@@ -145,6 +154,7 @@ func (s *sshSession) Run(ctx context.Context, req Request) (Response, error) {
 		return response, result.PublicError("connection_lost")
 	}
 	var stdout, stderr boundedOutput
+	stdout.limit = req.StdoutLimit
 	task.Stdout = &stdout
 	task.Stderr = &stderr
 	// Start requests exec only. No PTY, shell, environment or task interpolation.

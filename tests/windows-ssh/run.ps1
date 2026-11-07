@@ -53,10 +53,13 @@ try {
     # Copy program files only: a custom installation may also contain host keys.
     Get-ChildItem $OpenSSHDirectory -File | Where-Object { $_.Extension -in '.exe','.dll' -or $_.Name -in 'LICENSE.txt','NOTICE.txt','moduli','sshd_config_default' } | Copy-Item -Destination "$context/OpenSSH"
     Copy-Item "$PSScriptRoot/Dockerfile", "$PSScriptRoot/init.ps1", "$PSScriptRoot/start.ps1", "$PSScriptRoot/receiver.ps1" $context
+    Copy-Item "$repo/tests/command/CRTReceiver.cs" $context
     $manifest = @{
         source_sha = (git rev-parse HEAD)
         source_status = @(git status --short)
         test_sha256 = (Get-FileHash (Join-Path $repo 'internal/transport/ssh_windows_container_test.go') -Algorithm SHA256).Hash
+        command_sources = @(Get-ChildItem "$repo/internal/module" -File | ForEach-Object { @{ name=$_.Name; sha256=(Get-FileHash $_.FullName -Algorithm SHA256).Hash } })
+        crt_sha256 = (Get-FileHash "$repo/tests/command/CRTReceiver.cs" -Algorithm SHA256).Hash
         started_utc = [DateTime]::UtcNow.ToString('o')
         base_image = $BaseImage
         isolation = $Isolation
@@ -94,6 +97,10 @@ try {
     "${address} $($pub[0]) $($pub[1])" | Set-Content "$output/known_hosts" -Encoding utf8NoBOM
     @{ Address=$address; Port=22; User='wintablessh'; Container=$name } | ConvertTo-Json | Set-Content "$output/fixture.json" -Encoding utf8NoBOM
     $env:WINTABLE_SSH_FIXTURE = $output
+    $manifest.command_test_command = 'go test ./internal/module -run ^TestCommand(Windows|SSHLaunchAndDisconnect)$ -count=1 -v -timeout=4m'
+    & go test ./internal/module -run '^TestCommand(Windows|SSHLaunchAndDisconnect)$' -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/command-test.log"
+    $manifest.command_test_exit_code = $LASTEXITCODE
+    if ($LASTEXITCODE) { throw 'command module acceptance failed' }
     $manifest.test_command = 'go test ./internal/transport -run ^TestWindowsOpenSSH$ -count=1 -v -timeout=4m'
     & go test ./internal/transport -run '^TestWindowsOpenSSH$' -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/test.log"
     $result = $LASTEXITCODE
@@ -104,6 +111,7 @@ try {
 } finally {
     $env:WINTABLE_SSH_FIXTURE = $oldFixture
     if ($created) {
+        try { Invoke-Docker exec $name powershell.exe -NoProfile -Command 'Get-CimInstance Win32_Process | Select-Object Name,ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Depth 3' | Set-Content "$output/processes.json" } catch { Write-Warning $_ }
         try { Invoke-Docker logs $name | Set-Content "$output/container.log" } catch { Write-Warning $_ }
         try { Invoke-Docker stop --time 1 $name | Out-Null } catch { Write-Warning $_ }
         foreach ($entry in @(@('C:/fixture/execs.log','execs.log'),@('C:/fixture/received-transfer.json','received-transfer.json'),@('C:/fixture/received-wait.json','received-wait.json'),@('C:/ProgramData/ssh/sshd.log','sshd.log'))) {

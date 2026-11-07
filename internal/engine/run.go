@@ -21,12 +21,14 @@ type Runtime struct {
 	Connector transport.Connector
 	Wrappers  map[string]string
 	Decode    func(TaskPlan, transport.Response) (result.Status, *bool, *result.Error)
+	// DecodeResult receives wrapper JSON and returns only module-owned fields.
+	DecodeResult func(TaskPlan, transport.Response, bool) result.TaskResult
 }
 
 // Execute consumes an entirely validated plan. It never retries or reserializes
 // payloads. Slots remain occupied until session cleanup has completed.
 func (r Runtime) Execute(ctx context.Context, p *Plan, forks int, timeout time.Duration, output bool) ([]result.TaskResult, error) {
-	if p == nil || forks < 1 || forks > 64 || timeout <= 0 || r.Connector == nil || r.Decode == nil {
+	if p == nil || forks < 1 || forks > 64 || timeout <= 0 || r.Connector == nil || (r.Decode == nil && r.DecodeResult == nil) {
 		return nil, result.PublicError("internal_error")
 	}
 	hosts := append([]HostPlan(nil), p.Hosts...)
@@ -177,6 +179,9 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 		deadline := taskCtx.Err() != nil || errors.Is(runErr, context.DeadlineExceeded)
 		stop()
 		row := result.TaskResult{Host: h.Name, Task: t.Name, TaskIndex: i, DurationMS: time.Since(start).Milliseconds(), ExitCode: response.ExitCode}
+		if r.DecodeResult != nil {
+			row.ExitCode = nil
+		} // outer wrapper status is never a child exit code
 		switch {
 		case ctx.Err() != nil:
 			row.Status = result.Cancelled
@@ -188,7 +193,14 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 			row.Status = result.Failed
 			row.Error = transportError(runErr, "connection_lost")
 		default:
-			row.Status, row.Changed, row.Error = r.Decode(t, response)
+			if r.DecodeResult != nil {
+				decoded := r.DecodeResult(t, response, output)
+				row.Status, row.Changed, row.Error, row.ExitCode = decoded.Status, decoded.Changed, decoded.Error, decoded.ExitCode
+				row.StdoutBase64, row.StderrBase64 = decoded.StdoutBase64, decoded.StderrBase64
+				row.StdoutTruncated, row.StderrTruncated = decoded.StdoutTruncated, decoded.StderrTruncated
+			} else {
+				row.Status, row.Changed, row.Error = r.Decode(t, response)
+			}
 			if row.Status != result.OK && row.Status != result.Changed && row.Status != result.Failed {
 				row.Status = result.Failed
 				row.Changed = nil
@@ -198,7 +210,7 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 				row.Error = result.PublicError(row.Error.Code)
 			}
 		}
-		if output {
+		if output && r.DecodeResult == nil {
 			a, b := result.NewCapture(true), result.NewCapture(true)
 			a.Write(response.Stdout)
 			b.Write(response.Stderr)

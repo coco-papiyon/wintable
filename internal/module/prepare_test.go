@@ -18,7 +18,7 @@ func TestCRT(t *testing.T) {
 	}
 	for _, n := range []int{32765, 32766, 32767} {
 		exe := `C:\a.exe`
-		arg := "😀" + strings.Repeat("x", n-len(exe)-3)
+		arg := "😀" + strings.Repeat("x", n-len(exe)-5)
 		_, e := Prepare("h", 1, "command", map[string]any{"executable": exe, "argv": []any{arg}})
 		if (e == nil) != (n <= CommandLimit) {
 			t.Fatalf("command %d: %v", n, e)
