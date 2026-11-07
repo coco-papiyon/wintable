@@ -203,3 +203,11 @@ Issue #3 の実装依頼と本文計画に基づき、次を採用する。設�
 依存方向はcmd → cli → 注入Executor（将来engine）、engine → config/inventory/module/transport/result、module → transport/result、inventory → configとする。transport/resultは上位層に依存しない。未実装パッケージはdoc.goで境界のみを示す。Host/Request/ResponseとConnector/Sessionはtransport、TaskResultはresultに配置した。TaskResultのtask_indexは0始まり、duration_msはミリ秒、changed/exit_codeのnilはJSON null、未実行はchanged=falseとexit_code=null。任意の下位エラーや接続資格情報を結果へ入れない。
 
 実運用対象、ドメイン認証、Playbook移行、WinRM、arm64、署名配布は将来検討として保留し、初期範囲には含めない。後続の順序と合格条件は[検証計画](windows-ansible-validation.md)に記載する。
+
+### I-02 入力検証の具体化
+
+- vars-fileはversionラッパーなしの文字列辞書。Inventoryのdefaults/groups/varsは省略可、hostsは非空で必須。各hostのaddress/user/private_key_file/known_hosts_fileは必須、port省略時は22。tasksのhostsと非空tasks、各taskのname/module/args、module固有の全引数は必須。空のargvとcontent、変数値は許容する。
+- 対象Windowsパスはドライブ文字・コロン・バックスラッシュで始まる絶対パスのみ受理する。UNCとデバイス名前空間は初期v1では非対応。対象パスには制御側filepathを適用しない。
+- CLIファイル引数は作業ディレクトリから絶対化し、Inventoryの鍵・known_hosts相対参照はInventory配置先から解決する。参照先の存在・ファイル種別・読込権限・鍵形式は後続の認証準備で検査する。JSON検証で鍵内容を読み込まない。
+- 診断は固定文言とファイル種別・スキーマ位置を返す。任意の辞書キーは入力順（構文解析）または辞書順（スキーマ検証）の0始まりmember番号で示し、入力本文やキー・値を表示しない。
+- サンプルはexamples/inventory.json、tasks.json、vars.json。サイズ上限は変数展開後の後続検査に属し、入力ファイル自体の追加上限は設けない。ホスト選択・名前の衝突・変数展開はIssue #5の範囲。

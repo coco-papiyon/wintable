@@ -1,4 +1,3 @@
-// Package config will own strict JSON v1 decoding and schema validation.
-// It must reject unknown/duplicate keys and trailing data before any connection.
-// It is independent of CLI and transport implementations.
+// Package config owns strict UTF-8 JSON v1 decoding and schema validation.
+// It rejects invalid inputs before execution and never echoes supplied values.
 package config

@@ -5,7 +5,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/coco-papiyon/wintable/internal/config"
 	"io"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -17,6 +19,7 @@ type Options struct {
 	Timeout                           time.Duration
 	Format                            string
 	IncludeOutput                     bool
+	Config                            *config.Bundle
 }
 
 // Executor receives validated options and the signal-aware parent context.
@@ -44,7 +47,7 @@ dynamic inventory, check mode, retries, rollback, WinRM, arm64 and Linux targets
 Output bodies may contain secrets from arbitrary commands. Automatic masking
 is not guaranteed; enable --include-output only when appropriate.
 
-Foundation stage: no files are read and no connections are made yet.
+Input files are strictly validated before execution. No connections are made yet.
 Valid run options report execution_not_implemented and exit 3 until the engine
 is integrated. JSON result rendering is also deferred to the result stage.
 Exit codes: 0 success/help, 1 target failure, 2 input, 3 internal, 130 cancelled.
@@ -91,6 +94,22 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer, execute E
 	if ctx.Err() != nil {
 		return 130
 	}
+	for _, path := range []*string{&o.Inventory, &o.Tasks, &o.VarsFile} {
+		if *path != "" {
+			resolved, err := filepath.Abs(*path)
+			if err != nil {
+				fmt.Fprintln(stderr, "input_error: cannot resolve CLI file path")
+				return 2
+			}
+			*path = resolved
+		}
+	}
+	bundle, err := config.Load(o.Inventory, o.Tasks, o.VarsFile)
+	if err != nil {
+		fmt.Fprintln(stderr, err)
+		return 2
+	}
+	o.Config = bundle
 	if execute == nil {
 		fmt.Fprintln(stderr, "execution_not_implemented: engine integration pending")
 		return 3

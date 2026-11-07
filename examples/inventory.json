@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "defaults": {"vars": {"message": "hello"}},
+  "groups": {"windows": {"hosts": ["win01"], "vars": {}}},
+  "hosts": {
+    "win01": {
+      "address": "win01.example.test",
+      "port": 22,
+      "user": "automation",
+      "private_key_file": "./keys/automation",
+      "known_hosts_file": "./known_hosts",
+      "vars": {"message": "こんにちは"}
+    }
+  }
+}
