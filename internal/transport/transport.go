@@ -37,6 +37,12 @@ type Response struct {
 }
 
 type Connector interface {
+	// Connect and Run may return a result.Error (also wrapped) to supply an
+	// explicit public classification. The engine sanitizes its Code through
+	// result.PublicError; unknown codes become internal_error. Unclassified
+	// errors use operation-specific connection defaults; raw text is never public.
+	// Connect must honor ctx and release partial resources on failure. A returned
+	// Session must outlive the connect context; the caller cancels it immediately.
 	Connect(context.Context, Host) (Session, error)
 }
 
@@ -45,6 +51,8 @@ type Connector interface {
 // never retry a request. Run errors describe transport/timeout/cancellation;
 // partial Response data may still be available. Closing the session does not
 // guarantee termination of a remote child process. Callers always Close after use.
+// Close must be safe concurrently with Run and promptly unblock its I/O. The
+// engine invokes Close exactly once, including cancellation and deadline paths.
 type Session interface {
 	Run(context.Context, Request) (Response, error)
 	Close() error

@@ -63,3 +63,5 @@ I-04単体検証: internal/result/report_test.goでV-12の全status、ホスト/
 V-11出力単体では0、1MiB−1/同値/+1、5MiBの任意バイトをCaptureへ流し、全量消費・保持上限・base64往復・既定本文除去・エラー秘密非出力を確認する。既存本文の描画時上限制限も検査する。
 CLIは診断/help障害、キャンセル優先、ResultExecutorのJSON/テキスト出力を確認する。実SSHの並行排出・Ctrl+C接続解放・Windows実機項目は後続Issueで未確認。
 I-03ではV-02/03/15/17の単体検査、V-16の合成最終行検査を追加。content/JSON/CRT/ラッパーの同値と±1、非BMP、CRT引用符・末尾バックスラッシュ、最後のホスト・タスクの不正による部分計画非返却とCLI Executor呼出0回、送信バイト列の所有権を検査する。実ラッパー、OpenSSH/cmd接頭辞、対象exeのargv往復と両対象OSの実測は後続Issueで未確認。
+
+I-05: internal/engine/run_test.go で模擬V-04/06（forks=1/3/64、順序、失敗停止、接続返却時キャンセル、期限切れ、Close一回、Close失敗）を検証。実SSH・実Ctrl+C・対象プロセス状態は後続Issueで実測する。
