@@ -17,7 +17,7 @@ const OutputLimit = 1 << 20
 // classify causes without copying error text; unknown codes become internal_error.
 func PublicError(code string) *Error {
 	switch code {
-	case "input_error", "connection_failed", "authentication_failed", "host_key_failed", "task_failed", "deadline_exceeded", "connection_lost", "cancelled", "internal_error", "output_failed", "execution_not_implemented":
+	case "input_error", "connection_failed", "authentication_failed", "host_key_failed", "host_key_unknown", "host_key_changed", "task_failed", "deadline_exceeded", "connection_lost", "cancelled", "internal_error", "output_failed", "execution_not_implemented":
 	default:
 		code = "internal_error"
 	}
@@ -254,7 +254,7 @@ func Finish(ctx context.Context, stdout, stderr io.Writer, tasks []TaskResult, f
 			code = 2
 		case "cancelled":
 			code = 130
-		case "connection_failed", "authentication_failed", "host_key_failed", "task_failed", "deadline_exceeded", "connection_lost":
+		case "connection_failed", "authentication_failed", "host_key_failed", "host_key_unknown", "host_key_changed", "task_failed", "deadline_exceeded", "connection_lost":
 			code = 1
 		}
 		codes = append(codes, code)
