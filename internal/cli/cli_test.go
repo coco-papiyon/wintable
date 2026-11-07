@@ -5,6 +5,8 @@ import (
 	"context"
 	"errors"
 	"io"
+	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -47,6 +49,7 @@ func TestInvalidInputNeverExecutes(t *testing.T) {
 }
 
 func TestOptionsAndContext(t *testing.T) {
+	validFiles(t)
 	type key struct{}
 	ctx := context.WithValue(context.Background(), key{}, "context marker")
 	for _, n := range []string{"1", "64"} {
@@ -59,6 +62,13 @@ func TestOptionsAndContext(t *testing.T) {
 				forks = 64
 			}
 			want := Options{Inventory: "i", Tasks: "t", Limit: "win01,win02", Forks: forks, Timeout: time.Millisecond, Format: "json", VarsFile: "v", IncludeOutput: true}
+			want.Inventory, _ = filepath.Abs(want.Inventory)
+			want.Tasks, _ = filepath.Abs(want.Tasks)
+			want.VarsFile, _ = filepath.Abs(want.VarsFile)
+			if got.Config == nil {
+				t.Fatal("missing validated config")
+			}
+			got.Config = nil
 			if !reflect.DeepEqual(got, want) || gotCtx != ctx {
 				t.Fatalf("got %+v, ctx %v", got, gotCtx)
 			}
@@ -70,6 +80,9 @@ func TestOptionsAndContext(t *testing.T) {
 	}
 	Run(ctx, []string{"run", "--inventory", "i", "--tasks", "t"}, io.Discard, io.Discard, func(_ context.Context, o Options) int {
 		want := Options{Inventory: "i", Tasks: "t", Forks: 5, Timeout: 60 * time.Second, Format: "text"}
+		want.Inventory, _ = filepath.Abs(want.Inventory)
+		want.Tasks, _ = filepath.Abs(want.Tasks)
+		o.Config = nil
 		if o != want {
 			t.Fatalf("defaults: %+v", o)
 		}
@@ -78,6 +91,7 @@ func TestOptionsAndContext(t *testing.T) {
 }
 
 func TestCancellation(t *testing.T) {
+	validFiles(t)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	args := []string{"run", "--inventory", "i", "--tasks", "t"}
@@ -97,8 +111,9 @@ func TestCancellation(t *testing.T) {
 }
 
 func TestFoundationDoesNotReportSuccess(t *testing.T) {
+	validFiles(t)
 	var out, errOut bytes.Buffer
-	code := Run(context.Background(), []string{"run", "--inventory", "missing", "--tasks", "missing"}, &out, &errOut, nil)
+	code := Run(context.Background(), []string{"run", "--inventory", "i", "--tasks", "t"}, &out, &errOut, nil)
 	if code != 3 || out.Len() != 0 || !strings.Contains(errOut.String(), "execution_not_implemented") {
 		t.Fatalf("%d %q %q", code, out.String(), errOut.String())
 	}
@@ -118,5 +133,58 @@ func TestInvalidValueIsNotEchoed(t *testing.T) {
 	Run(context.Background(), []string{"run", "--timeout=secret-value"}, io.Discard, &out, nil)
 	if strings.Contains(out.String(), "secret-value") {
 		t.Fatal("raw argument leaked")
+	}
+}
+
+func validFiles(t *testing.T) {
+	t.Helper()
+	t.Chdir(t.TempDir())
+	for name, data := range map[string]string{
+		"i": `{"version":1,"hosts":{"win":{"address":"localhost","user":"user","private_key_file":"key","known_hosts_file":"known"}}}`,
+		"t": `{"version":1,"hosts":"all","tasks":[{"name":"test","module":"command","args":{"executable":"C:\\Windows\\whoami.exe","argv":[]}}]}`,
+		"v": `{}`,
+	} {
+		if err := os.WriteFile(name, []byte(data), 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestFilesRejectedBeforeExecutor(t *testing.T) {
+	for _, name := range []string{"i", "t", "v"} {
+		t.Run(name, func(t *testing.T) {
+			validFiles(t)
+			if err := os.WriteFile(name, []byte(`{"SECRET":"secret","SECRET":"secret"}`), 0600); err != nil {
+				t.Fatal(err)
+			}
+			var out, diag bytes.Buffer
+			calls := 0
+			code := Run(context.Background(), []string{"run", "--inventory", "i", "--tasks", "t", "--vars-file", "v"}, &out, &diag, func(context.Context, Options) int { calls++; return 0 })
+			if code != 2 || calls != 0 || out.Len() != 0 || !strings.Contains(diag.String(), "$") || strings.Contains(diag.String(), "secret") || strings.Contains(diag.String(), "SECRET") {
+				t.Fatalf("%d %d %s", code, calls, diag.String())
+			}
+		})
+	}
+}
+
+func TestV01NeverExecutes(t *testing.T) {
+	for _, file := range []string{"i", "t", "v"} {
+		for _, body := range []string{"", "version: 1", "[]", "{} {}", "\xff", "\xef\xbb\xbf\xef\xbb\xbf{}", `{"SECRET":1,"SECRET":2}`, `{"version":"1"}`, `{"version":2}`, `{"version":1,"unknown":"secret"}`, `{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"unknown","args":{}}]}`, `{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe","argv":[],"unknown":true}}]}`, `{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe"}}]}`} {
+			t.Run(file+body, func(t *testing.T) {
+				if file == "v" && body == `{"version":"1"}` {
+					t.Skip("valid string dictionary")
+				}
+				validFiles(t)
+				if err := os.WriteFile(file, []byte(body), 0600); err != nil {
+					t.Fatal(err)
+				}
+				var out, diag bytes.Buffer
+				calls := 0
+				code := Run(context.Background(), []string{"run", "--inventory", "i", "--tasks", "t", "--vars-file", "v"}, &out, &diag, func(context.Context, Options) int { calls++; return 0 })
+				if code != 2 || calls != 0 || out.Len() != 0 || !strings.Contains(diag.String(), "$") || strings.Contains(diag.String(), "secret") || strings.Contains(diag.String(), "SECRET") {
+					t.Fatalf("%d %d %s", code, calls, diag.String())
+				}
+			})
+		}
 	}
 }

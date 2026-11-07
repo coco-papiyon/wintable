@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "hosts": "windows",
+  "tasks": [
+    {"name": "接続確認", "module": "command", "args": {"executable": "C:\\Windows\\System32\\whoami.exe", "argv": []}},
+    {"name": "メッセージを配置", "module": "file_content", "args": {"path": "C:\\Temp\\wintable-message.txt", "content": "${message}\n"}}
+  ]
+}
