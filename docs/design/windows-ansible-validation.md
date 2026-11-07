@@ -65,3 +65,5 @@ CLIは診断/help障害、キャンセル優先、ResultExecutorのJSON/テキ�
 I-03ではV-02/03/15/17の単体検査、V-16の合成最終行検査を追加。content/JSON/CRT/ラッパーの同値と±1、非BMP、CRT引用符・末尾バックスラッシュ、最後のホスト・タスクの不正による部分計画非返却とCLI Executor呼出0回、送信バイト列の所有権を検査する。実ラッパー、OpenSSH/cmd接頭辞、対象exeのargv往復と両対象OSの実測は後続Issueで未確認。
 
 I-05: internal/engine/run_test.go で模擬V-04/06（forks=1/3/64、順序、失敗停止、接続返却時キャンセル、期限切れ、Close一回、Close失敗）を検証。実SSH・実Ctrl+C・対象プロセス状態は後続Issueで実測する。
+
+I-08ではfile_contentの固定受信コード・冪等書込み・CLI接続を実装。ローカルcmd/PowerShellとServer Core 2022/OpenSSHの試験内容、起動行7,985単位、ACL比較時のOS由来AIフラグ、競合の保証範囲と未確認項目は[file_contentモジュール](../file-content-module.md)を参照。両対象OSのV-08/09/10/14/15/16/18全体の合格とはしない。

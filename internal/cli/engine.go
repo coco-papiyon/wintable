@@ -12,14 +12,20 @@ import (
 
 // RunEngine validates every input and fixed wrapper before allowing connections.
 // A nil connector selects mandatory-host-key SSH. An unspecified module runtime
-// selects the built-in command distribution (file_content awaits Issue #10).
+// selects the built-in command and file_content distributions.
 func RunEngine(ctx context.Context, args []string, stdout, stderr io.Writer, r engine.Runtime) int {
 	if r.Wrappers == nil && r.Decode == nil && r.DecodeResult == nil {
 		if err := module.ValidateCommandWrapper(); err != nil {
 			return RunWithWrappers(ctx, args, stdout, stderr, nil, []string{module.WrapperLaunchLine(module.CommandWrapper())})
 		}
-		r.Wrappers = map[string]string{"command": module.CommandWrapper()}
-		r.DecodeResult = func(_ engine.TaskPlan, response transport.Response, output bool) result.TaskResult {
+		if err := module.ValidateFileContentWrapper(); err != nil {
+			return RunWithWrappers(ctx, args, stdout, stderr, nil, []string{module.WrapperLaunchLine(module.FileContentWrapper())})
+		}
+		r.Wrappers = map[string]string{"command": module.CommandWrapper(), "file_content": module.FileContentWrapper()}
+		r.DecodeResult = func(t engine.TaskPlan, response transport.Response, output bool) result.TaskResult {
+			if t.Module == "file_content" {
+				return module.DecodeFileContent(response)
+			}
 			return module.DecodeCommand(response, output)
 		}
 	}

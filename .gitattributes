@@ -1,0 +1,2 @@
+# Fixed embedded sources must keep their bytes for reproducible wrapper encoding.
+internal/module/*.cs -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
