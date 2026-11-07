@@ -9,6 +9,7 @@ import (
 	"github.com/coco-papiyon/wintable/internal/config"
 	"github.com/coco-papiyon/wintable/internal/engine"
 	"github.com/coco-papiyon/wintable/internal/module"
+	"github.com/coco-papiyon/wintable/internal/result"
 	"io"
 	"path/filepath"
 	"strings"
@@ -53,7 +54,7 @@ is not guaranteed; enable --include-output only when appropriate.
 
 Input files are strictly validated before execution. No connections are made yet.
 Valid run options report execution_not_implemented and exit 3 until the engine
-is integrated. JSON result rendering is also deferred to the result stage.
+is integrated. Result rendering is available through RunResults.
 Exit codes: 0 success/help, 1 target failure, 2 input, 3 internal, 130 cancelled.
 `
 
@@ -64,9 +65,18 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer, execute E
 
 // RunWithWrappers is the integration entry for distribution-provided final
 // OpenSSH/cmd launch lines. All are checked before the executor can connect.
-func RunWithWrappers(ctx context.Context, args []string, stdout, stderr io.Writer, execute Executor, wrapperLines []string) int {
+func RunWithWrappers(ctx context.Context, args []string, stdout, stderr io.Writer, execute Executor, wrapperLines []string) (code int) {
+	tracked := &diagnosticWriter{Writer: stderr}
+	stderr = tracked
+	defer func() {
+		extra := 0
+		if tracked.failed {
+			extra = 3
+		}
+		code = result.ExitCode(ctx, result.Counts{}, code, extra)
+	}()
 	showHelp := func() int {
-		if _, err := io.WriteString(stdout, help); err != nil {
+		if err := result.WriteAll(stdout, []byte(help)); err != nil {
 			return 3
 		}
 		return 0
@@ -143,4 +153,31 @@ func RunWithWrappers(ctx context.Context, args []string, stdout, stderr io.Write
 		return 3
 	}
 	return execute(ctx, o)
+}
+
+// ResultExecutor returns credential-free task results and an optional classified
+// run failure. Engine integration uses this instead of returning an exit code.
+type ResultExecutor func(context.Context, Options) ([]result.TaskResult, error)
+
+func RunResults(ctx context.Context, args []string, stdout, stderr io.Writer, execute ResultExecutor) int {
+	if execute == nil {
+		return Run(ctx, args, stdout, stderr, nil)
+	}
+	return Run(ctx, args, stdout, stderr, func(ctx context.Context, o Options) int {
+		tasks, err := execute(ctx, o)
+		return result.Finish(ctx, stdout, stderr, tasks, o.Format, o.IncludeOutput, err)
+	})
+}
+
+type diagnosticWriter struct {
+	io.Writer
+	failed bool
+}
+
+func (w *diagnosticWriter) Write(p []byte) (int, error) {
+	n, e := w.Writer.Write(p)
+	if e != nil || n != len(p) {
+		w.failed = true
+	}
+	return n, e
 }

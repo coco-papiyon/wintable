@@ -221,3 +221,24 @@ Issue #3 の実装依頼と本文計画に基づき、次を採用する。設�
 - module.Preparedはmodule/argsの空白なしUTF-8 JSONを一度生成して所有する。標準encoding/jsonのエスケープを含む実バイト長を検査する。JSON/Requestはコピーを返し、transportはRequest.Stdinをそのまま送信する。引数から再生成しない。
 - module.ValidateWrapperは実際のcmd接頭辞・引用符・UTF-16LE/base64化済みラッパーを含む最終行を受ける。cli.RunWithWrappersで配布物提供の全起動行を接続前に検査し、超過・不正配布物は終了3にする。同じ検査をビルド検査から利用できる。現段階のcli.Runはラッパーなし・実行未実装で終了3。実ラッパーと実OpenSSHの接頭辞の確定・符号化は#9/#10で提供し、このAPIへ必ず渡す。
 - サイズ診断はhost/task/limit/actualのみ。taskは1始まり。ホスト未割当の固定ラッパーはhost=""、task=0で示す。
+
+### I-04 結果出力の契約
+
+`result.Aggregate` はタスク結果のコピーをホスト名の辞書順、0始まりのtask_index順に集計する。
+JSONは `{"hosts":[{"host":"win01","tasks":[{"host":"win01","task":"example","task_index":0,"status":"ok","changed":false,"exit_code":0,"duration_ms":1,"stdout_truncated":false,"stderr_truncated":false}],"counts":{"ok":1,"changed":0,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}],"counts":{"ok":1,"changed":0,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}` の単一文書。
+空結果はhosts=[]、全件数0。件数はstatusを数え、changed値から推測しない。changed/exit_codeのnull、duration_msを保持する。
+空のホスト名、不正status、負のtask_index/duration_ms、同じhost/task_indexの重複は内部エラーとし、部分集計を出さない。
+テキストも同じ集計結果から全タスク・各ホスト件数・全体件数を出す。
+
+`result.PublicError` が許可するコードは input_error、connection_failed、authentication_failed、host_key_failed、task_failed、deadline_exceeded、connection_lost、cancelled、internal_error、output_failed、execution_not_implemented。
+transport/moduleは既知の原因をこのコードへ分類し、下位のerror.Error()を渡さない。未知コードや未知errorはinternal_errorへ変換する。タスク名・ホスト名は結果識別子として表示する。
+`result.Finish` は描画・定型診断・終了判定をまとめる。失敗/unreachableは1、input_errorは2、内部/出力障害は3、cancelled結果・親contextキャンセルは130。deadline_exceededだけでは130にしない。
+`result.ExitCode` は130→3→2→1→0を適用し、不正なExecutor終了値は3にする。CLIのhelp/診断の短い書き込みも出力障害として扱う。
+書き込み失敗では途中のJSONが残り得る。同じstdoutへ代替JSONや診断を追記しない。
+
+`result.NewCapture(includeOutput)` はストリーム別に使うWriter。保持上限は1,048,576バイト、同値ではtruncated=false、超過後も全バイトを受け取って破棄する。
+既定では本文を保持せず、描画時にも既存の本文フィールドを除去する。明示指定時は不正UTF-8を含む生バイトをbase64化し、stdout/stderrを独立に制限する。描画境界でも既存base64を検査・上限に切り詰める。不正base64は内部エラー。
+任意コマンド出力の秘密の自動マスキングは保証しない。
+
+`cli.RunResults` は検証済みOptionsを受けるResultExecutorからタスク配列と分類済みerrorを取得し、指定format/include-outputでFinishへ渡す。既存Runの整数Executorも維持する。
+実エンジンの接続は#7の範囲であり、実バイナリのnil Executorは引き続き終了3。

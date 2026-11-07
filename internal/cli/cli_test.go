@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/coco-papiyon/wintable/internal/module"
+	"github.com/coco-papiyon/wintable/internal/result"
 	"io"
 	"os"
 	"path/filepath"
@@ -193,6 +194,37 @@ func TestV01NeverExecutes(t *testing.T) {
 				}
 			})
 		}
+	}
+}
+
+func TestDiagnosticFailurePriority(t *testing.T) {
+	for _, args := range [][]string{nil, {"help"}, {"run"}} {
+		if got := Run(context.Background(), args, brokenWriter{}, brokenWriter{}, nil); got != 3 {
+			t.Fatal(args, got)
+		}
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+		if got := Run(ctx, args, brokenWriter{}, brokenWriter{}, nil); got != 130 {
+			t.Fatal(args, got)
+		}
+	}
+}
+
+func TestResultExecutorBoundary(t *testing.T) {
+	validFiles(t)
+	for _, format := range []string{"text", "json"} {
+		var out, diag bytes.Buffer
+		code := RunResults(context.Background(), []string{"run", "--inventory", "i", "--tasks", "t", "--format", format}, &out, &diag, func(context.Context, Options) ([]result.TaskResult, error) {
+			return []result.TaskResult{{Host: "a", Status: result.Failed}}, nil
+		})
+		if code != 1 || out.Len() == 0 || diag.Len() != 0 {
+			t.Fatal(code, out.String(), diag.String())
+		}
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	if got := Run(ctx, []string{"run", "--inventory", "i", "--tasks", "t"}, io.Discard, io.Discard, func(context.Context, Options) int { cancel(); return 0 }); got != 130 {
+		t.Fatal(got)
 	}
 }
 
