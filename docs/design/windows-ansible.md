@@ -250,3 +250,5 @@ transport/moduleは既知の原因をこのコードへ分類し、下位のerro
 接続失敗は先頭unreachable・後続skipped（changed=false）。実行中の通信断・期限切れはfailed・changed=null。親キャンセル時は確定済み結果を保持し、実行中はcancelled・null、未開始はcancelled・falseです。結果はホスト名・task_index順です。Close失敗は内部エラーですが、終了130が優先します。
 Ctrl+Cで新規処理を止め接続を解放します。切断で対象プロセス停止は保証できません。変更不明時は対象状態を確認してから手動で再実行してください。
 `cli.RunEngine` が全件事前検証から結果描画まで接続します。SSHと実モジュールは後続Issueのため、本番mainは引き続き未実装終了3です。模擬V-04/06を実機SSH検証の合格とは扱いません。
+
+関連: [モジュール一覧と設計](modules.md)。

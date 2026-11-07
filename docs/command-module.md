@@ -37,3 +37,4 @@ Windows 11ローカルで確認した項目：日本語・空白パス、空引�
 今回の製品試験証跡: `.cache/windows-ssh/4726fe503440/`。`command-test.log`は実cmdとSSH両モードで全サブテスト成功、`wrapper-launch.json`は実起動行、`manifest.json`はソースhash・OpenSSH版・コマンド・終了値・後片付けを保存します。ベースはServer Core LTSC 2022のdigest `sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09`、Hyper-V分離です。ホストのSSHサービス・設定は変更しません。
 
 Windows 11のローカルcmd/PowerShell/CRT試験は成功しましたが、Windows 11をSSH対象とする試験、およびフルServer 2022での試験は未確認です。Server Coreコンテナを両OSの実機合格へ読み替えません。Issue #9の受け入れ条件全体は、これらが未確認のため合格扱いにしません。独自引数解析exe等の互換範囲は本書冒頭のとおりです。
+関連: [モジュール一覧と設計](design/modules.md)。
