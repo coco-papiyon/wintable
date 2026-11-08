@@ -1,0 +1,37 @@
+Preparation: removed preinstalled WSL launcher from disposable controller layer
+{
+    "os":  "Microsoft Windows NT 10.0.20348.0",
+    "architecture":  "AMD64",
+    "powershell":  "5.1.20348.5773",
+    "tools":  {
+                  "wsl":  [
+
+                          ],
+                  "go":  [
+
+                         ],
+                  "py":  [
+
+                         ],
+                  "python3":  [
+
+                              ],
+                  "python":  [
+
+                             ]
+              },
+    "exe_sha256":  "C7BAD84A7C9697552422C52F10DD2B4C268B77D3886C28B5B835AF6CD6CB0F14"
+}
+{
+    "case":  "V-13-first-command-file",
+    "command":  "wintable.exe run --inventory C:/validation/inventory.json --tasks C:/validation/tasks.json --format json --include-output",
+    "exit_code":  0,
+    "output":  "{\"hosts\":[{\"host\":\"target\",\"tasks\":[{\"host\":\"target\",\"task\":\"command\",\"task_index\":0,\"status\":\"changed\",\"changed\":true,\"exit_code\":0,\"duration_ms\":2665,\"stdout_base64\":\"YmFkODNlZTFlNTg4XHdpbnRhYmxlc3NoDQo=\",\"stderr_base64\":\"\",\"stdout_truncated\":false,\"stderr_truncated\":false},{\"host\":\"target\",\"task\":\"file\",\"task_index\":1,\"status\":\"changed\",\"changed\":true,\"exit_code\":null,\"duration_ms\":1544,\"stdout_truncated\":false,\"stderr_truncated\":false}],\"counts\":{\"ok\":0,\"changed\":2,\"failed\":0,\"unreachable\":0,\"skipped\":0,\"cancelled\":0}}],\"counts\":{\"ok\":0,\"changed\":2,\"failed\":0,\"unreachable\":0,\"skipped\":0,\"cancelled\":0}}"
+}
+{
+    "case":  "V-13-idempotence",
+    "command":  "wintable.exe run --inventory C:/validation/inventory.json --tasks C:/validation/tasks.json --format json",
+    "exit_code":  0,
+    "output":  "{\"hosts\":[{\"host\":\"target\",\"tasks\":[{\"host\":\"target\",\"task\":\"command\",\"task_index\":0,\"status\":\"changed\",\"changed\":true,\"exit_code\":0,\"duration_ms\":1628,\"stdout_truncated\":false,\"stderr_truncated\":false},{\"host\":\"target\",\"task\":\"file\",\"task_index\":1,\"status\":\"ok\",\"changed\":false,\"exit_code\":null,\"duration_ms\":1523,\"stdout_truncated\":false,\"stderr_truncated\":false}],\"counts\":{\"ok\":1,\"changed\":1,\"failed\":0,\"unreachable\":0,\"skipped\":0,\"cancelled\":0}}],\"counts\":{\"ok\":1,\"changed\":1,\"failed\":0,\"unreachable\":0,\"skipped\":0,\"cancelled\":0}}"
+}
+CLEAN_CONTROLLER_PASS
