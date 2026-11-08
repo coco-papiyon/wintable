@@ -1,0 +1,50 @@
+{
+  "source_sha": "dd8ce6b3150bb1afc0908200e167fe494bb61679",
+  "source_status": [
+    " M tests/validation/run.ps1",
+    " M tests/windows-ssh/run.ps1",
+    "?? tests/validation/clean-controller.ps1",
+    "?? tests/validation/controller-cases.ps1",
+    "?? tests/validation/summarize.ps1"
+  ],
+  "started_utc": "2026-11-08T00:53:59.244968Z",
+  "base_image": "mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09",
+  "checks": [
+    {
+      "exit_code": 0,
+      "name": "test",
+      "log": "test.log",
+      "command": "go test ./... -count=1 -v -timeout=8m"
+    },
+    {
+      "exit_code": 0,
+      "name": "vet",
+      "log": "vet.log",
+      "command": "go vet ./..."
+    },
+    {
+      "exit_code": 0,
+      "name": "wrappers",
+      "log": "wrappers.log",
+      "command": "go test ./internal/module -run ^TestDistributionWrapper$ -count=1 -v"
+    },
+    {
+      "exit_code": 0,
+      "name": "build",
+      "log": "build.log",
+      "command": "go build -trimpath -o C:\\data\\dev\\github\\wintable\\.cache\\issue11\\.cache\\validation\\89b5caa7644945e3bef619e0992e5633/wintable.exe ./cmd/wintable"
+    }
+  ],
+  "acceptance": "unconfirmed",
+  "launch_measurement": "UTF-16 code units of cmd.exe /c plus quoted fixed wrapper; non-BMP counts as 2; limit 8000",
+  "runner_sha256": "A3DB0AF0E2A1CC0AEF35A00FD2A277761E1974F9F37C04143B1B2FBBD189EF0D",
+  "go": "go version go1.27.3 windows/amd64",
+  "controller": {
+    "architecture": "AMD64",
+    "powershell": "7.6.9",
+    "os": "Microsoft Windows NT 10.0.26300.0"
+  },
+  "exe_sha256": "65DE68A4097A7A2CD5D55B64DA0EA14520ADB76D670A7574B5B0BF999E8AD9A3",
+  "failure": "Clean controller failed: 1",
+  "finished_utc": "2026-11-08T00:55:52.1998183Z"
+}
