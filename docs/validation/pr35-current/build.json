@@ -1,0 +1,7 @@
+{
+  "source_commit": "7af2f1b03961c616fa7b7b09c16539969409c76b",
+  "go": "go1.27.3",
+  "scanner": "govulncheck v1.9.0",
+  "created_utc": "2026-11-08T15:03:40.0457835Z",
+  "release_status": "candidate; requires acceptance evidence"
+}

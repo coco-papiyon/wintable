@@ -1,6 +1,6 @@
 # Windows配布候補と公開条件
 
-[監査修正後の配布候補検証記録](validation/issue12-audit-fixed/README.md)に、配布commit・最終ZIPとV-01〜18の合格証跡を保存しています。リリース公開はまだ行っていません。[Issue #11の最新検証](https://github.com/coco-papiyon/wintable/issues/11#issuecomment-6717454311)は全体OKで、検証headは `40ba3c7675418c0df2e020ec68f2e5a6098918f8` です。ただし、その合格範囲は固定Server Core 2022コンテナの既存実測であり、本Issueの最終ZIPや配布commitの合格を示しません。製品本体は権利者の指定によりMITライセンスを採用し、リポジトリのLICENSEを同梱します。Go・依存ライブラリのライセンス本文と通知は別途保持します。本候補は配布commitへの全必須証跡の対応付けと同一最終ZIPのV-13に合格済みです。公開前には下記の人手レビューを行います。
+[最新製品の配布候補検証記録](validation/pr35-current/README.md)に、配布commit・最終ZIPとV-01〜18の合格証跡を保存しています。リリース公開はまだ行っていません。[Issue #11の最新検証](https://github.com/coco-papiyon/wintable/issues/11#issuecomment-6717454311)は全体OKで、検証headは `40ba3c7675418c0df2e020ec68f2e5a6098918f8` です。ただし、その合格範囲は固定Server Core 2022コンテナの既存実測であり、本Issueの最終ZIPや配布commitの合格を示しません。製品本体は権利者の指定によりMITライセンスを採用し、リポジトリのLICENSEを同梱します。Go・依存ライブラリのライセンス本文と通知は別途保持します。本候補は配布commitへの全必須証跡の対応付けと同一最終ZIPのV-13に合格済みです。公開前には下記の人手レビューを行います。
 
 ## 候補の生成
 
