@@ -1,0 +1,231 @@
+{
+  "finished_utc": "2026-11-08T09:30:07.2684723Z",
+  "command_sources": [
+    {
+      "name": "backend_test.go",
+      "sha256": "016875DBC1A064ADC4F956E0D47E2298DDA8EC6875DA268081C6C9A9537F9144"
+    },
+    {
+      "name": "backend.go",
+      "sha256": "6AAEF8FA3B7D4FA15175ED9EDB0B0DC10DD3D418CBD441BF3F7AB8CAF7854633"
+    },
+    {
+      "name": "command_linux.py",
+      "sha256": "ADC651D57D9D18C68EA1672B8C73573E134CD3B1E61CF459F66F5C189185496B"
+    },
+    {
+      "name": "command_ssh_windows_test.go",
+      "sha256": "6E398D58F88168B7223C10A54EF7E8C7F1126599B792C7309EB1748EED5E609C"
+    },
+    {
+      "name": "command_windows_test.go",
+      "sha256": "E8110673FDB6775FC575D363D2BCDFC1F1BF48087325F8991C3CB54B046C79FB"
+    },
+    {
+      "name": "command.cs",
+      "sha256": "F7CC5EF20AAF0F8C162ECC0C215030E4DA92EF6CFF6FB28B827456D2F59F34D8"
+    },
+    {
+      "name": "doc.go",
+      "sha256": "BE319511DA59E6D8A5763D6585B81C3001A5009B2F65A344EB33619B49D536ED"
+    },
+    {
+      "name": "file_content_race_windows_test.go",
+      "sha256": "138CB32F6CDB0060FC512AB4A3ADBDAFE07AB6C262A40B8D169478F23DAAF6FE"
+    },
+    {
+      "name": "file_content_ssh_windows_test.go",
+      "sha256": "668B56F6A5A3867184EE7F96C9242AC483F66D6547E2B7C16C5B1F1403CC4D86"
+    },
+    {
+      "name": "file_content_test.go",
+      "sha256": "FEDDDD28D686C8CD86FE1C1172F03EE8FC43D42363732CBC797F3B1F5114CC95"
+    },
+    {
+      "name": "file_content_windows_test.go",
+      "sha256": "291250BDB03D72A46481B5F57059EDDE85C693EAA745620DE6B265DF975FFFD8"
+    },
+    {
+      "name": "file_content.cs",
+      "sha256": "644DD4932B0AEF854D650CE00AC8CE9D096756A5AEEBB83D44782AF4909ECDD5"
+    },
+    {
+      "name": "file_content.go",
+      "sha256": "7EA20417E7C59DFC81A28643FA2F6C2B1C635683B476DB1135D98690F8FF53FC"
+    },
+    {
+      "name": "linux_command_ssh_test.go",
+      "sha256": "94B189F81EB9B23FB8A9B09AA9CEE2739D145694E415622A3FA0950359D77C95"
+    },
+    {
+      "name": "linux_command_test.go",
+      "sha256": "3F3CB44E947BBC023ED2D1BF0BE6C4B4621939CE875B1938CF30FB555862E19D"
+    },
+    {
+      "name": "linux_command.go",
+      "sha256": "55E6754DB37F091C94B8010585FDC6B57C5379F6C0CFC63B3009BFE4210CFAFB"
+    },
+    {
+      "name": "prepare_test.go",
+      "sha256": "1D6C2552AB74C81924D1D916D4B5DF21DE4DA3A5FD5C7B59814E9E4E433CDEE6"
+    },
+    {
+      "name": "prepare.go",
+      "sha256": "E5E8071EEDBAB8F79E31196528A684048A901668BBD1A36EBD149567B6FA42B0"
+    },
+    {
+      "name": "raw_windows_test.go",
+      "sha256": "8629F82A19550FEFD3130D89F3CBE6AF839191B778098EA7884346504B555ACC"
+    },
+    {
+      "name": "receiver.cs",
+      "sha256": "935F3F21BEAA4B9E0EB8D708D4A8F40044386EEAE80C2F6639981BBFA86FB53A"
+    },
+    {
+      "name": "response_test.go",
+      "sha256": "7D7C372E1EFE7D967AF7853DEA9803195295BB2F62766F3280A1AB9AD7B9EA67"
+    },
+    {
+      "name": "response.go",
+      "sha256": "0C9AE4A13AEEF294CB8C4DD4FB330241BC5187B71327FD25F87AB877064ACCBA"
+    },
+    {
+      "name": "wrapper_test.go",
+      "sha256": "FFD5373A4D788A8A49BCC2AA81B6C0C116B0BE9078B310B409900464DBF29B2E"
+    },
+    {
+      "name": "wrapper.go",
+      "sha256": "FD48DA36CD45656AB5EB6989872184FAC4D6944E9D99F7971BB81F8BD3AA0887"
+    }
+  ],
+  "openssh": [
+    {
+      "version": null,
+      "sha256": "E6A25DA96C2FCCDC025CAAD56D99F87851EC3FE814A3CEA83F2BC77FFC800681",
+      "name": "LICENSE.txt"
+    },
+    {
+      "version": null,
+      "sha256": "CC12AEBE3FB41A092E53CF41DD05029E5B93F336D67B5F941A6132E5440FDCC8",
+      "name": "moduli"
+    },
+    {
+      "version": null,
+      "sha256": "2CD5F5D0064BC909DFE0F0FC8F4787882C7C379F2730D89E5FAA0C2BC57C620B",
+      "name": "NOTICE.txt"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "B9CC1AE5FDBA1F3833CC1130F6E11A9BED84A7953099DC40789C7D2744A862A1",
+      "name": "scp.exe"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "4092275D7A365637EE4A1E4A24753876D56B51C46C4935C907BA7365D0AAAD93",
+      "name": "sftp-server.exe"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "D3F09304016366C57E5006056E6B231ADA469F556083DF9F7DF0A371B8CC4935",
+      "name": "sftp.exe"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "69D8AA7E2ADC47694689B87EB1FCB33B2700AE70F036211A9D6052D2195DB634",
+      "name": "ssh-add.exe"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "C7D52CF9DCE67BF3D67AEC4267E28EA2B7DFCFBF9A7A23DB84CD8F05318E7B77",
+      "name": "ssh-agent.exe"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "C9DC170CD161DB87E75EB6CF282F1325005B9E35628B9A36CB19883A8BE1A34F",
+      "name": "ssh-keygen.exe"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "673EE651264490808E0B236C041D13D1539EA8C4C266700EC599E14785132363",
+      "name": "ssh-keyscan.exe"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "8735995A22009429AD7EA7D226F35D2D46CED7DAFF41D96BD5BCAC6E4B7DB8BF",
+      "name": "ssh-pkcs11-helper.exe"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "6CB27AE795BE1A85C21755CC6BF226A5323B73F7D7E999A974BD38F1E00A981B",
+      "name": "ssh-shellhost.exe"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "2AF64342777CC90D3980721BB8D284072C0C5ABB760BB8CB04908836CD622F91",
+      "name": "ssh-sk-helper.exe"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "98D447730047F5DF91373E852D057928A921C3D1E89938700AB656BA84B19DC8",
+      "name": "ssh.exe"
+    },
+    {
+      "version": null,
+      "sha256": "99F373A06DFA706F0A8A98D655C776850305B4B1EA3BF9A33FA926897BB15649",
+      "name": "sshd_config_default"
+    },
+    {
+      "version": "9.5.6.4",
+      "sha256": "4A150A2881A040F7FAAFF82B57A896B116BB4CD8073B91C6C58D0EDDA60CD6B7",
+      "name": "sshd.exe"
+    }
+  ],
+  "started_utc": "2026-11-08T09:26:59.6317894Z",
+  "base_image": "mcr.microsoft.com/windows/servercore:ltsc2022",
+  "docker": [
+    "{\"Client\":{\"Version\":\"29.9.2\",\"ApiVersion\":\"1.56\",\"DefaultAPIVersion\":\"1.56\",\"GitCommit\":\"a82e528\",\"GoVersion\":\"go1.26.10\",\"Os\":\"windows\",\"Arch\":\"amd64\",\"BuildTime\":\"Tue Oct 20 19:44:07 2026\",\"Context\":\"desktop-windows\"},\"Server\":{\"Platform\":{\"Name\":\"Docker Desktop 4.98.0 (245422)\"},\"Version\":\"29.9.2\",\"ApiVersion\":\"1.56\",\"MinAPIVersion\":\"1.40\",\"Os\":\"windows\",\"Arch\":\"amd64\",\"Components\":[{\"Name\":\"Engine\",\"Version\":\"29.9.2\",\"Details\":{\"ApiVersion\":\"1.56\",\"Arch\":\"amd64\",\"BuildTime\":\"Tue Oct 20 19:40:53 2026\",\"Experimental\":\"false\",\"GitCommit\":\"0367cbe\",\"GoVersion\":\"go1.26.10\",\"KernelVersion\":\"10.0 26300 (26100.1.amd64fre.ge_release.240331-1435)\",\"MinAPIVersion\":\"1.40\",\"Module\":\"github.com/moby/moby/v2\",\"ModuleVersion\":\"v2.0.0+unknown\",\"Os\":\"windows\"}}],\"GitCommit\":\"0367cbe\",\"GoVersion\":\"go1.26.10\",\"KernelVersion\":\"10.0 26300 (26100.1.amd64fre.ge_release.240331-1435)\",\"BuildTime\":\"2026-10-20T19:40:53.000000000+00:00\"}}"
+  ],
+  "base_image_id": "sha256:e23cc44a7bfddc7ddf3aabb438b69862d59df5cc1b06fba321773775acc50a38",
+  "container_removed": true,
+  "image": "sha256:bd87401f172a124c2a6e1c8c5f4b3fcd9eda46778fc8dc1d2c22cac89f059c31",
+  "command_test_command": "go test ./internal/module -run ^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows)$ -count=1 -v -timeout=4m",
+  "crt_sha256": "EE5A571519FB0526D6C4BE3BA723978DE0546C2D703829414552290990AD14C2",
+  "isolation": "hyperv",
+  "fixture_files": [
+    {
+      "name": "Dockerfile",
+      "sha256": "345DC404D719140CFF28115628F2DB9E417D214EE92130F4B1D75F7CC0C93D8F"
+    },
+    {
+      "name": "init.ps1",
+      "sha256": "B07AE02A1DD0D441405D4695F387BE40C36AA0FCA411F7088A2348AAB7C72CAE"
+    },
+    {
+      "name": "README.md",
+      "sha256": "4497F0E43DCDB5DAE562DDEFF457EDB4CCD76F306FE3F33D1888A18A7666362A"
+    },
+    {
+      "name": "receiver.ps1",
+      "sha256": "A51B352FF4CE661360E3D126190D4597B941DB82641459D421D8B66B7B361EA7"
+    },
+    {
+      "name": "run.ps1",
+      "sha256": "890557BC91366D7DEA8C6946E2E276251C83182EC5E209AB5739F38913EEF882"
+    },
+    {
+      "name": "start.ps1",
+      "sha256": "471D85B094A9D0C14BB702AF06EB3FBD2CD2F42C52FCC7A21DE6AF41FEEBE7AE"
+    }
+  ],
+  "base_repo_digests": "[\"mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09\"]",
+  "source_sha": "3e9df567829a905f85556557853998616df10193",
+  "source_status": [
+    "?? docs/validation/issue28/"
+  ],
+  "image_removed": true,
+  "command_test_exit_code": 0,
+  "go": "go version go1.27.3 windows/amd64",
+  "test_exit_code": 0,
+  "test_sha256": "9B91E2E1FD7133AE45005E147ED78F9D01DE87A0F3120627903CC0DD86D15933",
+  "test_command": "go test ./internal/transport -run ^TestWindowsOpenSSH$ -count=1 -v -timeout=4m"
+}

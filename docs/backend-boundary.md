@@ -6,10 +6,11 @@
 検査を完了してからPlanを返す。エラーでは部分Planを返さない。
 選択したbackendを値コピーしてTaskPlanへ保持し、Executeは全件のOS/module整合性を
 接続前に再検査する。登録欠落時のWindows fallbackはない。
-本番は `WindowsBackends` のcommand/file_contentだけを登録する。
+本番は `DefaultBackends` にWindows command/file_contentとLinux commandを登録する。
+Linux file_contentは未登録で接続前に拒否する。
 
 `Prepare` はWindows専用のCRT引用、32,766 UTF-16単位と従来の対象パス検査を維持する。
-`PrepareLinuxCommand` は実行機能ではなく後続backend向けの検査・共通JSON生成関数。
+`PrepareLinuxCommand` はLinux backend向けの検査・共通JSON生成関数。
 POSIX絶対パス、制御文字・末尾/・ドットセグメント拒否、UTF-8/NUL検査、
 各値32KiB・NUL込み合計64KiB・argv4096要素を境界込みで適用する。
 固定行はWindows 8,000 UTF-16単位とLinux 8KiB UTF-8を別々に検査する。

@@ -16,7 +16,7 @@ import (
 func RunEngine(ctx context.Context, args []string, stdout, stderr io.Writer, r engine.Runtime) int {
 	legacy := r.Backends == nil && (r.Wrappers != nil || r.Decode != nil || r.DecodeResult != nil)
 	if r.Backends == nil {
-		r.Backends = module.WindowsBackends()
+		r.Backends = module.DefaultBackends()
 		// Legacy injected runtimes are explicitly Windows-only.
 		if legacy {
 			r.Backends = module.Backends{}
