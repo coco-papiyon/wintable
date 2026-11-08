@@ -1,0 +1,19 @@
+=== RUN   TestWindowsOpenSSH
+=== RUN   TestWindowsOpenSSH/V05_reject_keys_and_auth
+=== RUN   TestWindowsOpenSSH/V11_V18_transfer_EOF_drain_reuse
+    ssh_windows_container_test.go:118: target environment: {"PowerShell":"5.1.20348.5773","DefaultShell":"C:\\Windows\\System32\\cmd.exe","OS":"Microsoft Windows NT 10.0.20348.0"}
+=== RUN   TestWindowsOpenSSH/V06_V18_blocked
+=== RUN   TestWindowsOpenSSH/V06_V18_wait
+=== RUN   TestWindowsOpenSSH/V06_V18_cancel
+=== RUN   TestWindowsOpenSSH/V06_V18_close
+=== RUN   TestWindowsOpenSSH/V06_V18_disconnect
+--- PASS: TestWindowsOpenSSH (33.00s)
+    --- PASS: TestWindowsOpenSSH/V05_reject_keys_and_auth (1.62s)
+    --- PASS: TestWindowsOpenSSH/V11_V18_transfer_EOF_drain_reuse (7.21s)
+    --- PASS: TestWindowsOpenSSH/V06_V18_blocked (8.12s)
+    --- PASS: TestWindowsOpenSSH/V06_V18_wait (8.08s)
+    --- PASS: TestWindowsOpenSSH/V06_V18_cancel (2.08s)
+    --- PASS: TestWindowsOpenSSH/V06_V18_close (2.08s)
+    --- PASS: TestWindowsOpenSSH/V06_V18_disconnect (3.61s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/transport	34.866s
