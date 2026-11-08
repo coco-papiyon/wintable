@@ -217,7 +217,7 @@ func TestLinuxCommandSSH(t *testing.T) {
 	})
 	t.Run("raw-E2BIG", func(t *testing.T) {
 		prefix := "import os,subprocess\nfor i in range(4): os.environ['WINTABLE_TEST_'+str(i)]='e'*30000\nreal_popen=subprocess.Popen\ndef observe(*a,**kw):\n try: return real_popen(*a,**kw)\n except OSError as e:\n  open('/fixture/results/e2big-errno','w').write(str(e.errno))\n  raise\nsubprocess.Popen=observe\n"
-		line := "/usr/bin/python3 -I -c '" + strings.ReplaceAll(prefix+"__import__('sys').stdin.buffer.read()\n"+linuxCommandSource, "'", "'\"'\"'") + "'"
+		line := "/usr/bin/python3 -I -c '" + strings.ReplaceAll(prefix+linuxCommandSource, "'", "'\"'\"'") + "'"
 		// Linux's 128KiB ARG_MAX floor with a 512KiB stack is exceeded by
 		// inherited environment plus this otherwise valid 32KiB argument.
 		r := raw(t, "ulimit -s 512; "+line, request("/bin/true", []any{strings.Repeat("a", 32768)}))
