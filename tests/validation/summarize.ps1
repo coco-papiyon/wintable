@@ -57,9 +57,20 @@ foreach ($row in $rows | Where-Object scenario -ne 'V-13') {
 $details | Export-Csv "$root/coverage.csv" -NoTypeInformation -Encoding utf8NoBOM
 $rows | Export-Csv "$root/scenarios.csv" -NoTypeInformation -Encoding utf8NoBOM
 $prerequisites = $true
+# Keep the recorded evidence's raw-byte hash mandatory. Git may convert the
+# source copy between LF and CRLF, so compare source/evidence text separately.
+# Normalize CRLF to LF only: do not ignore whitespace, BOMs, case or content.
+function Read-CoverageText([string]$Path) {
+    $utf8 = [Text.UTF8Encoding]::new($false, $true)
+    return $utf8.GetString([IO.File]::ReadAllBytes($Path)).Replace("`r`n", "`n")
+}
 if (!(Test-Path -LiteralPath "$root/coverage.json") -or
-    (Get-FileHash "$root/coverage.json" -Algorithm SHA256).Hash -ne $manifest.coverage_sha256 -or
-    (Get-FileHash "$PSScriptRoot/coverage.json" -Algorithm SHA256).Hash -ne $manifest.coverage_sha256) { $prerequisites=$false }
+    (Get-FileHash "$root/coverage.json" -Algorithm SHA256).Hash -ne $manifest.coverage_sha256) {
+    $prerequisites=$false
+} elseif (![string]::Equals((Read-CoverageText "$root/coverage.json"),
+    (Read-CoverageText "$PSScriptRoot/coverage.json"), [StringComparison]::Ordinal)) {
+    $prerequisites=$false
+}
 foreach ($name in 'test','vet','build','wrappers','module_binary','native_container') {
     $check = @($manifest.checks | Where-Object name -eq $name)
     if ($check.Count -ne 1 -or $null -eq $check[0].exit_code -or $check[0].exit_code -ne 0 -or !(Test-Path -LiteralPath "$root/$($check[0].log)")) { $prerequisites=$false }

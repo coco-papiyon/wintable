@@ -45,7 +45,11 @@ Ctrl+Cや通信断で対象の子プロセスが停止する保証はしない�
 
 V-13は別途、正常終了、完了マーカー、exe/source一致、build成功、制御側清掃を照合する。全18シナリオのpassedに加え、test/vet/build/ラッパー/試験exeビルド/ネイティブコンテナの終了0、SSH三工程の終了0、source一致、全清掃、開始時作業ツリーcleanが揃った場合だけacceptance=passed・runner終了0。それ以外は終了1とする。各コマンドの終了値は独立して保存する。
 
-再集約は `./tests/validation/summarize.ps1 -EvidenceDirectory <run-dir>`。集約器の23パターン試験は、部分結果、欠落/不整合、失敗、SKIP、重複、dirty source、清掃失敗などを合格にしないことを確認する。
+再集約は `./tests/validation/summarize.ps1 -EvidenceDirectory <run-dir>`。保存された `coverage.json` の生バイトSHA-256はmanifestの記録値と一致しなければならない。ソース側の対応表との照合では、両方を厳密なUTF-8として読み、CRLFだけをLFへ置換して文字列をOrdinalで比較する。BOM、大文字小文字、空白、内容は正規化しない。これによりGitの改行変換でソースがLFになっても、保存証跡の生バイト整合性を維持して再集約できる。
+
+集約器の28パターン試験は、部分結果、欠落/不整合、失敗、SKIP、重複、dirty source、清掃失敗に加え、LF/CRLFの両証跡を検証する。内容・空白の変更は生バイトハッシュを更新しても拒否し、証跡の改行を記録ハッシュと不一致にした場合も拒否する。
+
+`./tests/validation/test-git-evidence.ps1` はHEADをgit archiveから新規ディレクトリへ展開し、保存証跡のハッシュを検査してから、展開先の回帰試験と再集約を別のpwshプロセスで実行する。全18項目passed、前提条件合格、両工程終了0を要求し、`.cache/git-evidence/<run-id>/result.json` とログを保存する。作業ツリーの未コミット変更は使わないため、修正をcommitした後に実行する。過去のソースには `-Revision <SHA>` を指定できる。
 
 証跡の公開前に秘密鍵やパスフレーズの混入を点検する。exe・試験exe・Docker context・一時鍵はGitへ含めない。レビュー済みの証跡は `docs/validation/evidence/` へ選別し、選別後の集合にハッシュ索引を作る。修正後の再検証は新しいrun-idとソースSHAで保存する。
 

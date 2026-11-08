@@ -28,7 +28,7 @@ try {
         Write-Output "PASS $mode"
     }
     $coverage = Get-Content "$PSScriptRoot/coverage.json" -Raw | ConvertFrom-Json
-    foreach ($mode in 'complete','missing-case','skipped-case','failed-case','duplicate-case','dirty-source','failed-vet','ssh-wrong-source','ssh-missing-exit','ssh-not-removed','native-not-removed','missing-vet-log','wrong-coverage-hash','missing-coverage') {
+    foreach ($mode in 'complete','complete-evidence-lf','complete-evidence-crlf','changed-coverage-content','changed-coverage-whitespace','raw-eol-tamper','missing-case','skipped-case','failed-case','duplicate-case','dirty-source','failed-vet','ssh-wrong-source','ssh-missing-exit','ssh-not-removed','native-not-removed','missing-vet-log','wrong-coverage-hash','missing-coverage') {
         $records = @(foreach ($group in $coverage) { foreach ($property in $group.checks.PSObject.Properties) { foreach ($name in $property.Value) { [pscustomobject]@{ log=$property.Name; test=$name } } } })
         foreach ($group in ($records | Group-Object log)) {
             @($group.Group.test | Sort-Object -Unique | ForEach-Object { "--- PASS: $_ (0.01s)" }) | Set-Content "$root/$($group.Name)"
@@ -46,6 +46,20 @@ try {
         $ssh = @{source_sha='source';source_status=@();container_removed=$true;image_removed=$true;test_exit_code=0;command_test_exit_code=0;cli_test_exit_code=0}
         'CLEAN_CONTROLLER_PASS' | Set-Content "$root/ssh/controller.log"
         switch ($mode) {
+            { $_ -in 'complete-evidence-lf','complete-evidence-crlf','changed-coverage-content','changed-coverage-whitespace','raw-eol-tamper' } {
+                $text = [IO.File]::ReadAllText("$PSScriptRoot/coverage.json").Replace("`r`n", "`n")
+                if ($mode -eq 'complete-evidence-crlf') { $text=$text.Replace("`n", "`r`n") }
+                if ($mode -eq 'changed-coverage-content') { $text=$text.Replace('strict JSON/schema','changed JSON/schema') }
+                if ($mode -eq 'changed-coverage-whitespace') { $text=$text.Replace('strict JSON/schema','strict  JSON/schema') }
+                if ($mode -eq 'raw-eol-tamper') {
+                    # Change raw bytes without updating the recorded hash, even
+                    # though the normalized source text would still match.
+                    $raw = [IO.File]::ReadAllText("$root/coverage.json")
+                    $text = if ($raw.Contains("`r`n")) { $text } else { $text.Replace("`n", "`r`n") }
+                }
+                [IO.File]::WriteAllText("$root/coverage.json", $text, [Text.UTF8Encoding]::new($false))
+                if ($mode -ne 'raw-eol-tamper') { $manifest.coverage_sha256=(Get-FileHash "$root/coverage.json" -Algorithm SHA256).Hash }
+            }
             'missing-case' { (Get-Content "$root/test.log") | Where-Object { $_ -notmatch 'TestSelect ' } | Set-Content "$root/test.log" }
             'skipped-case' { (Get-Content "$root/test.log" -Raw).Replace('PASS: TestSelect ', 'SKIP: TestSelect ') | Set-Content "$root/test.log" }
             'failed-case' { (Get-Content "$root/test.log" -Raw).Replace('PASS: TestSelect ', 'FAIL: TestSelect ') | Set-Content "$root/test.log" }
@@ -64,9 +78,10 @@ try {
         $controller | ConvertTo-Json | Set-Content "$root/ssh/controller.json"
         $ssh | ConvertTo-Json | Set-Content "$root/ssh/manifest.json"
         & "$PSScriptRoot/summarize.ps1" -EvidenceDirectory $root
-        if (($mode -eq 'complete' -and $LASTEXITCODE -ne 0) -or ($mode -ne 'complete' -and $LASTEXITCODE -ne 1)) { throw "Incorrect exit code for $mode" }
+        $success = $mode -in 'complete','complete-evidence-lf','complete-evidence-crlf'
+        if (($success -and $LASTEXITCODE -ne 0) -or (!$success -and $LASTEXITCODE -ne 1)) { throw "Incorrect exit code for $mode" }
         $actual = Get-Content "$root/manifest.json" -Raw | ConvertFrom-Json
-        $expected = if ($mode -eq 'complete') { 'passed' } else { 'unconfirmed' }
+        $expected = if ($success) { 'passed' } else { 'unconfirmed' }
         if ($actual.acceptance -ne $expected) { throw "Incorrect acceptance for $mode : $($actual.acceptance)" }
         Write-Output "PASS $mode"
     }
@@ -77,3 +92,4 @@ try {
     Remove-Item -LiteralPath "$root/ssh"
     Remove-Item -LiteralPath $root
 }
+exit 0
