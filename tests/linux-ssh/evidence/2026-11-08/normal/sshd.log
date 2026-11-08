@@ -1,0 +1,78 @@
+Server listening on 0.0.0.0 port 22.
+Connection from 172.18.0.1 port 57092 on 172.18.0.2 port 22 rdomain ""
+kex_exchange_identification: Connection closed by remote host
+Connection closed by 172.18.0.1 port 57092
+srclimit_penalise: ipv4: new 172.18.0.1/32 deferred penalty of 1 seconds for penalty: connections without attempting authentication
+Connection from 172.18.0.1 port 42502 on 172.18.0.2 port 22 rdomain ""
+Connection closed by 172.18.0.1 port 42502 [preauth]
+srclimit_penalise: ipv4: new 172.18.0.1/32 deferred penalty of 1 seconds for penalty: connections without attempting authentication
+Connection from 172.18.0.1 port 42514 on 172.18.0.2 port 22 rdomain ""
+Connection closed by 172.18.0.1 port 42514 [preauth]
+Connection from 172.18.0.1 port 42530 on 172.18.0.2 port 22 rdomain ""
+Failed publickey for runner from 172.18.0.1 port 42530 ssh2: ED25519 SHA256:AKBast9wxI9D7FF5NRMOKYb4EnaxQeQ84vex+vlyQiQ
+Connection closed by authenticating user runner 172.18.0.1 port 42530 [preauth]
+Connection from 172.18.0.1 port 42540 on 172.18.0.2 port 22 rdomain ""
+User root from 172.18.0.1 not allowed because not listed in AllowUsers
+Connection closed by invalid user root 172.18.0.1 port 42540 [preauth]
+Connection from 172.18.0.1 port 42542 on 172.18.0.2 port 22 rdomain ""
+Connection closed by authenticating user runner 172.18.0.1 port 42542 [preauth]
+Connection from 172.18.0.1 port 42550 on 172.18.0.2 port 22 rdomain ""
+Accepted key ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE found at /home/runner/.ssh/authorized_keys:1
+Postponed publickey for runner from 172.18.0.1 port 42550 ssh2 [preauth]
+Accepted key ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE found at /home/runner/.ssh/authorized_keys:1
+Accepted publickey for runner from 172.18.0.1 port 42550 ssh2: ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE
+User child is on pid 67
+Starting session: command for runner from 172.18.0.1 port 42550 id 0
+Close session: user runner from 172.18.0.1 port 42550 id 0
+Starting session: command for runner from 172.18.0.1 port 42550 id 1
+Close session: user runner from 172.18.0.1 port 42550 id 1
+Starting session: command for runner from 172.18.0.1 port 42550 id 1
+Close session: user runner from 172.18.0.1 port 42550 id 1
+Connection closed by 172.18.0.1 port 42550
+Transferred: sent 2262312, received 6299176 bytes
+Closing connection to 172.18.0.1 port 42550
+Connection from 172.18.0.1 port 42556 on 172.18.0.2 port 22 rdomain ""
+Accepted key ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE found at /home/runner/.ssh/authorized_keys:1
+Postponed publickey for runner from 172.18.0.1 port 42556 ssh2 [preauth]
+Accepted key ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE found at /home/runner/.ssh/authorized_keys:1
+Accepted publickey for runner from 172.18.0.1 port 42556 ssh2: ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE
+User child is on pid 97
+Starting session: command for runner from 172.18.0.1 port 42556 id 0
+Connection closed by 172.18.0.1 port 42556
+Close session: user runner from 172.18.0.1 port 42556 id 0
+Transferred: sent 3200, received 2167088 bytes
+Closing connection to 172.18.0.1 port 42556
+Connection from 172.18.0.1 port 42558 on 172.18.0.2 port 22 rdomain ""
+Accepted key ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE found at /home/runner/.ssh/authorized_keys:1
+Postponed publickey for runner from 172.18.0.1 port 42558 ssh2 [preauth]
+Accepted key ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE found at /home/runner/.ssh/authorized_keys:1
+Accepted publickey for runner from 172.18.0.1 port 42558 ssh2: ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE
+User child is on pid 116
+Starting session: command for runner from 172.18.0.1 port 42558 id 0
+Connection closed by 172.18.0.1 port 42558
+Close session: user runner from 172.18.0.1 port 42558 id 0
+Transferred: sent 12140, received 2101532 bytes
+Closing connection to 172.18.0.1 port 42558
+Connection from 172.18.0.1 port 42560 on 172.18.0.2 port 22 rdomain ""
+Accepted key ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE found at /home/runner/.ssh/authorized_keys:1
+Postponed publickey for runner from 172.18.0.1 port 42560 ssh2 [preauth]
+Accepted key ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE found at /home/runner/.ssh/authorized_keys:1
+Accepted publickey for runner from 172.18.0.1 port 42560 ssh2: ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE
+User child is on pid 141
+Starting session: command for runner from 172.18.0.1 port 42560 id 0
+Connection closed by 172.18.0.1 port 42560
+Close session: user runner from 172.18.0.1 port 42560 id 0
+Transferred: sent 12140, received 2101532 bytes
+Closing connection to 172.18.0.1 port 42560
+Connection from 172.18.0.1 port 42572 on 172.18.0.2 port 22 rdomain ""
+Accepted key ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE found at /home/runner/.ssh/authorized_keys:1
+Postponed publickey for runner from 172.18.0.1 port 42572 ssh2 [preauth]
+Accepted key ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE found at /home/runner/.ssh/authorized_keys:1
+Accepted publickey for runner from 172.18.0.1 port 42572 ssh2: ED25519 SHA256:tbeDpumu2BIiIYSiPnsk9GAirJqSgUowwMDx33cK+eE
+User child is on pid 200
+Starting session: command for runner from 172.18.0.1 port 42572 id 0
+Connection closed by 172.18.0.1 port 42572
+Close session: user runner from 172.18.0.1 port 42572 id 0
+Transferred: sent 12100, received 2101532 bytes
+Closing connection to 172.18.0.1 port 42572
+
