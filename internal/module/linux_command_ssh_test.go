@@ -372,4 +372,37 @@ func TestLinuxCommandSSH(t *testing.T) {
 			})
 		}
 	})
+	t.Run("product-E2BIG-fixture", func(t *testing.T) {
+		// This disposable fixture variant changes only the runtime launcher:
+		// actual CPython 3.13 still runs the unchanged product receiver, with
+		// a 512KiB stack and 120KiB inherited environment. Restore in all paths.
+		if !strings.HasPrefix(cfg.Container, "wintable-linux-") || cfg.DockerContext == "" {
+			t.Fatal("unsafe fixture")
+		}
+		manage := func(script, input string) error {
+			c := exec.CommandContext(ctx, "docker", "--context", cfg.DockerContext, "exec", "-i", cfg.Container, "/bin/sh", "-ec", script)
+			c.Stdin = strings.NewReader(input)
+			return c.Run()
+		}
+		wrapper := "#!/bin/sh\nulimit -s 512\n"
+		for i := 0; i < 4; i++ {
+			wrapper += fmt.Sprintf("export WINTABLE_SIZE_%d=$(head -c 30000 /dev/zero | tr '\\000' e)\n", i)
+		}
+		wrapper += "exec /usr/bin/python3.13 \"$@\"\n"
+		if e := manage("test -L /usr/bin/python3; mv /usr/bin/python3 /usr/bin/python3.wintable-original", ""); e != nil {
+			t.Fatal(e)
+		}
+		defer func() {
+			if e := manage("rm -f /usr/bin/python3; mv /usr/bin/python3.wintable-original /usr/bin/python3", ""); e != nil {
+				t.Error("runtime restore", e)
+			}
+		}()
+		if e := manage("cat > /usr/bin/python3; chmod 755 /usr/bin/python3", wrapper); e != nil {
+			t.Fatal(e)
+		}
+		r := run(t, "/bin/true", []any{strings.Repeat("a", 32768)}, false, 1)
+		if r.Changed == nil || *r.Changed || r.ExitCode != nil {
+			t.Fatal("product E2BIG contract", r)
+		}
+	})
 }
