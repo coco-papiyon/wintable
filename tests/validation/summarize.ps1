@@ -28,7 +28,7 @@ if (Test-Path -LiteralPath $controllerFile) {
 }
 $rows | Export-Csv "$root/scenarios.csv" -NoTypeInformation -Encoding utf8NoBOM
 # Preserve individual PASS/FAIL/SKIP records: a parent PASS never erases SKIP.
-$tests = @(foreach ($relative in 'test.log','wrappers.log','ssh/command-test.log','ssh/test.log') {
+$tests = @(foreach ($relative in 'test.log','wrappers.log','native-container.log','ssh/cli-test.log','ssh/command-test.log','ssh/test.log') {
     if (!(Test-Path -LiteralPath "$root/$relative")) { continue }
     foreach ($line in Get-Content "$root/$relative") {
         if ($line -match '^\s*--- (PASS|FAIL|SKIP): (\S+)') {
@@ -37,7 +37,39 @@ $tests = @(foreach ($relative in 'test.log','wrappers.log','ssh/command-test.log
     }
 })
 $tests | Export-Csv "$root/test-cases.csv" -NoTypeInformation -Encoding utf8NoBOM
+$coverage = Get-Content "$PSScriptRoot/coverage.json" -Raw | ConvertFrom-Json
+$details = @(foreach ($group in $coverage) {
+    foreach ($property in $group.checks.PSObject.Properties) {
+        foreach ($name in $property.Value) {
+            $records = @($tests | Where-Object { $_.test -ceq $name -and $_.evidence -ceq $property.Name })
+            $status = if ($records.Count -eq 1 -and $records[0].status -ceq 'PASS') { 'passed' } elseif (@($records | Where-Object status -eq 'FAIL').Count) { 'failed' } else { 'unconfirmed' }
+            [pscustomobject]@{ scenario=$group.scenario; test=$name; status=$status; evidence=$property.Name; scope=$group.scope }
+        }
+    }
+})
+# Check every test record, not just a parent PASS. A missing/SKIP record remains unconfirmed.
+foreach ($row in $rows | Where-Object scenario -ne 'V-13') {
+    $cases = @($details | Where-Object scenario -eq $row.scenario)
+    if ($cases.Count -and !@($cases | Where-Object status -ne 'passed').Count) { $row.status='passed'; $row.note=($coverage | Where-Object scenario -eq $row.scenario).scope }
+    elseif (@($cases | Where-Object status -eq 'failed').Count) { $row.status='failed' }
+    $row.evidence = 'coverage.csv; ' + (($cases.evidence | Sort-Object -Unique) -join '; ')
+}
+$details | Export-Csv "$root/coverage.csv" -NoTypeInformation -Encoding utf8NoBOM
+$rows | Export-Csv "$root/scenarios.csv" -NoTypeInformation -Encoding utf8NoBOM
+$prerequisites = $true
+foreach ($name in 'test','vet','build','wrappers','module_binary','native_container') {
+    $check = @($manifest.checks | Where-Object name -eq $name)
+    if ($check.Count -ne 1 -or $null -eq $check[0].exit_code -or $check[0].exit_code -ne 0 -or !(Test-Path -LiteralPath "$root/$($check[0].log)")) { $prerequisites=$false }
+}
+if (!(Test-Path "$root/ssh/manifest.json")) { $prerequisites=$false } else {
+    $ssh = Get-Content "$root/ssh/manifest.json" -Raw | ConvertFrom-Json
+    if ($ssh.source_sha -ne $manifest.source_sha -or $ssh.failure -or $ssh.container_removed -ne $true -or $ssh.image_removed -ne $true) { $prerequisites=$false }
+    foreach ($name in 'test_exit_code','command_test_exit_code','cli_test_exit_code') { if ($null -eq $ssh.$name -or $ssh.$name -ne 0) { $prerequisites=$false } }
+}
+if ($manifest.failure -or $manifest.native_container_removed -ne $true -or @($manifest.source_status).Count -or @($tests | Where-Object status -eq 'FAIL').Count) { $prerequisites=$false }
 $manifest.acceptance = if (@($rows | Where-Object status -ne 'passed').Count) { 'unconfirmed' } else { 'passed' }
+if (!$prerequisites) { $manifest.acceptance='unconfirmed' }
+$manifest | Add-Member -NotePropertyName prerequisites_passed -NotePropertyValue $prerequisites -Force
 $manifest | ConvertTo-Json -Depth 10 | Set-Content "$root/manifest.json" -Encoding utf8NoBOM
 Get-ChildItem $root -Recurse -File | Where-Object { $_.Name -ne 'sha256.csv' -and $_.Extension -ne '.exe' } |
     ForEach-Object { [pscustomobject]@{ path=[IO.Path]::GetRelativePath($root,$_.FullName); sha256=(Get-FileHash $_.FullName -Algorithm SHA256).Hash } } |

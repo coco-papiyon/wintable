@@ -61,5 +61,6 @@ try {
     & "$PSScriptRoot/summarize.ps1" -EvidenceDirectory $output
     Write-Host "Evidence: $output"
 }
-# Partial coverage must never produce an acceptance success exit code.
+$final = Get-Content "$output/manifest.json" -Raw | ConvertFrom-Json
+if ($final.acceptance -eq 'passed') { exit 0 }
 exit 1

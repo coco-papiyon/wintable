@@ -140,6 +140,26 @@ func TestWindowsOpenSSH(t *testing.T) {
 			}
 		}
 	})
+	t.Run("V05_unreachable", func(t *testing.T) {
+		listener, err := net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			t.Fatal(err)
+		}
+		h := host
+		h.Address = "127.0.0.1"
+		h.Port = uint16(listener.Addr().(*net.TCPAddr).Port)
+		listener.Close()
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		s, err := (SSHConnector{}).Connect(ctx, h)
+		if s != nil {
+			s.Close()
+			t.Fatal("closed endpoint accepted")
+		}
+		if err == nil || err.Error() != "connection_failed" {
+			t.Fatalf("unreachable: %v", err)
+		}
+	})
 	t.Run("V06_delayed_SSH_banner", func(t *testing.T) {
 		// A real TCP relay delays the target's SSH banner. No host network
 		// settings, firewall rules, or production service are changed.
