@@ -65,3 +65,5 @@ CLIは診断/help障害、キャンセル優先、ResultExecutorのJSON/テキ�
 I-03ではV-02/03/15/17の単体検査、V-16の合成最終行検査を追加。content/JSON/CRT/ラッパーの同値と±1、非BMP、CRT引用符・末尾バックスラッシュ、最後のホスト・タスクの不正による部分計画非返却とCLI Executor呼出0回、送信バイト列の所有権を検査する。実ラッパー、OpenSSH/cmd接頭辞、対象exeのargv往復と両対象OSの実測は後続Issueで未確認。
 
 I-05: internal/engine/run_test.go で模擬V-04/06（forks=1/3/64、順序、失敗停止、接続返却時キャンセル、期限切れ、Close一回、Close失敗）を検証。実SSH・実Ctrl+C・対象プロセス状態は後続Issueで実測する。
+
+関連: [モジュール一覧と設計](modules.md)。
