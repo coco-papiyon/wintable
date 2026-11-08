@@ -17,11 +17,11 @@ try {
     Copy-Item -LiteralPath "$FixtureDirectory/client" -Destination "$root/client"
     Copy-Item -LiteralPath "$FixtureDirectory/known_hosts" -Destination "$root/known_hosts"
     Copy-Item -LiteralPath "$PSScriptRoot/controller-cases.ps1" -Destination "$root/cases.ps1"
-    @{ version=1; hosts=@{ target=@{ address=$fixture.Address; port=$fixture.Port; user=$fixture.User; private_key_file='C:/validation/client'; known_hosts_file='C:/validation/known_hosts' } } } |
+    @{ version=1; hosts=@{ target=@{ address=$fixture.Address; port=$fixture.Port; user=$fixture.User; private_key_file='C:\validation\client'; known_hosts_file='C:\validation\known_hosts' } } } |
         ConvertTo-Json -Depth 8 | Set-Content "$root/inventory.json" -Encoding utf8NoBOM
     @{ version=1; hosts='all'; tasks=@(
-        @{ name='command'; module='command'; args=@{ executable='C:/Windows/System32/whoami.exe'; argv=@() } },
-        @{ name='file'; module='file_content'; args=@{ path=('C:/fixture/clean-' + $name + '.txt'); content="日本語 `"quoted`"`n" } }
+        @{ name='command'; module='command'; args=@{ executable='C:\Windows\System32\whoami.exe'; argv=@() } },
+        @{ name='file'; module='file_content'; args=@{ path=('C:\fixture\clean-' + $name + '.txt'); content="日本語 `"quoted`"`n" } }
     ) } | ConvertTo-Json -Depth 8 | Set-Content "$root/tasks.json" -Encoding utf8NoBOM
     $record.exe_sha256 = (Get-FileHash "$root/wintable.exe" -Algorithm SHA256).Hash
     $arguments = @('run','--name',$name,'--isolation',$Isolation,'--mount',"type=bind,source=$root,target=C:/validation,readonly",$BaseImage,'powershell.exe','-NoProfile','-File','C:/validation/cases.ps1')
