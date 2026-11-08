@@ -42,3 +42,5 @@ Ctrl+Cで新規処理を止め接続を解放します。切断で対象プロ�
 `cli.RunEngine` が全件事前検証から結果描画まで接続します。本番mainは固定command/file_contentラッパーとSSHConnectorを使います。模擬V-04/06を実機SSH検証の合格とは扱いません。
 
 SSH接続の設定・依存監査・検証範囲は [SSH transport](docs/ssh-transport.md) を参照してください。
+
+関連: [モジュール一覧と設計](docs/design/modules.md)。
