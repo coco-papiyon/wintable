@@ -1,0 +1,58 @@
+{
+  "source_sha": "df72c0574fb84e870a95a836374c06d354358a6b",
+  "source_status": [],
+  "started_utc": "2026-11-08T01:24:07.6477296Z",
+  "base_image": "mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09",
+  "checks": [
+    {
+      "command": "go test ./... -count=1 -v -timeout=8m",
+      "log": "test.log",
+      "name": "test",
+      "exit_code": 0
+    },
+    {
+      "command": "go vet ./...",
+      "log": "vet.log",
+      "name": "vet",
+      "exit_code": 0
+    },
+    {
+      "command": "go test ./internal/module -run ^TestDistributionWrapper$ -count=1 -v",
+      "log": "wrappers.log",
+      "name": "wrappers",
+      "exit_code": 0
+    },
+    {
+      "command": "go build -trimpath -o C:\\data\\dev\\github\\wintable\\.cache\\issue11\\.cache\\validation\\issue11-final/wintable.exe ./cmd/wintable",
+      "log": "build.log",
+      "name": "build",
+      "exit_code": 0
+    },
+    {
+      "command": "go test -c -o C:\\data\\dev\\github\\wintable\\.cache\\issue11\\.cache\\validation\\issue11-final/module.test.exe ./internal/module",
+      "log": "module_binary.log",
+      "name": "module_binary",
+      "exit_code": 0
+    },
+    {
+      "command": "docker run --name wintable-native-ac76e8150503 --isolation hyperv --mount type=bind,source=C:\\data\\dev\\github\\wintable\\.cache\\issue11\\.cache\\validation\\issue11-final,target=C:/validation,readonly mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09 C:/validation/module.test.exe -test.run=^TestFileContentWindows$ -test.v -test.timeout=3m",
+      "log": "native-container.log",
+      "name": "native_container",
+      "exit_code": 0
+    }
+  ],
+  "acceptance": "unconfirmed",
+  "launch_measurement": "UTF-16 code units of cmd.exe /c plus quoted fixed wrapper; non-BMP counts as 2; limit 8000",
+  "runner_sha256": "4B45A88D7EA54F6B481DE0A0DDD58D92238EB10129802641FB521246E0AE2582",
+  "go": "go version go1.27.3 windows/amd64",
+  "controller": {
+    "os": "Microsoft Windows NT 10.0.26300.0",
+    "powershell": "7.6.9",
+    "architecture": "AMD64"
+  },
+  "native_container_removed": true,
+  "exe_sha256": "8573B63E0FA843954E99A075DF7ECA7F2E284A26B769E73E47FC530C70F277E1",
+  "failure": "command module acceptance failed",
+  "finished_utc": "2026-11-08T01:29:15.5905142Z",
+  "prerequisites_passed": false
+}

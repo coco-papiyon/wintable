@@ -1,0 +1,31 @@
+=== RUN   TestWindowsCLIProcess
+=== RUN   TestWindowsCLIProcess/V10_input_encodings_V12_formats
+    process_windows_test.go:155: LF/json: actual exe over SSH exit=0; output={"hosts":[{"host":"target","tasks":[{"host":"target","task":"process","task_index":0,"status":"changed","changed":true,"exit_code":0,"duration_ms":1462,"stdout_truncated":false,"stderr_truncated":false}],"counts":{"ok":0,"changed":1,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}],"counts":{"ok":0,"changed":1,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}
+    process_windows_test.go:155: LF/text: actual exe over SSH exit=0; output=host="target"
+          task_index=0 task="process" status=changed changed=true exit_code=0 duration_ms=1464
+          counts={OK:0 Changed:1 Failed:0 Unreachable:0 Skipped:0 Cancelled:0}
+        counts={OK:0 Changed:1 Failed:0 Unreachable:0 Skipped:0 Cancelled:0}
+    process_windows_test.go:155: CRLF/json: actual exe over SSH exit=0; output={"hosts":[{"host":"target","tasks":[{"host":"target","task":"process","task_index":0,"status":"changed","changed":true,"exit_code":0,"duration_ms":1547,"stdout_truncated":false,"stderr_truncated":false}],"counts":{"ok":0,"changed":1,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}],"counts":{"ok":0,"changed":1,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}
+    process_windows_test.go:155: CRLF/text: actual exe over SSH exit=0; output=host="target"
+          task_index=0 task="process" status=changed changed=true exit_code=0 duration_ms=1534
+          counts={OK:0 Changed:1 Failed:0 Unreachable:0 Skipped:0 Cancelled:0}
+        counts={OK:0 Changed:1 Failed:0 Unreachable:0 Skipped:0 Cancelled:0}
+    process_windows_test.go:155: BOM/json: actual exe over SSH exit=0; output={"hosts":[{"host":"target","tasks":[{"host":"target","task":"process","task_index":0,"status":"changed","changed":true,"exit_code":0,"duration_ms":1493,"stdout_truncated":false,"stderr_truncated":false}],"counts":{"ok":0,"changed":1,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}],"counts":{"ok":0,"changed":1,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}
+    process_windows_test.go:155: BOM/text: actual exe over SSH exit=0; output=host="target"
+          task_index=0 task="process" status=changed changed=true exit_code=0 duration_ms=1474
+          counts={OK:0 Changed:1 Failed:0 Unreachable:0 Skipped:0 Cancelled:0}
+        counts={OK:0 Changed:1 Failed:0 Unreachable:0 Skipped:0 Cancelled:0}
+=== RUN   TestWindowsCLIProcess/V12_broken_stdout
+    process_windows_test.go:181: Real product exe, real SSH command completed; closed stdout pipe => exit 3
+=== RUN   TestWindowsCLIProcess/V06_V12_CtrlC
+    process_windows_test.go:201: === RUN   TestWindowsCLIConsoleHelper
+            process_windows_test.go:77: Actual CTRL_C_EVENT: exit=130; single JSON; changed=null; output={"hosts":[{"host":"target","tasks":[{"host":"target","task":"process","task_index":0,"status":"cancelled","changed":null,"exit_code":null,"duration_ms":1784,"error":{"code":"cancelled"},"stdout_truncated":false,"stderr_truncated":false}],"counts":{"ok":0,"changed":0,"failed":0,"unreachable":0,"skipped":0,"cancelled":1}}],"counts":{"ok":0,"changed":0,"failed":0,"unreachable":0,"skipped":0,"cancelled":1}}
+        --- PASS: TestWindowsCLIConsoleHelper (2.07s)
+        PASS
+        
+--- PASS: TestWindowsCLIProcess (14.70s)
+    --- PASS: TestWindowsCLIProcess/V10_input_encodings_V12_formats (10.33s)
+    --- PASS: TestWindowsCLIProcess/V12_broken_stdout (1.79s)
+    --- PASS: TestWindowsCLIProcess/V06_V12_CtrlC (2.57s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/cli	16.412s

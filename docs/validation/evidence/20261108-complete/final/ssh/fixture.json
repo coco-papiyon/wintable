@@ -1,0 +1,6 @@
+{
+  "Port": 22,
+  "Address": "172.21.192.154",
+  "User": "wintablessh",
+  "Container": "wintable-ssh-fede48285c0d"
+}

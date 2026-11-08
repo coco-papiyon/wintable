@@ -49,3 +49,4 @@ V-13は別途、正常終了、完了マーカー、exe/source一致、build成�
 
 証跡の公開前に秘密鍵やパスフレーズの混入を点検する。exe・試験exe・Docker context・一時鍵はGitへ含めない。レビュー済みの証跡は `docs/validation/evidence/` へ選別し、選別後の集合にハッシュ索引を作る。修正後の再検証は新しいrun-idとソースSHAで保存する。
 
+保存済みの全シナリオ再検証は [20261108-complete](evidence/20261108-complete/README.md) を参照。
