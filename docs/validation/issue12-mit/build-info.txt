@@ -1,0 +1,15 @@
+C:\data\dev\github\wintable\.cache\issue12\dist\mit-release\package/wintable.exe: go1.27.3
+	path	github.com/coco-papiyon/wintable/cmd/wintable
+	mod	github.com/coco-papiyon/wintable	v0.0.0-20261108125137-c69881711272	
+	dep	golang.org/x/crypto	v0.58.0	h1:COkYLr4k7nDI4r6QtMML2AfzeIswWHAJthLS6K/M/54=
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	-trimpath=true
+	build	CGO_ENABLED=0
+	build	GOARCH=amd64
+	build	GOOS=windows
+	build	GOAMD64=v1
+	build	vcs=git
+	build	vcs.revision=c698817112724af47d7147d74fa21386dc5507f8
+	build	vcs.time=2026-11-08T12:51:37Z
+	build	vcs.modified=false
