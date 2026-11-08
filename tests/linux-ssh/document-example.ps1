@@ -13,7 +13,7 @@ try {
     $inventory | ConvertTo-Json -Depth 10 | Set-Content $inputFile -Encoding utf8NoBOM
     $text=& "$package/wintable.exe" run --inventory $inputFile --tasks "$package/examples/linux-command.json" --format json --include-output
     if ($LASTEXITCODE -ne 0) { throw 'Document example failed' }
-    $result=$text | ConvertFrom-Json
+    $result=($text -join "`n") | ConvertFrom-Json
     # Compare only fixed synthetic whoami output; never persist arbitrary output.
     $tasks=@($result.hosts | ForEach-Object { $_.tasks })
     if ($tasks.Count -ne 1 -or $tasks[0].status -ne 'changed' -or $tasks[0].exit_code -ne 0 -or

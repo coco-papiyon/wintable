@@ -2,6 +2,7 @@ param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][str
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path "$PSScriptRoot/../..").Path
 Push-Location $repo
+$stage='product-tests'
 try {
     $env:WINTABLE_LINUX_SSH_FIXTURE=$FixtureDirectory
     $env:WINTABLE_PRODUCT_EXE=Join-Path $repo 'dist/wintable.exe'
@@ -15,8 +16,14 @@ try {
     foreach ($case in $required) {
         if (@($parsed | Where-Object { $_.Action -eq 'pass' -and $_.Test -ceq "TestLinuxCommandSSH/$case" }).Count -ne 1) { throw "Missing/duplicate product case: $case" }
     }
+    $stage='document-example'
     & "$PSScriptRoot/document-example.ps1" -FixtureDirectory $FixtureDirectory -EvidenceDirectory $EvidenceDirectory
     Get-FileHash $env:WINTABLE_PRODUCT_EXE | Select-Object Algorithm,Hash | ConvertTo-Json | Set-Content "$EvidenceDirectory/product-hash.json"
+} catch {
+    # Persist only location metadata, never exception text or command output.
+    @{stage=$stage;script=[IO.Path]::GetFileName($_.InvocationInfo.ScriptName);line=$_.InvocationInfo.ScriptLineNumber} |
+        ConvertTo-Json | Set-Content "$EvidenceDirectory/product-failure.json" -Encoding utf8NoBOM
+    throw
 } finally {
     Remove-Item Env:WINTABLE_LINUX_SSH_FIXTURE -ErrorAction SilentlyContinue
     Remove-Item Env:WINTABLE_PRODUCT_EXE -ErrorAction SilentlyContinue

@@ -2,20 +2,14 @@
 param([string]$OutputDirectory = "$PSScriptRoot/../../dist/package")
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path "$PSScriptRoot/../..").Path
-if (Test-Path $OutputDirectory) { throw 'Package directory must be new' }
-New-Item $OutputDirectory -ItemType Directory -Force | Out-Null
-Copy-Item "$repo/dist/wintable.exe","$repo/README.md" $OutputDirectory
-Copy-Item "$repo/docs","$repo/examples" $OutputDirectory -Recurse
-$files=@(Get-ChildItem $OutputDirectory -Recurse -File | ForEach-Object {
-    @{path=[IO.Path]::GetRelativePath($OutputDirectory,$_.FullName).Replace('\','/');sha256=(Get-FileHash $_.FullName).Hash}
-})
-@{schema=1;source_sha=(& git -C $repo rev-parse HEAD);go=(& go version);files=$files} |
-    ConvertTo-Json -Depth 8 | Set-Content "$OutputDirectory/distribution.json" -Encoding utf8NoBOM
-Compress-Archive -Path "$OutputDirectory/*" -DestinationPath "$OutputDirectory.zip"
-$expanded="$OutputDirectory-check"
-Expand-Archive "$OutputDirectory.zip" $expanded
-foreach ($file in $files) {
-    if ((Get-FileHash (Join-Path $expanded $file.path)).Hash -ne $file.sha256) { throw 'ZIP content mismatch' }
-}
-& "$expanded/wintable.exe" help | Out-Null
-if ($LASTEXITCODE) { throw 'Packaged executable failed' }
+if (Test-Path -LiteralPath $OutputDirectory) { throw 'Package directory must be new' }
+$output=[IO.Path]::GetFullPath($OutputDirectory)
+$auditOutput="$output-audit"
+# Keep the existing vulnerability audit, license inventory and ZIP checks.
+& "$repo/scripts/distribution.ps1" -OutputDirectory $auditOutput -ProductLicense "$repo/LICENSE"
+New-Item (Split-Path $output) -ItemType Directory -Force | Out-Null
+Copy-Item -LiteralPath "$auditOutput/package" -Destination $output -Recurse
+& "$PSScriptRoot/check-package.ps1" -Directory $output -SourceSHA (& git -C $repo rev-parse HEAD)
+$zips=@(Get-ChildItem $auditOutput -Filter '*.zip' -File)
+if ($zips.Count -ne 1) { throw 'Expected one audited ZIP' }
+Copy-Item -LiteralPath $zips[0].FullName -Destination "$output.zip"

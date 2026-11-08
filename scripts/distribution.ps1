@@ -31,7 +31,7 @@ try {
     Invoke-Go -Arguments @('version','-m',"$stage/wintable.exe") | Set-Content "$stage/build-info.txt" -Encoding utf8
     Copy-Item examples "$stage/examples" -Recurse
     New-Item -ItemType Directory "$stage/docs" | Out-Null
-    Copy-Item docs/usage.md,docs/release.md,docs/command-module.md,docs/file-content-module.md,docs/linux-command.md "$stage/docs"
+    Copy-Item docs/usage.md,docs/release.md,docs/command-module.md,docs/file-content-module.md,docs/linux-command.md,docs/support.md,docs/ci.md "$stage/docs"
     @('# wintable Windows amd64', '', '導入・SSH準備・利用方法: [docs/usage.md](docs/usage.md)', '', '配布条件と検証範囲: [docs/release.md](docs/release.md)', '', 'このZIPは検証用候補です。公開可否はbuild.jsonと対応する受け入れ証跡で確認してください。') | Set-Content "$stage/README.md" -Encoding utf8
     $licenses = New-Item -ItemType Directory "$stage/licenses"
     $goroot = (& go env GOROOT).Trim()
@@ -61,6 +61,12 @@ try {
     Copy-Item -LiteralPath $ProductLicense -Destination "$stage/LICENSE"
     Copy-Item "$out/audit.json" "$stage/audit.json"
     [ordered]@{source_commit=$sha; go='go1.27.3'; scanner='govulncheck v1.9.0'; created_utc=[DateTime]::UtcNow.ToString('o'); release_status='candidate; requires acceptance evidence'} | ConvertTo-Json | Set-Content "$stage/build.json" -Encoding utf8
+    # Bind the common SSH candidate to the audited, licensed distribution.
+    $files = @(Get-ChildItem $stage -File -Recurse | ForEach-Object {
+        @{path=[IO.Path]::GetRelativePath($stage.FullName,$_.FullName).Replace('\','/');sha256=(Get-FileHash $_.FullName).Hash}
+    })
+    @{schema=1;source_sha=$sha;go=(& go version);files=$files} |
+        ConvertTo-Json -Depth 8 | Set-Content "$stage/distribution.json" -Encoding utf8NoBOM
     $hashes = @(Get-ChildItem $stage -File -Recurse | ForEach-Object {
         [ordered]@{path=[IO.Path]::GetRelativePath($stage.FullName,$_.FullName).Replace('\','/'); sha256=(Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()}
     })

@@ -6,7 +6,7 @@ function Save($object,$path) { $object | ConvertTo-Json -Depth 15 | Set-Content 
 try {
     'synthetic executable bytes' | Set-Content "$root/package/wintable.exe"
     $hash=(Get-FileHash "$root/package/wintable.exe").Hash
-    $paths=@('wintable.exe','README.md','docs/linux-command.md','docs/support.md','docs/ci.md','examples/linux-inventory.json','examples/linux-command.json','examples/mixed-inventory.json','examples/mixed-command.json')
+    $paths=@('wintable.exe','README.md','LICENSE','audit.json','build.json','SHA256.json','licenses/index.json','licenses/Go-LICENSE','docs/usage.md','docs/release.md','docs/file-content-module.md','docs/linux-command.md','docs/support.md','docs/ci.md','examples/linux-inventory.json','examples/linux-command.json','examples/mixed-inventory.json','examples/mixed-command.json')
     foreach ($path in $paths | Select-Object -Skip 1) {
         New-Item (Split-Path "$root/package/$path") -ItemType Directory -Force | Out-Null
         'synthetic' | Set-Content "$root/package/$path"
