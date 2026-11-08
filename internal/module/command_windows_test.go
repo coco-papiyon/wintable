@@ -162,6 +162,22 @@ func TestCommandWindows(t *testing.T) {
 				}
 			})
 			t.Run("nonzero_and_bytes", func(t *testing.T) {
+				for _, cp := range []struct {
+					id   string
+					want []byte
+				}{
+					{"932", []byte{0x93, 0xfa, 0x96, 0x7b, 0x8c, 0xea}},
+					{"65001", []byte("日本語")}, {"437", []byte{0x63, 0x61, 0x66, 0x82}}, {"1252", []byte{0x63, 0x61, 0x66, 0xe9}},
+				} {
+					row := DecodeCommand(run(t, payload([]string{"--codepage", cp.id})), true)
+					if row.StdoutBase64 == nil {
+						t.Fatal("missing encoded output")
+					}
+					got, err := base64.StdEncoding.DecodeString(*row.StdoutBase64)
+					if err != nil || !bytes.Equal(got, cp.want) || row.Status != result.Changed {
+						t.Fatalf("codepage %s: %x %v", cp.id, got, err)
+					}
+				}
 				row := DecodeCommand(run(t, payload([]string{"--exit", "13"})), false)
 				if row.Status != result.Failed || row.Changed != nil || row.ExitCode == nil || *row.ExitCode != 13 {
 					t.Fatal(row)

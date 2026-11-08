@@ -1,0 +1,6 @@
+=== RUN   TestDistributionWrapper
+    wrapper_test.go:6: file_content wrapper UTF-16 units: 7997
+    wrapper_test.go:20: wrapper UTF-16 units: 7185
+--- PASS: TestDistributionWrapper (0.01s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/module	1.709s

@@ -95,6 +95,30 @@ func TestFileContentSSH(t *testing.T) {
 	if observe() != second {
 		t.Fatal("invalid request modified file")
 	}
+	// Deny creation in a dedicated fixture directory, preserving target bytes.
+	denied := `C:\fixture\write-denied`
+	setup := exec.CommandContext(ctx, "docker", "exec", cfg.Container, "powershell.exe", "-NoProfile", "-Command", `New-Item -ItemType Directory -Force 'C:\fixture\write-denied'|Out-Null; & icacls.exe 'C:\fixture\write-denied' /deny '*S-1-1-0:(OI)(CI)(W)'|Out-Null; if($LASTEXITCODE){exit 1}`)
+	if out, err := setup.CombinedOutput(); err != nil {
+		t.Fatalf("deny setup: %v %s", err, out)
+	}
+	defer func() {
+		cleanup := exec.Command("docker", "exec", cfg.Container, "icacls.exe", denied, "/remove:d", "*S-1-1-0")
+		if out, err := cleanup.CombinedOutput(); err != nil {
+			t.Errorf("deny cleanup: %v %s", err, out)
+		}
+	}()
+	input, e := Prepare("h", 1, "file_content", map[string]any{"path": denied + `\file.txt`, "content": "must not write"})
+	if e != nil {
+		t.Fatal(e)
+	}
+	if row := run(input.JSON()); row.Status != result.Failed {
+		t.Fatal("ACL denial did not fail", row)
+	}
+	verify := exec.CommandContext(ctx, "docker", "exec", cfg.Container, "powershell.exe", "-NoProfile", "-Command", `if(@(Get-ChildItem -Force 'C:\fixture\write-denied').Count){throw 'ACL denied write left data or temporary files'}`)
+	if out, err := verify.CombinedOutput(); err != nil {
+		t.Fatalf("denied directory changed: %v %s", err, out)
+	}
+	t.Log("ACL deny: failed without target or temporary file; deny ACE removed in deferred cleanup")
 	out, e := exec.CommandContext(ctx, "docker", "exec", cfg.Container, "powershell.exe", "-NoProfile", "-Command", `$PSVersionTable.PSVersion.ToString();cmd /c ver`).CombinedOutput()
 	if e != nil {
 		t.Fatal(e)

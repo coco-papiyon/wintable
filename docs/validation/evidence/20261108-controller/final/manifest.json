@@ -1,0 +1,46 @@
+{
+  "source_sha": "828c062e8fd02cb8b5cba4b39ae20d803233e08e",
+  "source_status": [
+    "?? docs/validation/evidence/20261108-controller/"
+  ],
+  "started_utc": "2026-11-08T00:58:50.5323818Z",
+  "base_image": "mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09",
+  "checks": [
+    {
+      "log": "test.log",
+      "name": "test",
+      "command": "go test ./... -count=1 -v -timeout=8m",
+      "exit_code": 0
+    },
+    {
+      "log": "vet.log",
+      "name": "vet",
+      "command": "go vet ./...",
+      "exit_code": 0
+    },
+    {
+      "log": "wrappers.log",
+      "name": "wrappers",
+      "command": "go test ./internal/module -run ^TestDistributionWrapper$ -count=1 -v",
+      "exit_code": 0
+    },
+    {
+      "log": "build.log",
+      "name": "build",
+      "command": "go build -trimpath -o C:\\data\\dev\\github\\wintable\\.cache\\issue11\\.cache\\validation\\d9a10a0203a54317b7433e62936bc60e/wintable.exe ./cmd/wintable",
+      "exit_code": 0
+    }
+  ],
+  "acceptance": "unconfirmed",
+  "launch_measurement": "UTF-16 code units of cmd.exe /c plus quoted fixed wrapper; non-BMP counts as 2; limit 8000",
+  "runner_sha256": "A3DB0AF0E2A1CC0AEF35A00FD2A277761E1974F9F37C04143B1B2FBBD189EF0D",
+  "go": "go version go1.27.3 windows/amd64",
+  "controller": {
+    "powershell": "7.6.9",
+    "os": "Microsoft Windows NT 10.0.26300.0",
+    "architecture": "AMD64"
+  },
+  "exe_sha256": "0C36A810FD4E82A259519055D209926DA589F7D2407779613383674063E166E5",
+  "ssh_fixture": "completed; see ssh/manifest.json for commands and exit codes",
+  "finished_utc": "2026-11-08T01:03:39.2325803Z"
+}

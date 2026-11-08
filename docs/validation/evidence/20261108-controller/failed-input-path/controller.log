@@ -1,0 +1,39 @@
+Preparation: removed preinstalled WSL launcher from disposable controller layer
+{
+    "os":  "Microsoft Windows NT 10.0.20348.0",
+    "architecture":  "AMD64",
+    "powershell":  "5.1.20348.5773",
+    "tools":  {
+                  "wsl":  [
+
+                          ],
+                  "go":  [
+
+                         ],
+                  "py":  [
+
+                         ],
+                  "python3":  [
+
+                              ],
+                  "python":  [
+
+                             ]
+              },
+    "exe_sha256":  "A34032750EDA4D8C5243081B5E9092FD86865C3294402C102E383F2102202608"
+}
+input_error: tasks $.tasks[0].args.executable: expected Windows drive absolute path
+{
+    "case":  "V-13-first-command-file",
+    "command":  "wintable.exe run --inventory C:/validation/inventory.json --tasks C:/validation/tasks.json --format json --include-output",
+    "exit_code":  2,
+    "output":  ""
+}
+V-13-first-command-file exited 2
+At C:\validation\cases.ps1:33 char:24
++     if ($code -ne 0) { throw "$Name exited $code" }
++                        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (V-13-first-command-file exite 
+   d 2:String) [], RuntimeException
+    + FullyQualifiedErrorId : V-13-first-command-file exited 2
+ 

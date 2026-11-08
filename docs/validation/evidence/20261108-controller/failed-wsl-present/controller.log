@@ -1,0 +1,8 @@
+Clean controller unexpectedly contains wsl
+At C:\validation\cases.ps1:14 char:25
++ ... found.Count) { throw "Clean controller unexpectedly contains $tool" }
++                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Clean controlle...ly contains 
+    wsl:String) [], RuntimeException
+    + FullyQualifiedErrorId : Clean controller unexpectedly contains wsl
+ 
