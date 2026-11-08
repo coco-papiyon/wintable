@@ -1,0 +1,120 @@
+{
+  "source_commit": "2a19a2becbd738b06929eb19825e395d936a8f17",
+  "zip_sha256": "66DD56EB63C85FDE014A962A7D1BD1AF5E2A7A70CB2DECFDE28E38CC044AE3C0",
+  "issue11_url": "https://github.com/coco-papiyon/wintable/issues/11#issuecomment-6717454311",
+  "reviewer": "Codex automated evidence review; human publication review remains required",
+  "clean_container": true,
+  "no_go_wsl_python": true,
+  "non_admin_install": true,
+  "japanese_space_path": true,
+  "scenarios": [
+    {
+      "id": "V-01",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-02",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-03",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-04",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-05",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-06",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-07",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-08",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-09",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-10",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-11",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-12",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-13",
+      "log": "final/ssh/zip-controller.log",
+      "sha256": "36435758866460A5A1C0EB15351CF1ADBCA28B2C3ECCE123403D0E56ADDF39F6",
+      "status": "passed"
+    },
+    {
+      "id": "V-14",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-15",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-16",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-17",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    },
+    {
+      "id": "V-18",
+      "log": "final/scenarios.csv",
+      "sha256": "832FC44D43E3388F6B0B65A0A27A2C3F3DA19AB88005A7E10C5C9B2ED733AA81",
+      "status": "passed"
+    }
+  ]
+}

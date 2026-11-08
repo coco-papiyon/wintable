@@ -46,6 +46,2545 @@
 {
   "osv": {
     "schema_version": "1.3.1",
+    "id": "GO-2020-0012",
+    "modified": "2024-05-20T16:03:47Z",
+    "published": "2021-04-14T20:04:52Z",
+    "aliases": [
+      "CVE-2020-9283",
+      "GHSA-ffhg-7mh4-33c4"
+    ],
+    "summary": "Panic due to improper verification of cryptographic signatures in golang.org/x/crypto/ssh",
+    "details": "An attacker can craft an ssh-ed25519 or sk-ssh-ed25519@openssh.com public key, such that the library will panic when trying to verify a signature with it. If verifying signatures using user supplied public keys, this may be used as a denial of service vector.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.0.0-20200220183623-bac4c82f6975"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "CertChecker.Authenticate",
+                "CertChecker.CheckCert",
+                "CertChecker.CheckHostKey",
+                "Certificate.Verify",
+                "Dial",
+                "NewClientConn",
+                "NewPublicKey",
+                "NewServerConn",
+                "NewSignerFromKey",
+                "NewSignerFromSigner",
+                "ParseAuthorizedKey",
+                "ParseKnownHosts",
+                "ParsePrivateKey",
+                "ParsePrivateKeyWithPassphrase",
+                "ParsePublicKey",
+                "ParseRawPrivateKey",
+                "ParseRawPrivateKeyWithPassphrase",
+                "ed25519PublicKey.Verify",
+                "parseED25519",
+                "parseSKEd25519",
+                "skEd25519PublicKey.Verify"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/220357"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.googlesource.com/crypto/+/bac4c82f69751a6dd76e702d54b3ceb88adab236"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/3L45YRc91SY"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Alex Gaynor, Fish in a Barrel"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2020-0012",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2020-0013",
+    "modified": "2024-05-20T16:03:47Z",
+    "published": "2021-04-14T20:04:52Z",
+    "aliases": [
+      "CVE-2017-3204",
+      "GHSA-xhjq-w7xm-p8qj"
+    ],
+    "summary": "Man-in-the-middle attack in golang.org/x/crypto/ssh",
+    "details": "By default host key verification is disabled which allows for man-in-the-middle attacks against SSH clients if ClientConfig.HostKeyCallback is not set.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.0.0-20170330155735-e4e2799dd7aa"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "Dial",
+                "NewClientConn"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/38701"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.googlesource.com/crypto/+/e4e2799dd7aab89f583e1d898300d96367750991"
+      },
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/19767"
+      },
+      {
+        "type": "WEB",
+        "url": "https://bridge.grumpy-troll.org/2017/04/golang-ssh-security/"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Phil Pennock"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2020-0013",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2021-0227",
+    "modified": "2024-05-20T16:03:47Z",
+    "published": "2022-02-17T17:35:32Z",
+    "aliases": [
+      "CVE-2020-29652",
+      "GHSA-3vm4-22fp-5rfm"
+    ],
+    "summary": "Panic on crafted authentication request message in golang.org/x/crypto/ssh",
+    "details": "Clients can cause a panic in SSH servers. An attacker can craft an authentication request message for the “gssapi-with-mic” method which will cause NewServerConn to panic via a nil pointer dereference if ServerConfig.GSSAPIWithMICConfig is nil.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.0.0-20201216223049-8b5274cf687f"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "NewServerConn",
+                "connection.serverAuthenticate"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/278852"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.googlesource.com/crypto/+/8b5274cf687fd9316b4108863654cc57385531e8"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/ouZIlBimOsE?pli=1"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Joern Schneewesiz (GitLab Security Research Team)"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2021-0227",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2021-0356",
+    "modified": "2024-05-20T16:03:47Z",
+    "published": "2022-04-25T20:38:40Z",
+    "aliases": [
+      "CVE-2022-27191",
+      "GHSA-8c26-wmh5-6g9v"
+    ],
+    "summary": "Denial of service via crafted Signer in golang.org/x/crypto/ssh",
+    "details": "Attackers can cause a crash in SSH servers when the server has been configured by passing a Signer to ServerConfig.AddHostKey such that\n1) the Signer passed to AddHostKey does not implement AlgorithmSigner, and\n2) the Signer passed to AddHostKey returns a key of type “ssh-rsa” from its PublicKey method.\n\nServers that only use Signer implementations provided by the ssh package are unaffected.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.0.0-20220314234659-1baeb1ce4c0b"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "ServerConfig.AddHostKey"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/392355"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.googlesource.com/crypto/+/1baeb1ce4c0b006eff0f294c47cb7617598dfb3d"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/-cp44ypCT5s"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2021-0356",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2022-0209",
+    "modified": "2024-05-20T16:03:47Z",
+    "published": "2022-07-01T20:15:25Z",
+    "aliases": [
+      "CVE-2019-11840",
+      "GHSA-r5c5-pr8j-pfp7"
+    ],
+    "summary": "Insufficiently random values in golang.org/x/crypto/salsa20",
+    "details": "XORKeyStream generates incorrect and insecure output for very large inputs.\n\nIf more than 256 GiB of keystream is generated, or if the counter otherwise grows greater than 32 bits, the amd64 implementation will first generate incorrect output, and then cycle back to previously generated keystream. Repeated keystream bytes can lead to loss of confidentiality in encryption applications, or to predictability in CSPRNG applications.\n\nThe issue might affect uses of golang.org/x/crypto/nacl with extremely large messages.\n\nArchitectures other than amd64 and uses that generate less than 256 GiB of keystream for a single salsa20.XORKeyStream invocation are unaffected.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.0.0-20190320223903-b7391e95e576"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/salsa20/salsa",
+              "goarch": [
+                "amd64"
+              ],
+              "symbols": [
+                "XORKeyStream"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/168406"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.googlesource.com/crypto/+/b7391e95e576cacdcdd422573063bc057239113d"
+      },
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/30965"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/tjyNcJxb2vQ/m/n0NRBziSCAAJ"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Michael McLoughlin"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2022-0209",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2022-0229",
+    "modified": "2024-05-20T16:03:47Z",
+    "published": "2022-07-06T18:23:48Z",
+    "aliases": [
+      "CVE-2020-7919",
+      "GHSA-cjjc-xp8v-855w"
+    ],
+    "summary": "Panic in certificate parsing in crypto/x509 and golang.org/x/crypto/cryptobyte",
+    "details": "On 32-bit architectures, a malformed input to crypto/x509 or the ASN.1 parsing functions of golang.org/x/crypto/cryptobyte can lead to a panic.\n\nThe malformed certificate can be delivered via a crypto/tls connection to a client, or to a server that accepts client certificates. net/http clients can be made to crash by an HTTPS server, while net/http servers that accept client certificates will recover the panic and are unaffected.",
+    "affected": [
+      {
+        "package": {
+          "name": "stdlib",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "1.12.16"
+              },
+              {
+                "introduced": "1.13.0-0"
+              },
+              {
+                "fixed": "1.13.7"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "crypto/x509"
+            }
+          ]
+        }
+      },
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.0.0-20200124225646-8b5121be2f68"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/cryptobyte"
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/216680"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.googlesource.com/go/+/b13ce14c4a6aa59b7b041ad2b6eed2d23e15b574"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/216677"
+      },
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/36837"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/Hsw4mHYc470"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Project Wycheproof"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2022-0229",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2022-0968",
+    "modified": "2024-05-20T16:03:47Z",
+    "published": "2022-09-13T03:32:38Z",
+    "aliases": [
+      "CVE-2021-43565",
+      "GHSA-gwc9-m7rh-j2ww"
+    ],
+    "summary": "Panic on malformed packets in golang.org/x/crypto/ssh",
+    "details": "Unauthenticated clients can cause a panic in SSH servers.\n\nWhen using AES-GCM or ChaCha20Poly1305, consuming a malformed packet which contains an empty plaintext causes a panic.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.0.0-20211202192323-5770296d904e"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "Dial",
+                "NewClientConn",
+                "NewServerConn",
+                "chacha20Poly1305Cipher.readCipherPacket",
+                "curve25519sha256.Client",
+                "curve25519sha256.Server",
+                "dhGEXSHA.Client",
+                "dhGEXSHA.Server",
+                "dhGroup.Client",
+                "dhGroup.Server",
+                "ecdh.Client",
+                "ecdh.Server",
+                "gcmCipher.readCipherPacket"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/2AR1sKiM-Qs"
+      },
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issues/49932"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/368814/"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Rod Hynes (Psiphon Inc)"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2022-0968",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2023-1992",
+    "modified": "2024-05-20T16:03:47Z",
+    "published": "2023-08-23T14:38:42Z",
+    "aliases": [
+      "CVE-2019-11841",
+      "GHSA-x3jr-pf6g-c48f"
+    ],
+    "summary": "Misleading message verification in golang.org/x/crypto/openpgp/clearsign",
+    "details": "The clearsign package accepts some malformed messages, making it possible for an attacker to trick a human user (but not a Go program) into thinking unverified text is part of the message.\n\nWith fix, messages with malformed headers in the SIGNED MESSAGE section are rejected.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.0.0-20190424203555-c05e17bb3b2d"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/openpgp/clearsign",
+              "symbols": [
+                "Decode"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://go-review.git.corp.google.com/c/crypto/+/173778"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.googlesource.com/crypto/+/c05e17bb3b2dca130fc919668a96b4bec9eb9442"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/d/msg/golang-openpgp/6vdgZoTgbIY/K6bBY9z3DAAJ"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Aida Mynzhasova (SEC Consult Vulnerability Lab)"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2023-1992",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2023-2402",
+    "modified": "2024-05-20T16:03:47Z",
+    "published": "2023-12-18T21:18:26Z",
+    "aliases": [
+      "CVE-2023-48795",
+      "GHSA-45x7-px36-x8w8"
+    ],
+    "summary": "Man-in-the-middle attacker can compromise integrity of secure channel in golang.org/x/crypto",
+    "details": "A protocol weakness allows a MITM attacker to compromise the integrity of the secure channel before it is established, allowing the attacker to prevent transmission of a number of messages immediately after the secure channel is established without either side being aware.\n\nThe impact of this attack is relatively limited, as it does not compromise confidentiality of the channel. Notably this attack would allow an attacker to prevent the transmission of the SSH2_MSG_EXT_INFO message, disabling a handful of newer security features.\n\nThis protocol weakness was also fixed in OpenSSH 9.6.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.17.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "Client.Dial",
+                "Client.DialContext",
+                "Client.DialTCP",
+                "Client.Listen",
+                "Client.ListenTCP",
+                "Client.ListenUnix",
+                "Client.NewSession",
+                "Dial",
+                "DiscardRequests",
+                "NewClient",
+                "NewClientConn",
+                "NewServerConn",
+                "Request.Reply",
+                "Session.Close",
+                "Session.CombinedOutput",
+                "Session.Output",
+                "Session.RequestPty",
+                "Session.RequestSubsystem",
+                "Session.Run",
+                "Session.SendRequest",
+                "Session.Setenv",
+                "Session.Shell",
+                "Session.Signal",
+                "Session.Start",
+                "Session.WindowChange",
+                "channel.Accept",
+                "channel.Close",
+                "channel.CloseWrite",
+                "channel.Read",
+                "channel.ReadExtended",
+                "channel.Reject",
+                "channel.SendRequest",
+                "channel.Write",
+                "channel.WriteExtended",
+                "connectionState.readPacket",
+                "connectionState.writePacket",
+                "curve25519sha256.Client",
+                "curve25519sha256.Server",
+                "dhGEXSHA.Client",
+                "dhGEXSHA.Server",
+                "dhGroup.Client",
+                "dhGroup.Server",
+                "ecdh.Client",
+                "ecdh.Server",
+                "extChannel.Read",
+                "extChannel.Write",
+                "handshakeTransport.enterKeyExchange",
+                "handshakeTransport.readLoop",
+                "handshakeTransport.sendKexInit",
+                "mux.OpenChannel",
+                "mux.SendRequest",
+                "sessionStdin.Close",
+                "sshClientKeyboardInteractive.Challenge",
+                "tcpListener.Accept",
+                "tcpListener.Close",
+                "transport.readPacket",
+                "transport.writePacket",
+                "unixListener.Accept",
+                "unixListener.Close"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/64784"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/550715"
+      },
+      {
+        "type": "FIX",
+        "url": "https://github.com/golang/crypto/commit/9d2ee975ef9fe627bf0a6f01c1f69e8ef1d4f05d"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/qA3XtxvMUyg"
+      },
+      {
+        "type": "WEB",
+        "url": "https://www.openssh.com/txt/release-9.6"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Fabian Bäumer (Ruhr University Bochum)"
+      },
+      {
+        "name": "Marcus Brinkmann (Ruhr University Bochum)"
+      },
+      {
+        "name": "Jörg Schwenk (Ruhr University Bochum)"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2023-2402",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2024-2961",
+    "modified": "2024-07-02T19:27:52Z",
+    "published": "2024-07-02T19:27:52Z",
+    "aliases": [
+      "CVE-2022-30636"
+    ],
+    "summary": "Limited directory traversal vulnerability on Windows in golang.org/x/crypto",
+    "details": "httpTokenCacheKey uses path.Base to extract the expected HTTP-01 token value to lookup in the DirCache implementation. On Windows, path.Base acts differently to filepath.Base, since Windows uses a different path separator (\\ vs. /), allowing a user to provide a relative path, i.e. .well-known/acme-challenge/..\\..\\asd becomes ..\\..\\asd. The extracted path is then suffixed with +http-01, joined with the cache directory, and opened.\n\nSince the controlled path is suffixed with +http-01 before opening, the impact of this is significantly limited, since it only allows reading arbitrary files on the system if and only if they have this suffix.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.0.0-20220525230936-793ad666bf5e"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/acme/autocert",
+              "goos": [
+                "windows"
+              ],
+              "symbols": [
+                "DirCache.Delete",
+                "DirCache.Get",
+                "DirCache.Put",
+                "HostWhitelist",
+                "Manager.GetCertificate",
+                "Manager.Listener",
+                "NewListener",
+                "listener.Accept",
+                "listener.Close"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/408694"
+      },
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/53082"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Juho Nurminen of Mattermost"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2024-2961",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2024-3321",
+    "modified": "2025-02-18T20:32:01Z",
+    "published": "2024-12-11T18:40:19Z",
+    "aliases": [
+      "CVE-2024-45337",
+      "GHSA-v778-237x-gjrc"
+    ],
+    "summary": "Misuse of connection.serverAuthenticate may cause authorization bypass in golang.org/x/crypto",
+    "details": "Applications and libraries which misuse connection.serverAuthenticate (via callback field ServerConfig.PublicKeyCallback) may be susceptible to an authorization bypass.\n\nThe documentation for ServerConfig.PublicKeyCallback says that \"A call to this function does not guarantee that the key offered is in fact used to authenticate.\" Specifically, the SSH protocol allows clients to inquire about whether a public key is acceptable before proving control of the corresponding private key. PublicKeyCallback may be called with multiple keys, and the order in which the keys were provided cannot be used to infer which key the client successfully authenticated with, if any. Some applications, which store the key(s) passed to PublicKeyCallback (or derived information) and make security relevant determinations based on it once the connection is established, may make incorrect assumptions.\n\nFor example, an attacker may send public keys A and B, and then authenticate with A. PublicKeyCallback would be called only twice, first with A and then with B. A vulnerable application may then make authorization decisions based on key B for which the attacker does not actually control the private key.\n\nSince this API is widely misused, as a partial mitigation golang.org/x/cry...@v0.31.0 enforces the property that, when successfully authenticating via public key, the last key passed to ServerConfig.PublicKeyCallback will be the key used to authenticate the connection. PublicKeyCallback will now be called multiple times with the same key, if necessary. Note that the client may still not control the last key passed to PublicKeyCallback if the connection is then authenticated with a different method, such as PasswordCallback, KeyboardInteractiveCallback, or NoClientAuth.\n\nUsers should be using the Extensions field of the Permissions return value from the various authentication callbacks to record data associated with the authentication attempt instead of referencing external state. Once the connection is established the state corresponding to the successful authentication attempt can be retrieved via the ServerConn.Permissions field. Note that some third-party libraries misuse the Permissions type by sharing it across authentication attempts; users of third-party libraries should refer to the relevant projects for guidance.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.31.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "NewServerConn",
+                "ServerConfig.PublicKeyCallback",
+                "connection.serverAuthenticate"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://github.com/golang/crypto/commit/b4f1988a35dee11ec3e05d6bf3e90b695fbd8909"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/635315"
+      },
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/70779"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/-nPEi39gI4Q/m/cGVPJCqdAQAJ"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Damien Tournoud (Platform.sh / Upsun)"
+      },
+      {
+        "name": "Patrick Dawkins (Platform.sh / Upsun)"
+      },
+      {
+        "name": "Vince Parker (Platform.sh / Upsun)"
+      },
+      {
+        "name": "Jules Duvivier (Platform.sh / Upsun)"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2024-3321",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2025-3487",
+    "modified": "2025-02-26T02:51:51Z",
+    "published": "2025-02-26T02:51:51Z",
+    "aliases": [
+      "CVE-2025-22869"
+    ],
+    "summary": "Potential denial of service in golang.org/x/crypto",
+    "details": "SSH servers which implement file transfer protocols are vulnerable to a denial of service attack from clients which complete the key exchange slowly, or not at all, causing pending content to be read into memory, but never transmitted.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.35.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "Client.Dial",
+                "Client.DialContext",
+                "Client.DialTCP",
+                "Client.Listen",
+                "Client.ListenTCP",
+                "Client.ListenUnix",
+                "Client.NewSession",
+                "Dial",
+                "DiscardRequests",
+                "NewClient",
+                "NewClientConn",
+                "NewServerConn",
+                "Request.Reply",
+                "Session.Close",
+                "Session.CombinedOutput",
+                "Session.Output",
+                "Session.RequestPty",
+                "Session.RequestSubsystem",
+                "Session.Run",
+                "Session.SendRequest",
+                "Session.Setenv",
+                "Session.Shell",
+                "Session.Signal",
+                "Session.Start",
+                "Session.WindowChange",
+                "channel.Accept",
+                "channel.Close",
+                "channel.CloseWrite",
+                "channel.Read",
+                "channel.ReadExtended",
+                "channel.Reject",
+                "channel.SendRequest",
+                "channel.Write",
+                "channel.WriteExtended",
+                "connection.SendAuthBanner",
+                "curve25519sha256.Client",
+                "curve25519sha256.Server",
+                "dhGEXSHA.Client",
+                "dhGEXSHA.Server",
+                "dhGroup.Client",
+                "dhGroup.Server",
+                "ecdh.Client",
+                "ecdh.Server",
+                "extChannel.Read",
+                "extChannel.Write",
+                "handshakeTransport.kexLoop",
+                "handshakeTransport.recordWriteError",
+                "handshakeTransport.writePacket",
+                "mux.OpenChannel",
+                "mux.SendRequest",
+                "newHandshakeTransport",
+                "sessionStdin.Close",
+                "sshClientKeyboardInteractive.Challenge",
+                "tcpListener.Accept",
+                "tcpListener.Close",
+                "unixListener.Accept",
+                "unixListener.Close"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/652135"
+      },
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/71931"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Yuichi Watanabe"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2025-3487",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2025-4116",
+    "modified": "2025-12-16T16:23:22Z",
+    "published": "2025-11-13T21:12:03Z",
+    "aliases": [
+      "CVE-2025-47913"
+    ],
+    "summary": "Potential denial of service in golang.org/x/crypto/ssh/agent",
+    "details": "SSH clients receiving SSH_AGENT_SUCCESS when expecting a typed response will panic and cause early termination of the client process.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.43.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh/agent",
+              "symbols": [
+                "agentKeyringSigner.Sign",
+                "agentKeyringSigner.SignWithAlgorithm",
+                "client.List",
+                "client.Sign",
+                "client.SignWithFlags",
+                "client.Signers"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/700295"
+      },
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/75178"
+      },
+      {
+        "type": "WEB",
+        "url": "https://github.com/advisories/GHSA-56w8-48fp-6mgv"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Jakub Ciolek"
+      },
+      {
+        "name": "Nicola Murino"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2025-4116",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2025-4134",
+    "modified": "2025-11-20T16:52:31Z",
+    "published": "2025-11-19T20:11:57Z",
+    "aliases": [
+      "CVE-2025-58181",
+      "GHSA-j5w8-q4qc-rx2x"
+    ],
+    "summary": "Unbounded memory consumption in golang.org/x/crypto/ssh",
+    "details": "SSH servers parsing GSSAPI authentication requests do not validate the number of mechanisms specified in the request, allowing an attacker to cause unbounded memory consumption.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.45.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "NewServerConn",
+                "parseGSSAPIPayload"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://groups.google.com/g/golang-announce/c/w-oX3UxNcZA"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/721961"
+      },
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/76363"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Jakub Ciolek"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2025-4134",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2025-4135",
+    "modified": "2025-11-20T16:52:31Z",
+    "published": "2025-11-19T20:11:57Z",
+    "aliases": [
+      "CVE-2025-47914",
+      "GHSA-f6x5-jh6r-wrfv"
+    ],
+    "summary": "Malformed constraint may cause denial of service in golang.org/x/crypto/ssh/agent",
+    "details": "SSH Agent servers do not validate the size of messages when processing new identity requests, which may cause the program to panic if the message is malformed due to an out of bounds read.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.45.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh/agent",
+              "symbols": [
+                "ForwardToAgent",
+                "ServeAgent",
+                "parseConstraints"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "ADVISORY",
+        "url": "https://groups.google.com/g/golang-announce/c/w-oX3UxNcZA"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/721960"
+      },
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/76364"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Jakub Ciolek"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2025-4135",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5005",
+    "modified": "2026-08-11T21:06:47Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-39833",
+      "GHSA-jppx-rxg9-jmrx"
+    ],
+    "summary": "Invoking key constraints not enforced in golang.org/x/crypto/ssh/agent",
+    "details": "The in-memory keyring returned by NewKeyring() silently accepted keys with the ConfirmBeforeUse constraint but never enforced it. The key would sign without any confirmation prompt, with no indication to the caller that the constraint was not in effect. NewKeyring() now returns an error when unsupported constraints are requested.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh/agent",
+              "symbols": [
+                "keyring.Add"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79436"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/778642"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      }
+    ],
+    "credits": [
+      {
+        "name": "NCC Group Cryptography Services, sponsored by Teleport"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5005",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5006",
+    "modified": "2026-08-11T21:06:47Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-39832",
+      "GHSA-f5wc-c3c7-36mc"
+    ],
+    "summary": "Invoking agent constraints dropped when forwarding keys in golang.org/x/crypto/ssh/agent",
+    "details": "When adding a key to a remote agent constraint extensions such as restrict-destination-v00@openssh.com were not serialized in the request. Destination restrictions were silently stripped when forwarding keys, allowing unrestricted use of the key on the remote host. The client now serializes all constraint extensions. Additionally, the in-memory keyring returned by NewKeyring() now rejects keys with unsupported constraint extensions instead of silently ignoring them.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh/agent",
+              "symbols": [
+                "client.Add",
+                "keyring.Add"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79435"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/778640"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/778641"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      }
+    ],
+    "credits": [
+      {
+        "name": "NCC Group Cryptography Services, sponsored by Teleport"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5006",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5013",
+    "modified": "2026-05-22T02:08:34Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-46597"
+    ],
+    "summary": "Invoking byte arithmetic causes underflow and panic in golang.org/x/crypto/ssh",
+    "details": "An incorrectly placed cast from bytes to int allowed for server-side panic in the AES-GCM packet decoder for well-crafted inputs.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "Dial",
+                "NewClientConn",
+                "NewServerConn",
+                "curve25519sha256.Client",
+                "curve25519sha256.Server",
+                "dhGEXSHA.Client",
+                "dhGEXSHA.Server",
+                "dhGroup.Client",
+                "dhGroup.Server",
+                "ecdh.Client",
+                "ecdh.Server",
+                "gcmCipher.readCipherPacket",
+                "mlkem768WithCurve25519sha256.Client",
+                "mlkem768WithCurve25519sha256.Server"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79561"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781620"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Maciej Kawka"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5013",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5014",
+    "modified": "2026-05-22T02:08:34Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-39828"
+    ],
+    "summary": "Invoking bypass of certificate restrictions in golang.org/x/crypto/ssh",
+    "details": "When an SSH server authentication callback returned PartialSuccessError with non-nil Permissions, those permissions were silently discarded, potentially dropping certificate restrictions such as force-command after a second factor succeeded. Returning non-nil Permissions with PartialSuccessError now results in a connection error.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "NewServerConn",
+                "connection.serverAuthenticate"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79562"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781621"
+      }
+    ],
+    "credits": [
+      {
+        "name": "NCC Group Cryptography Services, sponsored by Teleport"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5014",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5015",
+    "modified": "2026-05-22T02:08:34Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-39835"
+    ],
+    "summary": "Invoking server panic during CheckHostKey/Authenticate in golang.org/x/crypto/ssh",
+    "details": "SSH servers which use CertChecker as a public key callback without setting IsUserAuthority or IsHostAuthority could be caused to panic by a client presenting a certificate. CertChecker now returns an error instead of panicking when these callbacks are nil.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "CertChecker.Authenticate",
+                "CertChecker.CheckHostKey"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79563"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781660"
+      }
+    ],
+    "credits": [
+      {
+        "name": "NCC Group Cryptography Services, sponsored by Teleport"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5015",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5016",
+    "modified": "2026-05-22T02:08:34Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-39827"
+    ],
+    "summary": "Invoking memory leak when rejecting channels can lead to DoS in golang.org/x/crypto/ssh",
+    "details": "An authenticated SSH client that repeatedly opened channels which were rejected by the server caused unbounded memory growth, eventually crashing the server process and affecting all connected users. Rejected channels are now properly removed from the connection's internal state and released for garbage collection.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "channel.Reject"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/35127"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781320"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Ziyan Zhou"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5016",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5017",
+    "modified": "2026-05-22T02:08:34Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-39830"
+    ],
+    "summary": "Invoking client can cause server deadlock on unexpected responses in golang.org/x/crypto/ssh",
+    "details": "A malicious SSH peer could send unsolicited global request responses to fill an internal buffer, blocking the connection's read loop. The blocked goroutine could not be released by calling Close(), resulting in a resource leak per connection. Unsolicited global responses are now discarded.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "Client.Listen",
+                "Client.ListenTCP",
+                "Client.ListenUnix",
+                "Dial",
+                "NewClientConn",
+                "NewServerConn",
+                "Session.CombinedOutput",
+                "Session.Output",
+                "Session.RequestPty",
+                "Session.RequestSubsystem",
+                "Session.Run",
+                "Session.SendRequest",
+                "Session.Setenv",
+                "Session.Shell",
+                "Session.Signal",
+                "Session.Start",
+                "Session.WindowChange",
+                "channel.SendRequest",
+                "channel.handlePacket",
+                "mux.SendRequest",
+                "mux.handleGlobalPacket",
+                "tcpListener.Close",
+                "unixListener.Close"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79564"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781640"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781664"
+      }
+    ],
+    "credits": [
+      {
+        "name": "NCC Group Cryptography Services, sponsored by Teleport"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5017",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5018",
+    "modified": "2026-05-22T02:08:34Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-39829"
+    ],
+    "summary": "Invoking pathological RSA/DSA parameters may cause DoS in golang.org/x/crypto/ssh",
+    "details": "The RSA and DSA public key parsers did not enforce size limits on key parameters. A crafted public key with an excessively large modulus or DSA parameter could cause several minutes of CPU consumption during signature verification. This could be triggered by unauthenticated clients during public key authentication. RSA moduli are now limited to 8192 bits, and DSA parameters are validated per FIPS 186-2.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "Dial",
+                "NewClientConn",
+                "NewServerConn",
+                "NewSignerFromKey",
+                "ParseAuthorizedKey",
+                "ParseKnownHosts",
+                "ParsePrivateKey",
+                "ParsePrivateKeyWithPassphrase",
+                "ParsePublicKey",
+                "ParseRawPrivateKey",
+                "ParseRawPrivateKeyWithPassphrase",
+                "checkDSAParams",
+                "parseDSA",
+                "parseRSA"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79565"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781641"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781661"
+      }
+    ],
+    "credits": [
+      {
+        "name": "NCC Group Cryptography Services, sponsored by Teleport"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5018",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5019",
+    "modified": "2026-05-22T02:08:34Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-39831"
+    ],
+    "summary": "Invoking bypass of FIDO/U2F security keys physical interaction in golang.org/x/crypto/ssh",
+    "details": "The Verify() method for FIDO/U2F security key types (sk-ecdsa-sha2-nistp256@openssh.com, sk-ssh-ed25519@openssh.com) did not check the User Presence flag. Signatures generated without physical touch were accepted, allowing unattended use of a hardware security key. To restore the previous behavior, return a \"no-touch-required\" extension in Permissions.Extensions from PublicKeyCallback.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "CertChecker.Authenticate",
+                "CertChecker.CheckCert",
+                "CertChecker.CheckHostKey",
+                "Certificate.Verify",
+                "Dial",
+                "NewClientConn",
+                "NewServerConn",
+                "connection.serverAuthenticate",
+                "skECDSAPublicKey.Verify",
+                "skEd25519PublicKey.Verify"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79566"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781662"
+      }
+    ],
+    "credits": [
+      {
+        "name": "NCC Group Cryptography Services, sponsored by Teleport"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5019",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5020",
+    "modified": "2026-05-22T02:08:34Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-39834"
+    ],
+    "summary": "Invoking infinite loop on large channel writes in golang.org/x/crypto/ssh",
+    "details": "When writing data larger than 4GB in a single Write call on an SSH channel, an integer overflow in the internal payload size calculation caused the write loop to spin indefinitely, sending empty packets without making progress. The size comparison now uses int64 to prevent truncation.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "Dial",
+                "NewClientConn",
+                "NewServerConn",
+                "Session.CombinedOutput",
+                "Session.Output",
+                "Session.Run",
+                "Session.Shell",
+                "Session.Start",
+                "channel.Write",
+                "channel.WriteExtended",
+                "curve25519sha256.Client",
+                "curve25519sha256.Server",
+                "dhGEXSHA.Client",
+                "dhGEXSHA.Server",
+                "dhGroup.Client",
+                "dhGroup.Server",
+                "ecdh.Client",
+                "ecdh.Server",
+                "extChannel.Write",
+                "mlkem768WithCurve25519sha256.Client",
+                "mlkem768WithCurve25519sha256.Server"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79567"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781663"
+      }
+    ],
+    "credits": [
+      {
+        "name": "NCC Group Cryptography Services, sponsored by Teleport"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5020",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5021",
+    "modified": "2026-08-14T16:22:54Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-42508",
+      "GHSA-5cgq-3rg8-m6cv"
+    ],
+    "summary": "Invoking auth bypass via unenforced @revoked status in golang.org/x/crypto/ssh/knownhosts",
+    "details": "Previously, a revoked 'SignatureKey' belonging to a CA was not correctly checked for revocation. Now, both the 'key' and 'key.SignatureKey' are checked for @revoked.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh/knownhosts",
+              "symbols": [
+                "hostKeyDB.IsRevoked"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79568"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781220"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Omar Khaleel Ibrahim - mr3okk"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5021",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5023",
+    "modified": "2026-05-22T02:08:34Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-46595"
+    ],
+    "summary": "Invoking VerifiedPublicKeyCallback permissions skip enforcement in golang.org/x/crypto/ssh",
+    "details": "Previously, CVE-2024-45337 fixed an authorization bypass for misused ssh server configurations; if any other type of callback is passed other than public key, then the source-address validation would be skipped.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "NewServerConn",
+                "connection.serverAuthenticate"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79570"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781642"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5023",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5033",
+    "modified": "2026-05-22T02:08:34Z",
+    "published": "2026-05-22T02:08:34Z",
+    "aliases": [
+      "CVE-2026-46598"
+    ],
+    "summary": "Invoking pathological inputs can lead to client panic in golang.org/x/crypto/ssh/agent",
+    "details": "For certain crafted inputs, a 'ed25519.PrivateKey' was created by casting malformed wire bytes, leading to a panic when used.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.52.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh/agent",
+              "symbols": [
+                "ForwardToAgent",
+                "ServeAgent",
+                "parseEd25519Cert",
+                "parseEd25519Key"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/79596"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/781360"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
+      }
+    ],
+    "credits": [
+      {
+        "name": "NCC Group Cryptography Services, sponsored by Teleport"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5033",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-5932",
+    "modified": "2026-11-02T22:01:43Z",
+    "published": "2026-07-07T22:15:29Z",
+    "summary": "The golang.org/x/crypto/openpgp package is unmaintained, unsafe by design, and has known security issues",
+    "details": "The golang.org/x/crypto/openpgp package is unsafe by design, has numerous known security issues, is not maintained, and should not be used.\n\nIf you are required to interoperate with OpenPGP systems and need a maintained package, consider github.com/ProtonMail/go-crypto/openpgp which is a maintained fork that aims to be a drop-in replacement for this package.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.58.1-0.20261009181718-2f1f834330b2"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/openpgp"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/packet"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/armor"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/clearsign"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/errors"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/elgamal"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/s2k"
+            }
+          ]
+        }
+      },
+      {
+        "package": {
+          "name": "golang.org/x/crypto/openpgp",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/openpgp"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/packet"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/armor"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/clearsign"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/errors"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/elgamal"
+            },
+            {
+              "path": "golang.org/x/crypto/openpgp/s2k"
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/44226"
+      },
+      {
+        "type": "WEB",
+        "url": "https://go.dev/issue/81227"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-5932",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-6303",
+    "modified": "2026-08-28T14:47:45Z",
+    "published": "2026-08-28T14:47:45Z",
+    "aliases": [
+      "CVE-2026-56854"
+    ],
+    "summary": "Source-address critical option not enforced for non-public-key auth callbacks in golang.org/x/crypto/ssh",
+    "details": "The source-address critical option in the Permissions returned by an authentication callback was only enforced for the PublicKeyCallback and VerifiedPublicKeyCallback paths, extending the fix for CVE-2026-46595. Permissions returned by the PasswordCallback, KeyboardInteractiveCallback, NoClientAuthCallback, and GSSAPIWithMICConfig.AllowLogin callbacks were not validated against the client's remote address, so a source-address restriction set by those callbacks was silently ignored. The check is now applied to the Permissions returned by any authentication callback.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.55.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "NewServerConn",
+                "connection.serverAuthenticate"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/80213"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/797040"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Longwei Wang (@gn00295120)"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-6303",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-6354",
+    "modified": "2026-09-02T19:12:04Z",
+    "published": "2026-09-02T19:12:04Z",
+    "aliases": [
+      "CVE-2026-78662"
+    ],
+    "summary": "Prevent DoS on deadlocked undecided channel in golang.org/x/crypto/ssh",
+    "details": "Previously, a channel registered in the mux's chanList is not usable until it is established. A malicious peer was able flood the channel's incomingRequests, deadlocking the entire connection.\n\nNow, we add an atomic established state, set when a channel becomes usable. Until such a time, handlePacket drops every packet other than the open confirmation/failure, without blocking and without tearing down the connection.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.56.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "Dial",
+                "NewClientConn",
+                "NewControlClientConn",
+                "NewServerConn",
+                "channel.Accept",
+                "channel.handlePacket",
+                "channel.responseMessageReceived"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/81316"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/826504"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/1y3fb2np35U"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Will Mortensen"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-6354",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
+    "id": "GO-2026-6355",
+    "modified": "2026-09-02T19:12:04Z",
+    "published": "2026-09-02T19:12:04Z",
+    "aliases": [
+      "CVE-2026-56855"
+    ],
+    "summary": "Prevent DoS on deadlocked established channel in golang.org/x/crypto/ssh",
+    "details": "Previously, after a channel has been established, a malicious peer could send crafted messages that would deadlock the entire connection.\n\nNow, we handle all RFC 4254 channel messages; global requests are handled explicitly. Then, treat all other messages as a protocol error and tear the connection down instead of buffering and blocking.",
+    "affected": [
+      {
+        "package": {
+          "name": "golang.org/x/crypto",
+          "ecosystem": "Go"
+        },
+        "ranges": [
+          {
+            "type": "SEMVER",
+            "events": [
+              {
+                "introduced": "0"
+              },
+              {
+                "fixed": "0.56.0"
+              }
+            ]
+          }
+        ],
+        "ecosystem_specific": {
+          "imports": [
+            {
+              "path": "golang.org/x/crypto/ssh",
+              "symbols": [
+                "Dial",
+                "NewClientConn",
+                "NewControlClientConn",
+                "NewServerConn",
+                "channel.handlePacket"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "references": [
+      {
+        "type": "REPORT",
+        "url": "https://go.dev/issue/81317"
+      },
+      {
+        "type": "FIX",
+        "url": "https://go.dev/cl/826524"
+      },
+      {
+        "type": "WEB",
+        "url": "https://groups.google.com/g/golang-announce/c/1y3fb2np35U"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Will Mortensen"
+      }
+    ],
+    "database_specific": {
+      "url": "https://pkg.go.dev/vuln/GO-2026-6355",
+      "review_status": "REVIEWED"
+    }
+  }
+}
+{
+  "osv": {
+    "schema_version": "1.3.1",
     "id": "GO-2021-0067",
     "modified": "2024-05-20T16:03:47Z",
     "published": "2021-04-14T20:04:52Z",
@@ -19620,2545 +22159,6 @@
     ],
     "database_specific": {
       "url": "https://pkg.go.dev/vuln/GO-2026-6809",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2020-0012",
-    "modified": "2024-05-20T16:03:47Z",
-    "published": "2021-04-14T20:04:52Z",
-    "aliases": [
-      "CVE-2020-9283",
-      "GHSA-ffhg-7mh4-33c4"
-    ],
-    "summary": "Panic due to improper verification of cryptographic signatures in golang.org/x/crypto/ssh",
-    "details": "An attacker can craft an ssh-ed25519 or sk-ssh-ed25519@openssh.com public key, such that the library will panic when trying to verify a signature with it. If verifying signatures using user supplied public keys, this may be used as a denial of service vector.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.0.0-20200220183623-bac4c82f6975"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "CertChecker.Authenticate",
-                "CertChecker.CheckCert",
-                "CertChecker.CheckHostKey",
-                "Certificate.Verify",
-                "Dial",
-                "NewClientConn",
-                "NewPublicKey",
-                "NewServerConn",
-                "NewSignerFromKey",
-                "NewSignerFromSigner",
-                "ParseAuthorizedKey",
-                "ParseKnownHosts",
-                "ParsePrivateKey",
-                "ParsePrivateKeyWithPassphrase",
-                "ParsePublicKey",
-                "ParseRawPrivateKey",
-                "ParseRawPrivateKeyWithPassphrase",
-                "ed25519PublicKey.Verify",
-                "parseED25519",
-                "parseSKEd25519",
-                "skEd25519PublicKey.Verify"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/220357"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.googlesource.com/crypto/+/bac4c82f69751a6dd76e702d54b3ceb88adab236"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/3L45YRc91SY"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Alex Gaynor, Fish in a Barrel"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2020-0012",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2020-0013",
-    "modified": "2024-05-20T16:03:47Z",
-    "published": "2021-04-14T20:04:52Z",
-    "aliases": [
-      "CVE-2017-3204",
-      "GHSA-xhjq-w7xm-p8qj"
-    ],
-    "summary": "Man-in-the-middle attack in golang.org/x/crypto/ssh",
-    "details": "By default host key verification is disabled which allows for man-in-the-middle attacks against SSH clients if ClientConfig.HostKeyCallback is not set.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.0.0-20170330155735-e4e2799dd7aa"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "Dial",
-                "NewClientConn"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/38701"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.googlesource.com/crypto/+/e4e2799dd7aab89f583e1d898300d96367750991"
-      },
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/19767"
-      },
-      {
-        "type": "WEB",
-        "url": "https://bridge.grumpy-troll.org/2017/04/golang-ssh-security/"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Phil Pennock"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2020-0013",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2021-0227",
-    "modified": "2024-05-20T16:03:47Z",
-    "published": "2022-02-17T17:35:32Z",
-    "aliases": [
-      "CVE-2020-29652",
-      "GHSA-3vm4-22fp-5rfm"
-    ],
-    "summary": "Panic on crafted authentication request message in golang.org/x/crypto/ssh",
-    "details": "Clients can cause a panic in SSH servers. An attacker can craft an authentication request message for the “gssapi-with-mic” method which will cause NewServerConn to panic via a nil pointer dereference if ServerConfig.GSSAPIWithMICConfig is nil.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.0.0-20201216223049-8b5274cf687f"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "NewServerConn",
-                "connection.serverAuthenticate"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/278852"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.googlesource.com/crypto/+/8b5274cf687fd9316b4108863654cc57385531e8"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/ouZIlBimOsE?pli=1"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Joern Schneewesiz (GitLab Security Research Team)"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2021-0227",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2021-0356",
-    "modified": "2024-05-20T16:03:47Z",
-    "published": "2022-04-25T20:38:40Z",
-    "aliases": [
-      "CVE-2022-27191",
-      "GHSA-8c26-wmh5-6g9v"
-    ],
-    "summary": "Denial of service via crafted Signer in golang.org/x/crypto/ssh",
-    "details": "Attackers can cause a crash in SSH servers when the server has been configured by passing a Signer to ServerConfig.AddHostKey such that\n1) the Signer passed to AddHostKey does not implement AlgorithmSigner, and\n2) the Signer passed to AddHostKey returns a key of type “ssh-rsa” from its PublicKey method.\n\nServers that only use Signer implementations provided by the ssh package are unaffected.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.0.0-20220314234659-1baeb1ce4c0b"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "ServerConfig.AddHostKey"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/392355"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.googlesource.com/crypto/+/1baeb1ce4c0b006eff0f294c47cb7617598dfb3d"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/-cp44ypCT5s"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2021-0356",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2022-0209",
-    "modified": "2024-05-20T16:03:47Z",
-    "published": "2022-07-01T20:15:25Z",
-    "aliases": [
-      "CVE-2019-11840",
-      "GHSA-r5c5-pr8j-pfp7"
-    ],
-    "summary": "Insufficiently random values in golang.org/x/crypto/salsa20",
-    "details": "XORKeyStream generates incorrect and insecure output for very large inputs.\n\nIf more than 256 GiB of keystream is generated, or if the counter otherwise grows greater than 32 bits, the amd64 implementation will first generate incorrect output, and then cycle back to previously generated keystream. Repeated keystream bytes can lead to loss of confidentiality in encryption applications, or to predictability in CSPRNG applications.\n\nThe issue might affect uses of golang.org/x/crypto/nacl with extremely large messages.\n\nArchitectures other than amd64 and uses that generate less than 256 GiB of keystream for a single salsa20.XORKeyStream invocation are unaffected.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.0.0-20190320223903-b7391e95e576"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/salsa20/salsa",
-              "goarch": [
-                "amd64"
-              ],
-              "symbols": [
-                "XORKeyStream"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/168406"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.googlesource.com/crypto/+/b7391e95e576cacdcdd422573063bc057239113d"
-      },
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/30965"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/tjyNcJxb2vQ/m/n0NRBziSCAAJ"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Michael McLoughlin"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2022-0209",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2022-0229",
-    "modified": "2024-05-20T16:03:47Z",
-    "published": "2022-07-06T18:23:48Z",
-    "aliases": [
-      "CVE-2020-7919",
-      "GHSA-cjjc-xp8v-855w"
-    ],
-    "summary": "Panic in certificate parsing in crypto/x509 and golang.org/x/crypto/cryptobyte",
-    "details": "On 32-bit architectures, a malformed input to crypto/x509 or the ASN.1 parsing functions of golang.org/x/crypto/cryptobyte can lead to a panic.\n\nThe malformed certificate can be delivered via a crypto/tls connection to a client, or to a server that accepts client certificates. net/http clients can be made to crash by an HTTPS server, while net/http servers that accept client certificates will recover the panic and are unaffected.",
-    "affected": [
-      {
-        "package": {
-          "name": "stdlib",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "1.12.16"
-              },
-              {
-                "introduced": "1.13.0-0"
-              },
-              {
-                "fixed": "1.13.7"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "crypto/x509"
-            }
-          ]
-        }
-      },
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.0.0-20200124225646-8b5121be2f68"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/cryptobyte"
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/216680"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.googlesource.com/go/+/b13ce14c4a6aa59b7b041ad2b6eed2d23e15b574"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/216677"
-      },
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/36837"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/Hsw4mHYc470"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Project Wycheproof"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2022-0229",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2022-0968",
-    "modified": "2024-05-20T16:03:47Z",
-    "published": "2022-09-13T03:32:38Z",
-    "aliases": [
-      "CVE-2021-43565",
-      "GHSA-gwc9-m7rh-j2ww"
-    ],
-    "summary": "Panic on malformed packets in golang.org/x/crypto/ssh",
-    "details": "Unauthenticated clients can cause a panic in SSH servers.\n\nWhen using AES-GCM or ChaCha20Poly1305, consuming a malformed packet which contains an empty plaintext causes a panic.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.0.0-20211202192323-5770296d904e"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "Dial",
-                "NewClientConn",
-                "NewServerConn",
-                "chacha20Poly1305Cipher.readCipherPacket",
-                "curve25519sha256.Client",
-                "curve25519sha256.Server",
-                "dhGEXSHA.Client",
-                "dhGEXSHA.Server",
-                "dhGroup.Client",
-                "dhGroup.Server",
-                "ecdh.Client",
-                "ecdh.Server",
-                "gcmCipher.readCipherPacket"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/2AR1sKiM-Qs"
-      },
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issues/49932"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/368814/"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Rod Hynes (Psiphon Inc)"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2022-0968",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2023-1992",
-    "modified": "2024-05-20T16:03:47Z",
-    "published": "2023-08-23T14:38:42Z",
-    "aliases": [
-      "CVE-2019-11841",
-      "GHSA-x3jr-pf6g-c48f"
-    ],
-    "summary": "Misleading message verification in golang.org/x/crypto/openpgp/clearsign",
-    "details": "The clearsign package accepts some malformed messages, making it possible for an attacker to trick a human user (but not a Go program) into thinking unverified text is part of the message.\n\nWith fix, messages with malformed headers in the SIGNED MESSAGE section are rejected.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.0.0-20190424203555-c05e17bb3b2d"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/openpgp/clearsign",
-              "symbols": [
-                "Decode"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://go-review.git.corp.google.com/c/crypto/+/173778"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.googlesource.com/crypto/+/c05e17bb3b2dca130fc919668a96b4bec9eb9442"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/d/msg/golang-openpgp/6vdgZoTgbIY/K6bBY9z3DAAJ"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Aida Mynzhasova (SEC Consult Vulnerability Lab)"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2023-1992",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2023-2402",
-    "modified": "2024-05-20T16:03:47Z",
-    "published": "2023-12-18T21:18:26Z",
-    "aliases": [
-      "CVE-2023-48795",
-      "GHSA-45x7-px36-x8w8"
-    ],
-    "summary": "Man-in-the-middle attacker can compromise integrity of secure channel in golang.org/x/crypto",
-    "details": "A protocol weakness allows a MITM attacker to compromise the integrity of the secure channel before it is established, allowing the attacker to prevent transmission of a number of messages immediately after the secure channel is established without either side being aware.\n\nThe impact of this attack is relatively limited, as it does not compromise confidentiality of the channel. Notably this attack would allow an attacker to prevent the transmission of the SSH2_MSG_EXT_INFO message, disabling a handful of newer security features.\n\nThis protocol weakness was also fixed in OpenSSH 9.6.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.17.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "Client.Dial",
-                "Client.DialContext",
-                "Client.DialTCP",
-                "Client.Listen",
-                "Client.ListenTCP",
-                "Client.ListenUnix",
-                "Client.NewSession",
-                "Dial",
-                "DiscardRequests",
-                "NewClient",
-                "NewClientConn",
-                "NewServerConn",
-                "Request.Reply",
-                "Session.Close",
-                "Session.CombinedOutput",
-                "Session.Output",
-                "Session.RequestPty",
-                "Session.RequestSubsystem",
-                "Session.Run",
-                "Session.SendRequest",
-                "Session.Setenv",
-                "Session.Shell",
-                "Session.Signal",
-                "Session.Start",
-                "Session.WindowChange",
-                "channel.Accept",
-                "channel.Close",
-                "channel.CloseWrite",
-                "channel.Read",
-                "channel.ReadExtended",
-                "channel.Reject",
-                "channel.SendRequest",
-                "channel.Write",
-                "channel.WriteExtended",
-                "connectionState.readPacket",
-                "connectionState.writePacket",
-                "curve25519sha256.Client",
-                "curve25519sha256.Server",
-                "dhGEXSHA.Client",
-                "dhGEXSHA.Server",
-                "dhGroup.Client",
-                "dhGroup.Server",
-                "ecdh.Client",
-                "ecdh.Server",
-                "extChannel.Read",
-                "extChannel.Write",
-                "handshakeTransport.enterKeyExchange",
-                "handshakeTransport.readLoop",
-                "handshakeTransport.sendKexInit",
-                "mux.OpenChannel",
-                "mux.SendRequest",
-                "sessionStdin.Close",
-                "sshClientKeyboardInteractive.Challenge",
-                "tcpListener.Accept",
-                "tcpListener.Close",
-                "transport.readPacket",
-                "transport.writePacket",
-                "unixListener.Accept",
-                "unixListener.Close"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/64784"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/550715"
-      },
-      {
-        "type": "FIX",
-        "url": "https://github.com/golang/crypto/commit/9d2ee975ef9fe627bf0a6f01c1f69e8ef1d4f05d"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/qA3XtxvMUyg"
-      },
-      {
-        "type": "WEB",
-        "url": "https://www.openssh.com/txt/release-9.6"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Fabian Bäumer (Ruhr University Bochum)"
-      },
-      {
-        "name": "Marcus Brinkmann (Ruhr University Bochum)"
-      },
-      {
-        "name": "Jörg Schwenk (Ruhr University Bochum)"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2023-2402",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2024-2961",
-    "modified": "2024-07-02T19:27:52Z",
-    "published": "2024-07-02T19:27:52Z",
-    "aliases": [
-      "CVE-2022-30636"
-    ],
-    "summary": "Limited directory traversal vulnerability on Windows in golang.org/x/crypto",
-    "details": "httpTokenCacheKey uses path.Base to extract the expected HTTP-01 token value to lookup in the DirCache implementation. On Windows, path.Base acts differently to filepath.Base, since Windows uses a different path separator (\\ vs. /), allowing a user to provide a relative path, i.e. .well-known/acme-challenge/..\\..\\asd becomes ..\\..\\asd. The extracted path is then suffixed with +http-01, joined with the cache directory, and opened.\n\nSince the controlled path is suffixed with +http-01 before opening, the impact of this is significantly limited, since it only allows reading arbitrary files on the system if and only if they have this suffix.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.0.0-20220525230936-793ad666bf5e"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/acme/autocert",
-              "goos": [
-                "windows"
-              ],
-              "symbols": [
-                "DirCache.Delete",
-                "DirCache.Get",
-                "DirCache.Put",
-                "HostWhitelist",
-                "Manager.GetCertificate",
-                "Manager.Listener",
-                "NewListener",
-                "listener.Accept",
-                "listener.Close"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/408694"
-      },
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/53082"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Juho Nurminen of Mattermost"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2024-2961",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2024-3321",
-    "modified": "2025-02-18T20:32:01Z",
-    "published": "2024-12-11T18:40:19Z",
-    "aliases": [
-      "CVE-2024-45337",
-      "GHSA-v778-237x-gjrc"
-    ],
-    "summary": "Misuse of connection.serverAuthenticate may cause authorization bypass in golang.org/x/crypto",
-    "details": "Applications and libraries which misuse connection.serverAuthenticate (via callback field ServerConfig.PublicKeyCallback) may be susceptible to an authorization bypass.\n\nThe documentation for ServerConfig.PublicKeyCallback says that \"A call to this function does not guarantee that the key offered is in fact used to authenticate.\" Specifically, the SSH protocol allows clients to inquire about whether a public key is acceptable before proving control of the corresponding private key. PublicKeyCallback may be called with multiple keys, and the order in which the keys were provided cannot be used to infer which key the client successfully authenticated with, if any. Some applications, which store the key(s) passed to PublicKeyCallback (or derived information) and make security relevant determinations based on it once the connection is established, may make incorrect assumptions.\n\nFor example, an attacker may send public keys A and B, and then authenticate with A. PublicKeyCallback would be called only twice, first with A and then with B. A vulnerable application may then make authorization decisions based on key B for which the attacker does not actually control the private key.\n\nSince this API is widely misused, as a partial mitigation golang.org/x/cry...@v0.31.0 enforces the property that, when successfully authenticating via public key, the last key passed to ServerConfig.PublicKeyCallback will be the key used to authenticate the connection. PublicKeyCallback will now be called multiple times with the same key, if necessary. Note that the client may still not control the last key passed to PublicKeyCallback if the connection is then authenticated with a different method, such as PasswordCallback, KeyboardInteractiveCallback, or NoClientAuth.\n\nUsers should be using the Extensions field of the Permissions return value from the various authentication callbacks to record data associated with the authentication attempt instead of referencing external state. Once the connection is established the state corresponding to the successful authentication attempt can be retrieved via the ServerConn.Permissions field. Note that some third-party libraries misuse the Permissions type by sharing it across authentication attempts; users of third-party libraries should refer to the relevant projects for guidance.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.31.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "NewServerConn",
-                "ServerConfig.PublicKeyCallback",
-                "connection.serverAuthenticate"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://github.com/golang/crypto/commit/b4f1988a35dee11ec3e05d6bf3e90b695fbd8909"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/635315"
-      },
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/70779"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/-nPEi39gI4Q/m/cGVPJCqdAQAJ"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Damien Tournoud (Platform.sh / Upsun)"
-      },
-      {
-        "name": "Patrick Dawkins (Platform.sh / Upsun)"
-      },
-      {
-        "name": "Vince Parker (Platform.sh / Upsun)"
-      },
-      {
-        "name": "Jules Duvivier (Platform.sh / Upsun)"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2024-3321",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2025-3487",
-    "modified": "2025-02-26T02:51:51Z",
-    "published": "2025-02-26T02:51:51Z",
-    "aliases": [
-      "CVE-2025-22869"
-    ],
-    "summary": "Potential denial of service in golang.org/x/crypto",
-    "details": "SSH servers which implement file transfer protocols are vulnerable to a denial of service attack from clients which complete the key exchange slowly, or not at all, causing pending content to be read into memory, but never transmitted.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.35.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "Client.Dial",
-                "Client.DialContext",
-                "Client.DialTCP",
-                "Client.Listen",
-                "Client.ListenTCP",
-                "Client.ListenUnix",
-                "Client.NewSession",
-                "Dial",
-                "DiscardRequests",
-                "NewClient",
-                "NewClientConn",
-                "NewServerConn",
-                "Request.Reply",
-                "Session.Close",
-                "Session.CombinedOutput",
-                "Session.Output",
-                "Session.RequestPty",
-                "Session.RequestSubsystem",
-                "Session.Run",
-                "Session.SendRequest",
-                "Session.Setenv",
-                "Session.Shell",
-                "Session.Signal",
-                "Session.Start",
-                "Session.WindowChange",
-                "channel.Accept",
-                "channel.Close",
-                "channel.CloseWrite",
-                "channel.Read",
-                "channel.ReadExtended",
-                "channel.Reject",
-                "channel.SendRequest",
-                "channel.Write",
-                "channel.WriteExtended",
-                "connection.SendAuthBanner",
-                "curve25519sha256.Client",
-                "curve25519sha256.Server",
-                "dhGEXSHA.Client",
-                "dhGEXSHA.Server",
-                "dhGroup.Client",
-                "dhGroup.Server",
-                "ecdh.Client",
-                "ecdh.Server",
-                "extChannel.Read",
-                "extChannel.Write",
-                "handshakeTransport.kexLoop",
-                "handshakeTransport.recordWriteError",
-                "handshakeTransport.writePacket",
-                "mux.OpenChannel",
-                "mux.SendRequest",
-                "newHandshakeTransport",
-                "sessionStdin.Close",
-                "sshClientKeyboardInteractive.Challenge",
-                "tcpListener.Accept",
-                "tcpListener.Close",
-                "unixListener.Accept",
-                "unixListener.Close"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/652135"
-      },
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/71931"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Yuichi Watanabe"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2025-3487",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2025-4116",
-    "modified": "2025-12-16T16:23:22Z",
-    "published": "2025-11-13T21:12:03Z",
-    "aliases": [
-      "CVE-2025-47913"
-    ],
-    "summary": "Potential denial of service in golang.org/x/crypto/ssh/agent",
-    "details": "SSH clients receiving SSH_AGENT_SUCCESS when expecting a typed response will panic and cause early termination of the client process.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.43.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh/agent",
-              "symbols": [
-                "agentKeyringSigner.Sign",
-                "agentKeyringSigner.SignWithAlgorithm",
-                "client.List",
-                "client.Sign",
-                "client.SignWithFlags",
-                "client.Signers"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/700295"
-      },
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/75178"
-      },
-      {
-        "type": "WEB",
-        "url": "https://github.com/advisories/GHSA-56w8-48fp-6mgv"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Jakub Ciolek"
-      },
-      {
-        "name": "Nicola Murino"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2025-4116",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2025-4134",
-    "modified": "2025-11-20T16:52:31Z",
-    "published": "2025-11-19T20:11:57Z",
-    "aliases": [
-      "CVE-2025-58181",
-      "GHSA-j5w8-q4qc-rx2x"
-    ],
-    "summary": "Unbounded memory consumption in golang.org/x/crypto/ssh",
-    "details": "SSH servers parsing GSSAPI authentication requests do not validate the number of mechanisms specified in the request, allowing an attacker to cause unbounded memory consumption.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.45.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "NewServerConn",
-                "parseGSSAPIPayload"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "ADVISORY",
-        "url": "https://groups.google.com/g/golang-announce/c/w-oX3UxNcZA"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/721961"
-      },
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/76363"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Jakub Ciolek"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2025-4134",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2025-4135",
-    "modified": "2025-11-20T16:52:31Z",
-    "published": "2025-11-19T20:11:57Z",
-    "aliases": [
-      "CVE-2025-47914",
-      "GHSA-f6x5-jh6r-wrfv"
-    ],
-    "summary": "Malformed constraint may cause denial of service in golang.org/x/crypto/ssh/agent",
-    "details": "SSH Agent servers do not validate the size of messages when processing new identity requests, which may cause the program to panic if the message is malformed due to an out of bounds read.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.45.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh/agent",
-              "symbols": [
-                "ForwardToAgent",
-                "ServeAgent",
-                "parseConstraints"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "ADVISORY",
-        "url": "https://groups.google.com/g/golang-announce/c/w-oX3UxNcZA"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/721960"
-      },
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/76364"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Jakub Ciolek"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2025-4135",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5005",
-    "modified": "2026-08-11T21:06:47Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-39833",
-      "GHSA-jppx-rxg9-jmrx"
-    ],
-    "summary": "Invoking key constraints not enforced in golang.org/x/crypto/ssh/agent",
-    "details": "The in-memory keyring returned by NewKeyring() silently accepted keys with the ConfirmBeforeUse constraint but never enforced it. The key would sign without any confirmation prompt, with no indication to the caller that the constraint was not in effect. NewKeyring() now returns an error when unsupported constraints are requested.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh/agent",
-              "symbols": [
-                "keyring.Add"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79436"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/778642"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      }
-    ],
-    "credits": [
-      {
-        "name": "NCC Group Cryptography Services, sponsored by Teleport"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5005",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5006",
-    "modified": "2026-08-11T21:06:47Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-39832",
-      "GHSA-f5wc-c3c7-36mc"
-    ],
-    "summary": "Invoking agent constraints dropped when forwarding keys in golang.org/x/crypto/ssh/agent",
-    "details": "When adding a key to a remote agent constraint extensions such as restrict-destination-v00@openssh.com were not serialized in the request. Destination restrictions were silently stripped when forwarding keys, allowing unrestricted use of the key on the remote host. The client now serializes all constraint extensions. Additionally, the in-memory keyring returned by NewKeyring() now rejects keys with unsupported constraint extensions instead of silently ignoring them.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh/agent",
-              "symbols": [
-                "client.Add",
-                "keyring.Add"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79435"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/778640"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/778641"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      }
-    ],
-    "credits": [
-      {
-        "name": "NCC Group Cryptography Services, sponsored by Teleport"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5006",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5013",
-    "modified": "2026-05-22T02:08:34Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-46597"
-    ],
-    "summary": "Invoking byte arithmetic causes underflow and panic in golang.org/x/crypto/ssh",
-    "details": "An incorrectly placed cast from bytes to int allowed for server-side panic in the AES-GCM packet decoder for well-crafted inputs.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "Dial",
-                "NewClientConn",
-                "NewServerConn",
-                "curve25519sha256.Client",
-                "curve25519sha256.Server",
-                "dhGEXSHA.Client",
-                "dhGEXSHA.Server",
-                "dhGroup.Client",
-                "dhGroup.Server",
-                "ecdh.Client",
-                "ecdh.Server",
-                "gcmCipher.readCipherPacket",
-                "mlkem768WithCurve25519sha256.Client",
-                "mlkem768WithCurve25519sha256.Server"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79561"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781620"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Maciej Kawka"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5013",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5014",
-    "modified": "2026-05-22T02:08:34Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-39828"
-    ],
-    "summary": "Invoking bypass of certificate restrictions in golang.org/x/crypto/ssh",
-    "details": "When an SSH server authentication callback returned PartialSuccessError with non-nil Permissions, those permissions were silently discarded, potentially dropping certificate restrictions such as force-command after a second factor succeeded. Returning non-nil Permissions with PartialSuccessError now results in a connection error.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "NewServerConn",
-                "connection.serverAuthenticate"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79562"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781621"
-      }
-    ],
-    "credits": [
-      {
-        "name": "NCC Group Cryptography Services, sponsored by Teleport"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5014",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5015",
-    "modified": "2026-05-22T02:08:34Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-39835"
-    ],
-    "summary": "Invoking server panic during CheckHostKey/Authenticate in golang.org/x/crypto/ssh",
-    "details": "SSH servers which use CertChecker as a public key callback without setting IsUserAuthority or IsHostAuthority could be caused to panic by a client presenting a certificate. CertChecker now returns an error instead of panicking when these callbacks are nil.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "CertChecker.Authenticate",
-                "CertChecker.CheckHostKey"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79563"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781660"
-      }
-    ],
-    "credits": [
-      {
-        "name": "NCC Group Cryptography Services, sponsored by Teleport"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5015",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5016",
-    "modified": "2026-05-22T02:08:34Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-39827"
-    ],
-    "summary": "Invoking memory leak when rejecting channels can lead to DoS in golang.org/x/crypto/ssh",
-    "details": "An authenticated SSH client that repeatedly opened channels which were rejected by the server caused unbounded memory growth, eventually crashing the server process and affecting all connected users. Rejected channels are now properly removed from the connection's internal state and released for garbage collection.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "channel.Reject"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/35127"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781320"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Ziyan Zhou"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5016",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5017",
-    "modified": "2026-05-22T02:08:34Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-39830"
-    ],
-    "summary": "Invoking client can cause server deadlock on unexpected responses in golang.org/x/crypto/ssh",
-    "details": "A malicious SSH peer could send unsolicited global request responses to fill an internal buffer, blocking the connection's read loop. The blocked goroutine could not be released by calling Close(), resulting in a resource leak per connection. Unsolicited global responses are now discarded.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "Client.Listen",
-                "Client.ListenTCP",
-                "Client.ListenUnix",
-                "Dial",
-                "NewClientConn",
-                "NewServerConn",
-                "Session.CombinedOutput",
-                "Session.Output",
-                "Session.RequestPty",
-                "Session.RequestSubsystem",
-                "Session.Run",
-                "Session.SendRequest",
-                "Session.Setenv",
-                "Session.Shell",
-                "Session.Signal",
-                "Session.Start",
-                "Session.WindowChange",
-                "channel.SendRequest",
-                "channel.handlePacket",
-                "mux.SendRequest",
-                "mux.handleGlobalPacket",
-                "tcpListener.Close",
-                "unixListener.Close"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79564"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781640"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781664"
-      }
-    ],
-    "credits": [
-      {
-        "name": "NCC Group Cryptography Services, sponsored by Teleport"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5017",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5018",
-    "modified": "2026-05-22T02:08:34Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-39829"
-    ],
-    "summary": "Invoking pathological RSA/DSA parameters may cause DoS in golang.org/x/crypto/ssh",
-    "details": "The RSA and DSA public key parsers did not enforce size limits on key parameters. A crafted public key with an excessively large modulus or DSA parameter could cause several minutes of CPU consumption during signature verification. This could be triggered by unauthenticated clients during public key authentication. RSA moduli are now limited to 8192 bits, and DSA parameters are validated per FIPS 186-2.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "Dial",
-                "NewClientConn",
-                "NewServerConn",
-                "NewSignerFromKey",
-                "ParseAuthorizedKey",
-                "ParseKnownHosts",
-                "ParsePrivateKey",
-                "ParsePrivateKeyWithPassphrase",
-                "ParsePublicKey",
-                "ParseRawPrivateKey",
-                "ParseRawPrivateKeyWithPassphrase",
-                "checkDSAParams",
-                "parseDSA",
-                "parseRSA"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79565"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781641"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781661"
-      }
-    ],
-    "credits": [
-      {
-        "name": "NCC Group Cryptography Services, sponsored by Teleport"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5018",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5019",
-    "modified": "2026-05-22T02:08:34Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-39831"
-    ],
-    "summary": "Invoking bypass of FIDO/U2F security keys physical interaction in golang.org/x/crypto/ssh",
-    "details": "The Verify() method for FIDO/U2F security key types (sk-ecdsa-sha2-nistp256@openssh.com, sk-ssh-ed25519@openssh.com) did not check the User Presence flag. Signatures generated without physical touch were accepted, allowing unattended use of a hardware security key. To restore the previous behavior, return a \"no-touch-required\" extension in Permissions.Extensions from PublicKeyCallback.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "CertChecker.Authenticate",
-                "CertChecker.CheckCert",
-                "CertChecker.CheckHostKey",
-                "Certificate.Verify",
-                "Dial",
-                "NewClientConn",
-                "NewServerConn",
-                "connection.serverAuthenticate",
-                "skECDSAPublicKey.Verify",
-                "skEd25519PublicKey.Verify"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79566"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781662"
-      }
-    ],
-    "credits": [
-      {
-        "name": "NCC Group Cryptography Services, sponsored by Teleport"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5019",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5020",
-    "modified": "2026-05-22T02:08:34Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-39834"
-    ],
-    "summary": "Invoking infinite loop on large channel writes in golang.org/x/crypto/ssh",
-    "details": "When writing data larger than 4GB in a single Write call on an SSH channel, an integer overflow in the internal payload size calculation caused the write loop to spin indefinitely, sending empty packets without making progress. The size comparison now uses int64 to prevent truncation.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "Dial",
-                "NewClientConn",
-                "NewServerConn",
-                "Session.CombinedOutput",
-                "Session.Output",
-                "Session.Run",
-                "Session.Shell",
-                "Session.Start",
-                "channel.Write",
-                "channel.WriteExtended",
-                "curve25519sha256.Client",
-                "curve25519sha256.Server",
-                "dhGEXSHA.Client",
-                "dhGEXSHA.Server",
-                "dhGroup.Client",
-                "dhGroup.Server",
-                "ecdh.Client",
-                "ecdh.Server",
-                "extChannel.Write",
-                "mlkem768WithCurve25519sha256.Client",
-                "mlkem768WithCurve25519sha256.Server"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79567"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781663"
-      }
-    ],
-    "credits": [
-      {
-        "name": "NCC Group Cryptography Services, sponsored by Teleport"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5020",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5021",
-    "modified": "2026-08-14T16:22:54Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-42508",
-      "GHSA-5cgq-3rg8-m6cv"
-    ],
-    "summary": "Invoking auth bypass via unenforced @revoked status in golang.org/x/crypto/ssh/knownhosts",
-    "details": "Previously, a revoked 'SignatureKey' belonging to a CA was not correctly checked for revocation. Now, both the 'key' and 'key.SignatureKey' are checked for @revoked.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh/knownhosts",
-              "symbols": [
-                "hostKeyDB.IsRevoked"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79568"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781220"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Omar Khaleel Ibrahim - mr3okk"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5021",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5023",
-    "modified": "2026-05-22T02:08:34Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-46595"
-    ],
-    "summary": "Invoking VerifiedPublicKeyCallback permissions skip enforcement in golang.org/x/crypto/ssh",
-    "details": "Previously, CVE-2024-45337 fixed an authorization bypass for misused ssh server configurations; if any other type of callback is passed other than public key, then the source-address validation would be skipped.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "NewServerConn",
-                "connection.serverAuthenticate"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79570"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781642"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5023",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5033",
-    "modified": "2026-05-22T02:08:34Z",
-    "published": "2026-05-22T02:08:34Z",
-    "aliases": [
-      "CVE-2026-46598"
-    ],
-    "summary": "Invoking pathological inputs can lead to client panic in golang.org/x/crypto/ssh/agent",
-    "details": "For certain crafted inputs, a 'ed25519.PrivateKey' was created by casting malformed wire bytes, leading to a panic when used.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.52.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh/agent",
-              "symbols": [
-                "ForwardToAgent",
-                "ServeAgent",
-                "parseEd25519Cert",
-                "parseEd25519Key"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/79596"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/781360"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/a082jnz-LvI"
-      }
-    ],
-    "credits": [
-      {
-        "name": "NCC Group Cryptography Services, sponsored by Teleport"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5033",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-5932",
-    "modified": "2026-11-02T22:01:43Z",
-    "published": "2026-07-07T22:15:29Z",
-    "summary": "The golang.org/x/crypto/openpgp package is unmaintained, unsafe by design, and has known security issues",
-    "details": "The golang.org/x/crypto/openpgp package is unsafe by design, has numerous known security issues, is not maintained, and should not be used.\n\nIf you are required to interoperate with OpenPGP systems and need a maintained package, consider github.com/ProtonMail/go-crypto/openpgp which is a maintained fork that aims to be a drop-in replacement for this package.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.58.1-0.20261009181718-2f1f834330b2"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/openpgp"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/packet"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/armor"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/clearsign"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/errors"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/elgamal"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/s2k"
-            }
-          ]
-        }
-      },
-      {
-        "package": {
-          "name": "golang.org/x/crypto/openpgp",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/openpgp"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/packet"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/armor"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/clearsign"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/errors"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/elgamal"
-            },
-            {
-              "path": "golang.org/x/crypto/openpgp/s2k"
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/44226"
-      },
-      {
-        "type": "WEB",
-        "url": "https://go.dev/issue/81227"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-5932",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-6303",
-    "modified": "2026-08-28T14:47:45Z",
-    "published": "2026-08-28T14:47:45Z",
-    "aliases": [
-      "CVE-2026-56854"
-    ],
-    "summary": "Source-address critical option not enforced for non-public-key auth callbacks in golang.org/x/crypto/ssh",
-    "details": "The source-address critical option in the Permissions returned by an authentication callback was only enforced for the PublicKeyCallback and VerifiedPublicKeyCallback paths, extending the fix for CVE-2026-46595. Permissions returned by the PasswordCallback, KeyboardInteractiveCallback, NoClientAuthCallback, and GSSAPIWithMICConfig.AllowLogin callbacks were not validated against the client's remote address, so a source-address restriction set by those callbacks was silently ignored. The check is now applied to the Permissions returned by any authentication callback.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.55.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "NewServerConn",
-                "connection.serverAuthenticate"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/80213"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/797040"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Longwei Wang (@gn00295120)"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-6303",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-6354",
-    "modified": "2026-09-02T19:12:04Z",
-    "published": "2026-09-02T19:12:04Z",
-    "aliases": [
-      "CVE-2026-78662"
-    ],
-    "summary": "Prevent DoS on deadlocked undecided channel in golang.org/x/crypto/ssh",
-    "details": "Previously, a channel registered in the mux's chanList is not usable until it is established. A malicious peer was able flood the channel's incomingRequests, deadlocking the entire connection.\n\nNow, we add an atomic established state, set when a channel becomes usable. Until such a time, handlePacket drops every packet other than the open confirmation/failure, without blocking and without tearing down the connection.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.56.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "Dial",
-                "NewClientConn",
-                "NewControlClientConn",
-                "NewServerConn",
-                "channel.Accept",
-                "channel.handlePacket",
-                "channel.responseMessageReceived"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/81316"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/826504"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/1y3fb2np35U"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Will Mortensen"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-6354",
-      "review_status": "REVIEWED"
-    }
-  }
-}
-{
-  "osv": {
-    "schema_version": "1.3.1",
-    "id": "GO-2026-6355",
-    "modified": "2026-09-02T19:12:04Z",
-    "published": "2026-09-02T19:12:04Z",
-    "aliases": [
-      "CVE-2026-56855"
-    ],
-    "summary": "Prevent DoS on deadlocked established channel in golang.org/x/crypto/ssh",
-    "details": "Previously, after a channel has been established, a malicious peer could send crafted messages that would deadlock the entire connection.\n\nNow, we handle all RFC 4254 channel messages; global requests are handled explicitly. Then, treat all other messages as a protocol error and tear the connection down instead of buffering and blocking.",
-    "affected": [
-      {
-        "package": {
-          "name": "golang.org/x/crypto",
-          "ecosystem": "Go"
-        },
-        "ranges": [
-          {
-            "type": "SEMVER",
-            "events": [
-              {
-                "introduced": "0"
-              },
-              {
-                "fixed": "0.56.0"
-              }
-            ]
-          }
-        ],
-        "ecosystem_specific": {
-          "imports": [
-            {
-              "path": "golang.org/x/crypto/ssh",
-              "symbols": [
-                "Dial",
-                "NewClientConn",
-                "NewControlClientConn",
-                "NewServerConn",
-                "channel.handlePacket"
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "references": [
-      {
-        "type": "REPORT",
-        "url": "https://go.dev/issue/81317"
-      },
-      {
-        "type": "FIX",
-        "url": "https://go.dev/cl/826524"
-      },
-      {
-        "type": "WEB",
-        "url": "https://groups.google.com/g/golang-announce/c/1y3fb2np35U"
-      }
-    ],
-    "credits": [
-      {
-        "name": "Will Mortensen"
-      }
-    ],
-    "database_specific": {
-      "url": "https://pkg.go.dev/vuln/GO-2026-6355",
       "review_status": "REVIEWED"
     }
   }

@@ -1,0 +1,59 @@
+{
+  "source_sha": "2a19a2becbd738b06929eb19825e395d936a8f17",
+  "source_status": [],
+  "started_utc": "2026-11-08T14:11:24.3661415Z",
+  "base_image": "mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09",
+  "checks": [
+    {
+      "log": "test.log",
+      "exit_code": 0,
+      "name": "test",
+      "command": "go test ./... -count=1 -v -timeout=8m"
+    },
+    {
+      "log": "vet.log",
+      "exit_code": 0,
+      "name": "vet",
+      "command": "go vet ./..."
+    },
+    {
+      "log": "wrappers.log",
+      "exit_code": 0,
+      "name": "wrappers",
+      "command": "go test ./internal/module -run ^TestDistributionWrapper$ -count=1 -v"
+    },
+    {
+      "log": "build.log",
+      "exit_code": 0,
+      "name": "build",
+      "command": "go build -trimpath -o C:\\data\\dev\\github\\wintable\\.cache\\issue12\\dist\\mit-verified-acceptance/wintable.exe ./cmd/wintable"
+    },
+    {
+      "log": "module_binary.log",
+      "exit_code": 0,
+      "name": "module_binary",
+      "command": "go test -c -o C:\\data\\dev\\github\\wintable\\.cache\\issue12\\dist\\mit-verified-acceptance/module.test.exe ./internal/module"
+    },
+    {
+      "log": "native-container.log",
+      "exit_code": 0,
+      "name": "native_container",
+      "command": "docker run --name wintable-native-e3a1e987f7ba --isolation hyperv --mount type=bind,source=C:\\data\\dev\\github\\wintable\\.cache\\issue12\\dist\\mit-verified-acceptance,target=C:/validation,readonly mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09 C:/validation/module.test.exe -test.run=^TestFileContentWindows$ -test.v -test.timeout=3m"
+    }
+  ],
+  "acceptance": "passed",
+  "launch_measurement": "UTF-16 code units of cmd.exe /c plus quoted fixed wrapper; non-BMP counts as 2; limit 8000",
+  "runner_sha256": "46E3DA7FB5D76AA537E69AD00E5F28E4D7364E44A731AD241BE27E94C7B5B1D9",
+  "coverage_sha256": "C4EC856C2E535DA734C1BFFD8D1B4619F26878D0D7B5F2F4B82569399E5F980E",
+  "go": "go version go1.27.3 windows/amd64",
+  "controller": {
+    "powershell": "7.6.9",
+    "os": "Microsoft Windows NT 10.0.26300.0",
+    "architecture": "AMD64"
+  },
+  "native_container_removed": true,
+  "exe_sha256": "C1FEF694445F363E575D8374DCDB13E89F3DF66980D84EB5127AEE5EEBD9D68B",
+  "ssh_fixture": "completed; see ssh/manifest.json for commands and exit codes",
+  "finished_utc": "2026-11-08T14:17:53.771757Z",
+  "prerequisites_passed": true
+}

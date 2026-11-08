@@ -1,6 +1,2 @@
-*.json -text
-*.log -text
-*.csv -text
-*.txt -text
-*.sha256 -text
-*.md -text
+* -text
+build-info.txt whitespace=-blank-at-eol
