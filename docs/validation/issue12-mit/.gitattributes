@@ -3,3 +3,4 @@
 *.csv -text
 *.txt -text
 *.sha256 -text
+*.md -text
