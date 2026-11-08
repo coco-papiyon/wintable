@@ -8,11 +8,12 @@ function Reject([scriptblock]$Action) {
 }
 try {
     $stage = New-Item -ItemType Directory "$temp/stage"
-    foreach ($name in @('wintable.exe','README.md','LICENSE','audit.json','docs/usage.md','docs/release.md','examples/inventory.json','examples/tasks.json','licenses/index.json','licenses/Go-LICENSE')) {
+    foreach ($name in @('wintable.exe','README.md','LICENSE','audit.json','docs/usage.md','docs/release.md','docs/command-module.md','docs/file-content-module.md','docs/linux-command.md','examples/inventory.json','examples/tasks.json','licenses/index.json','licenses/Go-LICENSE')) {
         $path = Join-Path $stage $name
         New-Item -ItemType Directory (Split-Path $path) -Force | Out-Null
         Set-Content $path 'synthetic gate test; not a distribution'
     }
+    if ((Get-Content "$root/scripts/distribution.ps1" -Raw) -notmatch 'docs/linux-command\.md') { throw 'Linux documentation missing from distribution staging' }
     $sha = 'a' * 40
     @(@{name='Go';version='go1.27.3';license='Go-LICENSE'}) | ConvertTo-Json -AsArray | Set-Content "$stage/licenses/index.json"
     @{source_commit=$sha} | ConvertTo-Json | Set-Content "$stage/build.json"
@@ -52,3 +53,4 @@ try {
 } finally {
     if (Test-Path -LiteralPath $temp) { Remove-Item -LiteralPath $temp -Recurse -Force }
 }
+
