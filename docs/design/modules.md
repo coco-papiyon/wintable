@@ -132,3 +132,5 @@ reboot案は `timeout_seconds:integer=600`、`message:string="wintable reboot"`�
 user/acl/template/powershell/shell/scheduled_task/updatesは採用未決定。順に秘密の非露出と更新比較、ACE継承と拒否優先、テンプレート言語と制御側読取、任意コードの結果検証、引用・シェル境界、実行主体と資格情報、長時間ジョブと再開点が未確定である。これらを調査して個別Issueで引数と受入試験を決定するまで、現行対応やP1/P2の確約に含めない。
 
 推奨順序は、file_contentの取り込みと安全置換の検証→P1のfile/service/registry/environment→読取結果基盤とfacts/stat/ping→転送・ハッシュ基盤とP2→再起動要求の結果契約→機能管理と再接続基盤。各段階でWindows 11 SSHとフルServer 2022の試験範囲を明示し、コンテナ試験だけで全環境合格としない。
+
+Linux対象の追加設計: [ADR-0001: LinuxをSSH実行対象に追加する](../adr/0001-linux-target-support.md)。設計決定であり、現行CLIのLinux対応を示すものではありません。
