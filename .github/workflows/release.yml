@@ -21,4 +21,12 @@ jobs:
           path: candidate/*zip*
           if-no-files-found: error
           retention-days: 14
+      - name: Preserve candidate audit even when packaging is blocked
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: candidate-audit-${{ github.sha }}
+          path: candidate/audit.json
+          if-no-files-found: warn
+          retention-days: 30
       # Deliberately no release publishing permission or step. See docs/release.md.
