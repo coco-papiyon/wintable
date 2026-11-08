@@ -1,0 +1,9 @@
+# 2026-11-08の部分検証証跡
+
+対象製品SHA: `fb1e92e02754def6b3d3c290c79573199282f843`。runner開発中に実行したため、manifestのdirty状態を保持した。製品ソースは変更していない。runnerの最終版そのものの全工程再試験ではない。
+
+test、vet、Windows amd64ビルド、ラッパー長、コンテナのmodule/transport試験は終了0。全必須シナリオの受け入れは未確認。runner終了1はそのための固定値。
+
+成功時に出力のなかったvet/buildログは初回runnerでは生成されなかった。終了値はmanifestに保存済み。最終runnerでは空ログも作成する。exeはGitに保存せずSHA-256をmanifestに保存した。
+
+選別したログとmanifestのみを保存し、コンテキスト、実行ファイル、鍵、known_hosts、processes.jsonは含めていない。SSH manifestで専用コンテナ・イメージ削除成功を確認。ローカルの生成秘密鍵も削除済み。全シナリオ合格の証跡として扱わない。

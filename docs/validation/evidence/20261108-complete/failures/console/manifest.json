@@ -1,0 +1,58 @@
+{
+  "source_sha": "4a7047ab67626124ad3d3c45d1d67592c2794781",
+  "source_status": [],
+  "started_utc": "2026-11-08T01:20:11.8189148Z",
+  "base_image": "mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09",
+  "checks": [
+    {
+      "name": "test",
+      "log": "test.log",
+      "command": "go test ./... -count=1 -v -timeout=8m",
+      "exit_code": 0
+    },
+    {
+      "name": "vet",
+      "log": "vet.log",
+      "command": "go vet ./...",
+      "exit_code": 0
+    },
+    {
+      "name": "wrappers",
+      "log": "wrappers.log",
+      "command": "go test ./internal/module -run ^TestDistributionWrapper$ -count=1 -v",
+      "exit_code": 0
+    },
+    {
+      "name": "build",
+      "log": "build.log",
+      "command": "go build -trimpath -o C:\\data\\dev\\github\\wintable\\.cache\\issue11\\.cache\\validation\\issue11-complete/wintable.exe ./cmd/wintable",
+      "exit_code": 0
+    },
+    {
+      "name": "module_binary",
+      "log": "module_binary.log",
+      "command": "go test -c -o C:\\data\\dev\\github\\wintable\\.cache\\issue11\\.cache\\validation\\issue11-complete/module.test.exe ./internal/module",
+      "exit_code": 0
+    },
+    {
+      "name": "native_container",
+      "log": "native-container.log",
+      "command": "docker run --name wintable-native-65ea5907a2ef --isolation hyperv --mount type=bind,source=C:\\data\\dev\\github\\wintable\\.cache\\issue11\\.cache\\validation\\issue11-complete,target=C:/validation,readonly mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09 C:/validation/module.test.exe -test.run=^TestFileContentWindows$ -test.v -test.timeout=3m",
+      "exit_code": 0
+    }
+  ],
+  "acceptance": "unconfirmed",
+  "launch_measurement": "UTF-16 code units of cmd.exe /c plus quoted fixed wrapper; non-BMP counts as 2; limit 8000",
+  "runner_sha256": "4B45A88D7EA54F6B481DE0A0DDD58D92238EB10129802641FB521246E0AE2582",
+  "go": "go version go1.27.3 windows/amd64",
+  "controller": {
+    "powershell": "7.6.9",
+    "architecture": "AMD64",
+    "os": "Microsoft Windows NT 10.0.26300.0"
+  },
+  "native_container_removed": true,
+  "exe_sha256": "CE0C5E893FB9D19FAB9B0AB7348B98D4559627D7ECDDF39E059CC7DCA4C794C7",
+  "failure": "CLI process acceptance failed",
+  "finished_utc": "2026-11-08T01:23:32.2992921Z",
+  "prerequisites_passed": false
+}

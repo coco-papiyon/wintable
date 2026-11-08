@@ -1,0 +1,10 @@
+ERROR: File or Directory not found.
+Could not take ownership of container WSL launcher
+At C:\validation\cases.ps1:9 char:26
++ ... EXITCODE) { throw 'Could not take ownership of container WSL launcher ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Could not take ...er WSL laun 
+   cher:String) [], RuntimeException
+    + FullyQualifiedErrorId : Could not take ownership of container WSL launch 
+   er
+ 

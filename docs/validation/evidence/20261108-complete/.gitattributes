@@ -1,0 +1,2 @@
+# Raw Windows evidence includes CRLF and console padding; preserve its bytes.
+* -text -whitespace

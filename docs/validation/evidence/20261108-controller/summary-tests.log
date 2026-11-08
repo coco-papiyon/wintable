@@ -1,0 +1,9 @@
+PASS valid
+PASS missing-log
+PASS wrong-binary
+PASS wrong-source
+PASS null-exit
+PASS failed
+PASS not-removed
+PASS missing-marker
+PASS missing-build

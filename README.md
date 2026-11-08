@@ -9,6 +9,7 @@ Windows CIと配布候補生成を整備しています。[Issue #11の全必須
 
 - [Windows版Ansible相当ツールの設計](docs/design/windows-ansible.md)
 - [検証計画と後続実装](docs/design/windows-ansible-validation.md)
+- [Windowsコンテナの証跡収集と未確認項目](docs/validation/windows-container.md)
 
 初期仕様はWindows 11 / Windows Server 2022以降のamd64制御・対象、SSH公開鍵認証とknown_hosts必須、cmd.exe既定シェル、PowerShell 5.1以上、独自JSON v1、command/file_contentです。採否・上限・非対応範囲は設計書のI-01決定表を参照してください。
 

@@ -3,9 +3,16 @@ package transport
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"encoding/pem"
+	"fmt"
 	"net"
 	"os"
 	"os/exec"
@@ -15,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
 )
 
@@ -62,6 +70,160 @@ func TestWindowsOpenSSH(t *testing.T) {
 	command := func(mode string) string {
 		return `powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File C:\fixture\receiver.ps1 -Mode ` + mode
 	}
+	t.Run("V05_RSA_ECDSA", func(t *testing.T) {
+		for _, kind := range []string{"rsa", "ecdsa"} {
+			t.Run(kind, func(t *testing.T) {
+				var key any
+				var err error
+				if kind == "rsa" {
+					key, err = rsa.GenerateKey(rand.Reader, 3072)
+				} else {
+					key, err = ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+				}
+				if err != nil {
+					t.Fatal(err)
+				}
+				signer, err := ssh.NewSignerFromKey(key)
+				if err != nil {
+					t.Fatal(err)
+				}
+				public := base64.StdEncoding.EncodeToString(ssh.MarshalAuthorizedKey(signer.PublicKey()))
+				docker(t, "exec", cfg.Container, "powershell.exe", "-NoProfile", "-Command", `[IO.File]::AppendAllText('C:\ProgramData\ssh\administrators_authorized_keys',[Text.Encoding]::ASCII.GetString([Convert]::FromBase64String('`+public+`')))`)
+				block, err := ssh.MarshalPrivateKey(key, "fixture")
+				if err != nil {
+					t.Fatal(err)
+				}
+				h := host
+				h.PrivateKeyFile = filepath.Join(t.TempDir(), "key")
+				if err := os.WriteFile(h.PrivateKeyFile, pem.EncodeToMemory(block), 0600); err != nil {
+					t.Fatal(err)
+				}
+				s := connect(t, h)
+				s.Close()
+			})
+		}
+	})
+	t.Run("V05_encrypted_key", func(t *testing.T) {
+		raw, err := os.ReadFile(host.PrivateKeyFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+		key, err := ssh.ParseRawPrivateKey(raw)
+		if err != nil {
+			t.Fatal(err)
+		}
+		const secret = "validation-only-passphrase"
+		block, err := ssh.MarshalPrivateKeyWithPassphrase(key, "fixture", []byte(secret))
+		if err != nil {
+			t.Fatal(err)
+		}
+		h := host
+		h.PrivateKeyFile = filepath.Join(t.TempDir(), "encrypted")
+		if err := os.WriteFile(h.PrivateKeyFile, pem.EncodeToMemory(block), 0600); err != nil {
+			t.Fatal(err)
+		}
+		for _, pass := range []string{secret, "incorrect", ""} {
+			t.Setenv("WINTABLE_KEY_PASSPHRASE", pass)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			s, err := (SSHConnector{}).Connect(ctx, h)
+			cancel()
+			if pass == secret {
+				if err != nil {
+					t.Fatal(err)
+				}
+				s.Close()
+			} else if s != nil || err == nil || err.Error() != "authentication_failed" {
+				if s != nil {
+					s.Close()
+				}
+				t.Fatalf("encrypted key rejection: %v", err)
+			}
+		}
+	})
+	t.Run("V05_unreachable", func(t *testing.T) {
+		listener, err := net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			t.Fatal(err)
+		}
+		h := host
+		h.Address = "127.0.0.1"
+		h.Port = uint16(listener.Addr().(*net.TCPAddr).Port)
+		listener.Close()
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		s, err := (SSHConnector{}).Connect(ctx, h)
+		if s != nil {
+			s.Close()
+			t.Fatal("closed endpoint accepted")
+		}
+		if err == nil || err.Error() != "connection_failed" {
+			t.Fatalf("unreachable: %v", err)
+		}
+	})
+	t.Run("V06_delayed_SSH_banner", func(t *testing.T) {
+		// A real TCP relay delays the target's SSH banner. No host network
+		// settings, firewall rules, or production service are changed.
+		listener, err := net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer listener.Close()
+		done := make(chan error, 1)
+		go func() {
+			client, err := listener.Accept()
+			if err != nil {
+				done <- err
+				return
+			}
+			defer client.Close()
+			target, err := net.DialTimeout("tcp", net.JoinHostPort(host.Address, strconv.Itoa(int(host.Port))), time.Second*5)
+			if err != nil {
+				done <- err
+				return
+			}
+			defer target.Close()
+			target.SetReadDeadline(time.Now().Add(5 * time.Second))
+			banner := make([]byte, 256)
+			n, err := target.Read(banner)
+			if err != nil {
+				done <- err
+				return
+			}
+			if !bytes.HasPrefix(banner[:n], []byte("SSH-")) {
+				done <- fmt.Errorf("missing target banner")
+				return
+			}
+			time.Sleep(1500 * time.Millisecond)
+			client.SetWriteDeadline(time.Now().Add(time.Second))
+			client.Write(banner[:n])
+			client.SetReadDeadline(time.Now().Add(time.Second))
+			buf := make([]byte, 4096)
+			for {
+				if _, err := client.Read(buf); err != nil {
+					break
+				}
+			}
+			done <- nil
+		}()
+		h := host
+		h.Address = "127.0.0.1"
+		h.Port = uint16(listener.Addr().(*net.TCPAddr).Port)
+		ctx, cancel := context.WithTimeout(context.Background(), 300*time.Millisecond)
+		defer cancel()
+		start := time.Now()
+		s, err := (SSHConnector{}).Connect(ctx, h)
+		if s != nil {
+			s.Close()
+			t.Fatal("delayed handshake accepted")
+		}
+		if err == nil || err.Error() != "deadline_exceeded" || time.Since(start) > time.Second {
+			t.Fatalf("deadline: %v", err)
+		}
+		if err := <-done; err != nil {
+			t.Fatal(err)
+		}
+		t.Log("Target SSH banner delayed 1500ms; connect deadline 300ms; connection closed; no exec request")
+	})
 	t.Run("V05_reject_keys_and_auth", func(t *testing.T) {
 		before, err := os.ReadFile(host.KnownHostsFile)
 		if err != nil {

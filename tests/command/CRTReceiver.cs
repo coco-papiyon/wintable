@@ -14,8 +14,13 @@ public class CRTReceiver {
   string[] values=new string[count-1];
   for(int i=1;i<count;i++)values[i-1]=Marshal.PtrToStringUni(Marshal.ReadIntPtr(args,i*IntPtr.Size));
   if(values.Length>0 && values[0]=="--marker") { File.WriteAllText(values[1],"executed");return 0; }
+  if(values.Length>0 && values[0]=="--wait") { File.AppendAllText(values[1],"started\n");System.Threading.Thread.Sleep(60000);return 0; }
   if(values.Length>0 && values[0]=="--assert-absent")return File.Exists(values[1])?98:0;
   if(values.Length>0 && values[0]=="--exit")return Int32.Parse(values[1]);
+  if(values.Length>0 && values[0]=="--codepage") {
+   int cp=Int32.Parse(values[1]);byte[] data=Encoding.GetEncoding(cp).GetBytes(cp==932||cp==65001?"日本語":"caf\u00e9");
+   var stream=Console.OpenStandardOutput();stream.Write(data,0,data.Length);return 0;
+  }
   if(values.Length>0 && values[0]=="--flood") {
    byte[] b=new byte[8192];for(int i=0;i<b.Length;i++)b[i]=(byte)(i%256);
    var t=Task.Factory.StartNew(()=>{var e=Console.OpenStandardError();for(int i=0;i<130;i++)e.Write(b,0,b.Length);});
