@@ -4,7 +4,7 @@ Issue #8のtransportを、Go模擬サーバーではなくWindows Server Core LT
 Win32-OpenSSH・cmd.exe・PowerShell 5.1に接続して検証するためのfixtureです。
 command-test.logの試験では製品の固定commandラッパーと実CRTパーサーを使用します。
 その後のtest.logのtransport単体試験は従来のreceiver.ps1を使用します。
-file_contentは対象外です。
+file_contentの製品ラッパーも試験します。対象はバイト一致・冪等性・置換とACL・厳密受信・実起動行・EOFと送信中切断です。
 
 ## 前提と実行
 
@@ -114,7 +114,7 @@ stdinサイズ、不正入力の実行抑止、非UTF-8生出力と各1MiB保持
 受信の小断片化により、長い要求で再現したstdinの停止を解消しています。
 詳細と未確認範囲は`docs/command-module.md`を参照してください。
 
-`wrapper-launch.json`はCIMで採取した実cmd起動行（7,401 UTF-16単位）です。
+`wrapper-launch.json`はCIMで採取した実cmd起動行です（7,401はIssue #9時点の値）。file_contentは`wrapper-launch-file.json`へ保存します。現行の長さは各モジュールの資料を参照してください。
 7,999/8,000単位の実ラッパー起動と8,001のローカル拒否、UTF-8途中分割送信、
 未完JSON送信中の切断と副作用なしも試験します。失敗時の調査用に
 `processes.json`を保存します。fixture.jsonのContainerはこのスクリプトで
@@ -122,3 +122,6 @@ stdinサイズ、不正入力の実行抑止、非UTF-8生出力と各1MiB保持
 
 この成功はServer Core 2022の製品試験に限定します。Windows 11 SSH対象と
 フルServer 2022の未確認は残り、両OS受け入れ全体の合格ではありません。
+
+file_contentだけの調査実行は "-ModuleTestPattern '^TestFileContentSSH'" を指定できます。既定はcommandとfile_contentの両方です。
+I-08の製品file_content試験とcommand回帰の最終証跡は`.cache/windows-ssh/1e0ecd98f80c/`。現行の実起動長はfile_content 7,985、command 7,185 UTF-16単位です。詳細・未確認範囲は`docs/file-content-module.md`を参照してください。
