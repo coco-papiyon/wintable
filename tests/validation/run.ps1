@@ -37,6 +37,16 @@ try {
     $env:GOOS='windows'; $env:GOARCH='amd64'; $env:CGO_ENABLED='0'
     Invoke-Check wrappers @('test','./internal/module','-run','^TestDistributionWrapper$','-count=1','-v')
     Invoke-Check build @('build','-trimpath','-o',"$output/wintable.exe",'./cmd/wintable')
+    Invoke-Check module_binary @('test','-c','-o',"$output/module.test.exe",'./internal/module')
+    $nativeName = 'wintable-native-' + [Guid]::NewGuid().ToString('N').Substring(0,12)
+    $nativeArgs = @('run','--name',$nativeName,'--isolation','hyperv','--mount',"type=bind,source=$output,target=C:/validation,readonly",$BaseImage,'C:/validation/module.test.exe','-test.run=^TestFileContentWindows$','-test.v','-test.timeout=3m')
+    try {
+        & docker @nativeArgs 2>&1 | Tee-Object "$output/native-container.log" | Out-Host
+        $manifest.checks += @{ name='native_container'; command=('docker ' + ($nativeArgs -join ' ')); exit_code=$LASTEXITCODE; log='native-container.log' }
+    } finally {
+        & docker rm -f $nativeName 2>&1 | Out-Null
+        $manifest.native_container_removed = $LASTEXITCODE -eq 0
+    }
     $manifest.exe_sha256 = (Get-FileHash "$output/wintable.exe" -Algorithm SHA256).Hash
     & "$repo/tests/windows-ssh/run.ps1" -BaseImage $BaseImage -OutputDirectory "$output/ssh" -ValidationExecutable "$output/wintable.exe"
     $manifest.ssh_fixture = 'completed; see ssh/manifest.json for commands and exit codes'

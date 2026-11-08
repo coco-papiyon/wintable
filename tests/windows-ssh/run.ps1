@@ -43,6 +43,7 @@ function Invoke-Docker {
     if ($code) { throw "docker failed ($code): $($args[0])" }
 }
 $oldFixture = $env:WINTABLE_SSH_FIXTURE
+$oldExecutable = $env:WINTABLE_VALIDATION_EXE
 $created = $false
 $built = $false
 $result = 1
@@ -100,8 +101,13 @@ try {
     @{ Address=$address; Port=22; User='wintablessh'; Container=$name } | ConvertTo-Json | Set-Content "$output/fixture.json" -Encoding utf8NoBOM
     $env:WINTABLE_SSH_FIXTURE = $output
     if ($ValidationExecutable) {
+        $env:WINTABLE_VALIDATION_EXE = [IO.Path]::GetFullPath($ValidationExecutable)
         & "$repo/tests/validation/clean-controller.ps1" -Executable $ValidationExecutable -FixtureDirectory $output -BaseImage $BaseImage -Isolation $Isolation
         $manifest.clean_controller = 'see controller.json and controller.log'
+        $manifest.cli_test_command = 'go test ./internal/cli -run ^TestWindowsCLIProcess$ -count=1 -v -timeout=2m'
+        & go test ./internal/cli -run '^TestWindowsCLIProcess$' -count=1 -v -timeout=2m 2>&1 | Tee-Object "$output/cli-test.log"
+        $manifest.cli_test_exit_code = $LASTEXITCODE
+        if ($LASTEXITCODE) { throw 'CLI process acceptance failed' }
     }
     $manifest.command_test_command = "go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=4m"
     & go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/command-test.log"
@@ -116,6 +122,7 @@ try {
     throw
 } finally {
     $env:WINTABLE_SSH_FIXTURE = $oldFixture
+    $env:WINTABLE_VALIDATION_EXE = $oldExecutable
     if ($created) {
         try { Invoke-Docker exec $name powershell.exe -NoProfile -Command 'Get-CimInstance Win32_Process | Select-Object Name,ProcessId,ParentProcessId,CommandLine | ConvertTo-Json -Depth 3' | Set-Content "$output/processes.json" } catch { Write-Warning $_ }
         try { Invoke-Docker logs $name | Set-Content "$output/container.log" } catch { Write-Warning $_ }

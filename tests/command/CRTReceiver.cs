@@ -14,6 +14,7 @@ public class CRTReceiver {
   string[] values=new string[count-1];
   for(int i=1;i<count;i++)values[i-1]=Marshal.PtrToStringUni(Marshal.ReadIntPtr(args,i*IntPtr.Size));
   if(values.Length>0 && values[0]=="--marker") { File.WriteAllText(values[1],"executed");return 0; }
+  if(values.Length>0 && values[0]=="--wait") { File.AppendAllText(values[1],"started\n");System.Threading.Thread.Sleep(60000);return 0; }
   if(values.Length>0 && values[0]=="--assert-absent")return File.Exists(values[1])?98:0;
   if(values.Length>0 && values[0]=="--exit")return Int32.Parse(values[1]);
   if(values.Length>0 && values[0]=="--flood") {
