@@ -3,8 +3,8 @@
 `transport.SSHConnector` implements the existing Connector contract.
 `cli.RunEngine` defaults a nil Connector to this implementation. Callers must
 provide distribution-owned fixed wrapper lines and a module response decoder.
-The executable continues to exit 3 until #9/#10 provide those modules; this
-transport does not synthesize successful module responses.
+The executable now supplies both command and file_content wrappers and their
+response decoders; this transport does not synthesize successful module responses.
 
 Inventory private_key_file and known_hosts_file paths are resolved relative to
 the inventory by the configuration layer. Only public-key authentication is
