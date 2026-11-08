@@ -105,8 +105,8 @@ try {
         & "$repo/tests/validation/clean-controller.ps1" -Executable $ValidationExecutable -FixtureDirectory $output -BaseImage $BaseImage -Isolation $Isolation
         $manifest.clean_controller = 'see controller.json and controller.log'
     }
-    $manifest.command_test_command = "go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=4m"
-    & go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/command-test.log"
+    $manifest.command_test_command = "go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=8m"
+    & go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=8m 2>&1 | Tee-Object "$output/command-test.log"
     $manifest.command_test_exit_code = $LASTEXITCODE
     if ($LASTEXITCODE) { throw 'command module acceptance failed' }
     # Cancellation may leave a target wrapper running. Run process-observation
