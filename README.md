@@ -5,7 +5,7 @@ Windowsネイティブで動作するGo製の構成管理CLIです。JSON v1の�
 - [ZIPの導入・SSH準備・利用手順](docs/usage.md)
 - [Windows CI・監査・ZIP作成と公開条件](docs/release.md)
 
-Windows CIと配布候補生成を整備しています。製品ライセンスの決定、Issue #11の全必須検証合格、最終ZIPでのV-13確認が完了するまで公開不可です。
+Windows CIと配布候補生成を整備しています。[Issue #11の全必須検証は合格済み](https://github.com/coco-papiyon/wintable/issues/11#issuecomment-6717454311)です。製品ライセンスの決定、配布commitへの証跡の対応付け、最終ZIPでのV-13確認が完了するまで公開不可です。
 
 - [Windows版Ansible相当ツールの設計](docs/design/windows-ansible.md)
 - [検証計画と後続実装](docs/design/windows-ansible-validation.md)
