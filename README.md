@@ -1,6 +1,11 @@
 # wintable
 
-Windowsネイティブで動作するGo製の構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、commandモジュール、結果集計・描画を実装しています。file_contentの実行はIssue #10で実装します。
+Windowsネイティブで動作するGo製の構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、command/file_contentモジュール、結果集計・描画を実装しています。
+
+- [ZIPの導入・SSH準備・利用手順](docs/usage.md)
+- [Windows CI・監査・ZIP作成と公開条件](docs/release.md)
+
+Windows CIと配布候補生成を整備しています。[Issue #11の全必須検証は合格済み](https://github.com/coco-papiyon/wintable/issues/11#issuecomment-6717454311)です。本体は[MITライセンス](LICENSE)です。Go・依存ライブラリのライセンスと通知も配布物に保持します。[最終ZIPのV-13と配布commitの全18シナリオを確認済み](docs/validation/issue12-audit-fixed/README.md)です。公開前に実ログ・最新監査・ライセンスの人手レビューを行います。
 
 - [Windows版Ansible相当ツールの設計](docs/design/windows-ansible.md)
 - [検証計画と後続実装](docs/design/windows-ansible-validation.md)
@@ -26,7 +31,7 @@ $env:CGO_ENABLED = '0'
 
 helpは終了0、不正引数は終了2。入力ファイルも検証し、不正入力は接続前に終了2となります。[サンプル](examples/)を参照してください。commandとfile_contentのrunは実際にSSHへ接続します。file_contentはBOMなしUTF-8のバイト比較を行い、差分があるときだけ安全な置換を行います。詳細は[file_contentモジュール](docs/file-content-module.md)を参照してください。Ctrl+Cのcontextを伝播します。
 
-`--include-output` は既定falseです。有効にすると任意コマンドの出力に秘密が含まれ得ます。完全な自動マスキングは保証しません。commandの実機検証範囲と未確認事項は [commandモジュール](docs/command-module.md) を参照してください。Windows CI・ZIP配布は後続Issueです。
+`--include-output` は既定falseです。有効にすると任意コマンドの出力に秘密が含まれ得ます。完全な自動マスキングは保証しません。commandの実機検証範囲と未確認事項は [commandモジュール](docs/command-module.md) を参照してください。
 
 結果集計・JSON／テキスト描画・終了判定は `internal/result` に実装済みです。
 `cli.RunResults` に結果を返すExecutorを注入すると、ホスト名／task_index順の単一JSON文書またはテキストをstdoutへ、定型診断をstderrへ出します。

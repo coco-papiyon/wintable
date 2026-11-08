@@ -75,7 +75,13 @@ func TestCommandWindows(t *testing.T) {
 			command := CommandWrapper()
 			run := func(t *testing.T, input []byte) transport.Response {
 				t.Helper()
-				ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+				timeout := 30 * time.Second
+				// The maximum JSON boundary is a throughput stress check on the
+				// seven-byte Windows OpenSSH receiver, not a 30-second latency contract.
+				if session != nil && len(input) > 1<<20 {
+					timeout = 2 * time.Minute
+				}
+				ctx, cancel := context.WithTimeout(context.Background(), timeout)
 				defer cancel()
 				if session != nil {
 					r, e := session.Run(ctx, transport.Request{Command: command, Stdin: input, StdoutLimit: transport.WrapperResponseLimit})
@@ -214,6 +220,7 @@ func TestCommandWindows(t *testing.T) {
 				}
 				seed := payload([]string{})
 				for _, n := range []int{JSONLimit - 1, JSONLimit, JSONLimit + 1} {
+					t.Logf("receiver JSON boundary: %d bytes", n)
 					input := append(append([]byte{}, seed...), bytes.Repeat([]byte(" "), n-len(seed))...)
 					row := DecodeCommand(run(t, input), false)
 					if (row.Status == result.Changed) != (n <= JSONLimit) {

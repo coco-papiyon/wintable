@@ -1,0 +1,71 @@
+=== RUN   TestCommandSSHLaunchAndDisconnect
+    command_ssh_windows_test.go:116: observed shell UTF-16 units=7185, model=7185
+    command_ssh_windows_test.go:161: seven-byte SSH writes and explicit EOF: valid request executed; pending request still has no side effect
+    command_ssh_windows_test.go:177: partial JSON disconnect: returned within 10 seconds; no child side effect before/after disconnect
+--- PASS: TestCommandSSHLaunchAndDisconnect (8.43s)
+=== RUN   TestFileContentSSHLaunchAndDisconnect
+    command_ssh_windows_test.go:116: observed shell UTF-16 units=7997, model=7997
+    command_ssh_windows_test.go:161: seven-byte SSH writes and explicit EOF: valid request executed; pending request still has no side effect
+    command_ssh_windows_test.go:177: partial JSON disconnect: returned within 10 seconds; no child side effect before/after disconnect
+--- PASS: TestFileContentSSHLaunchAndDisconnect (8.05s)
+=== RUN   TestCommandWindows
+    command_windows_test.go:41: CRT parser: msvcrt.dll __wgetmainargs; local exe=C:\Users\cocoo\AppData\Local\Temp\TestCommandWindows78516786\001\日本語 空白.exe
+=== RUN   TestCommandWindows/cmd
+=== RUN   TestCommandWindows/cmd/wrapper_launch_boundaries
+    command_windows_test.go:139: real wrapper launch accepted: 7999 UTF-16 units mode=cmd
+    command_windows_test.go:139: real wrapper launch accepted: 8000 UTF-16 units mode=cmd
+=== RUN   TestCommandWindows/cmd/CRT_roundtrip
+=== RUN   TestCommandWindows/cmd/nonzero_and_bytes
+=== RUN   TestCommandWindows/cmd/receiver_boundaries
+    command_windows_test.go:223: receiver JSON boundary: 2097151 bytes
+    command_windows_test.go:223: receiver JSON boundary: 2097152 bytes
+    command_windows_test.go:223: receiver JSON boundary: 2097153 bytes
+=== RUN   TestCommandWindows/cmd/invalid_before_execution
+=== RUN   TestCommandWindows/cmd/EOF_required
+=== NAME  TestCommandWindows/cmd
+    command_windows_test.go:296: launch units=7185 mode=cmd
+=== RUN   TestCommandWindows/ssh
+=== RUN   TestCommandWindows/ssh/wrapper_launch_boundaries
+    command_windows_test.go:139: real wrapper launch accepted: 7999 UTF-16 units mode=ssh
+    command_windows_test.go:139: real wrapper launch accepted: 8000 UTF-16 units mode=ssh
+=== RUN   TestCommandWindows/ssh/CRT_roundtrip
+=== RUN   TestCommandWindows/ssh/nonzero_and_bytes
+=== RUN   TestCommandWindows/ssh/receiver_boundaries
+    command_windows_test.go:223: receiver JSON boundary: 2097151 bytes
+    command_windows_test.go:223: receiver JSON boundary: 2097152 bytes
+    command_windows_test.go:223: receiver JSON boundary: 2097153 bytes
+=== RUN   TestCommandWindows/ssh/invalid_before_execution
+=== NAME  TestCommandWindows/ssh
+    command_windows_test.go:296: launch units=7185 mode=ssh
+--- PASS: TestCommandWindows (69.85s)
+    --- PASS: TestCommandWindows/cmd (23.48s)
+        --- PASS: TestCommandWindows/cmd/wrapper_launch_boundaries (1.25s)
+        --- PASS: TestCommandWindows/cmd/CRT_roundtrip (0.68s)
+        --- PASS: TestCommandWindows/cmd/nonzero_and_bytes (3.82s)
+        --- PASS: TestCommandWindows/cmd/receiver_boundaries (7.90s)
+        --- PASS: TestCommandWindows/cmd/invalid_before_execution (7.74s)
+        --- PASS: TestCommandWindows/cmd/EOF_required (2.08s)
+    --- PASS: TestCommandWindows/ssh (45.86s)
+        --- PASS: TestCommandWindows/ssh/wrapper_launch_boundaries (2.98s)
+        --- PASS: TestCommandWindows/ssh/CRT_roundtrip (1.44s)
+        --- PASS: TestCommandWindows/ssh/nonzero_and_bytes (8.91s)
+        --- PASS: TestCommandWindows/ssh/receiver_boundaries (10.63s)
+        --- PASS: TestCommandWindows/ssh/invalid_before_execution (21.81s)
+=== RUN   TestFileContentLinkSwapWindows
+=== RUN   TestFileContentLinkSwapWindows/expected
+    file_content_race_windows_test.go:68: synchronized file-to-symlink swap rejected; referent unchanged; no temporary files
+=== RUN   TestFileContentLinkSwapWindows/different
+    file_content_race_windows_test.go:68: synchronized file-to-symlink swap rejected; referent unchanged; no temporary files
+--- PASS: TestFileContentLinkSwapWindows (7.52s)
+    --- PASS: TestFileContentLinkSwapWindows/expected (3.84s)
+    --- PASS: TestFileContentLinkSwapWindows/different (3.69s)
+=== RUN   TestFileContentSSH
+    file_content_ssh_windows_test.go:56: failed receiver stdout={"error":"invalid_request"} stderr=
+    file_content_ssh_windows_test.go:56: failed receiver stdout={"error":"write_failed"} stderr=
+    file_content_ssh_windows_test.go:121: ACL deny: failed without target or temporary file; deny ACE removed in deferred cleanup
+    file_content_ssh_windows_test.go:126: SSH/cmd file_content: bytes, 10KiB stdin, idempotence, replacement ACL, invalid JSON passed; launch model=7997 UTF-16; target=5.1.20348.5773
+        
+        Microsoft Windows [Version 10.0.20348.5773]
+--- PASS: TestFileContentSSH (16.04s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/module	111.656s

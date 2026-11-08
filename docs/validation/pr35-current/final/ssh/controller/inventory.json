@@ -1,0 +1,12 @@
+{
+  "hosts": {
+    "target": {
+      "user": "wintablessh",
+      "known_hosts_file": "C:\\validation\\known_hosts",
+      "address": "172.21.204.66",
+      "port": 22,
+      "private_key_file": "C:\\validation\\client"
+    }
+  },
+  "version": 1
+}

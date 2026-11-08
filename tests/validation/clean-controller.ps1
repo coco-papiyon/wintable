@@ -24,12 +24,35 @@ try {
         @{ name='file'; module='file_content'; args=@{ path=('C:\fixture\clean-' + $name + '.txt'); content="日本語 `"quoted`"`n" } }
     ) } | ConvertTo-Json -Depth 8 | Set-Content "$root/tasks.json" -Encoding utf8NoBOM
     $record.exe_sha256 = (Get-FileHash "$root/wintable.exe" -Algorithm SHA256).Hash
+    if ($env:WINTABLE_DISTRIBUTION_ZIP) {
+        $zip = [IO.Path]::GetFullPath($env:WINTABLE_DISTRIBUTION_ZIP)
+        $record.zip_sha256 = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
+        & "$PSScriptRoot/../../scripts/verify-package.ps1" -Zip $zip -ExpectedSHA256 $record.zip_sha256
+        Copy-Item -LiteralPath $zip -Destination "$root/candidate.zip"
+        Copy-Item -LiteralPath "$PSScriptRoot/zip-controller-cases.ps1" -Destination "$root/zip-cases.ps1"
+    }
     $arguments = @('run','--name',$name,'--isolation',$Isolation,'--mount',"type=bind,source=$root,target=C:/validation,readonly",$BaseImage,'powershell.exe','-NoProfile','-File','C:/validation/cases.ps1')
     $record.command = 'docker ' + ($arguments -join ' ')
     & docker @arguments 2>&1 | Tee-Object "$FixtureDirectory/controller.log" | Out-Host
     $record.exit_code = $LASTEXITCODE
     if ($record.exit_code -ne 0) { throw "Clean controller failed: $($record.exit_code)" }
     if (!(Select-String -LiteralPath "$FixtureDirectory/controller.log" -SimpleMatch 'CLEAN_CONTROLLER_PASS' -Quiet)) { throw 'Missing controller completion marker' }
+    if ($env:WINTABLE_DISTRIBUTION_ZIP) {
+        # Administrative fixture preparation is separate from ordinary-user installation.
+        $zipName = "$name-zip"
+        try {
+            & docker run -d --name $zipName --isolation $Isolation --mount "type=bind,source=$root,target=C:/validation,readonly" $BaseImage powershell.exe -NoProfile -Command '$ErrorActionPreference="Stop"; if (Test-Path C:\Windows\System32\wsl.exe) { takeown.exe /F C:\Windows\System32\wsl.exe /A | Out-Null; icacls.exe C:\Windows\System32\wsl.exe /grant *S-1-5-32-544:F | Out-Null; Remove-Item C:\Windows\System32\wsl.exe -Force }; Set-Content C:\ready.txt ready; Start-Sleep -Seconds 600'
+            if ($LASTEXITCODE) { throw 'ZIP controller setup failed' }
+            & docker exec --user ContainerUser $zipName powershell.exe -NoProfile -File C:/validation/zip-cases.ps1 2>&1 | Tee-Object "$FixtureDirectory/zip-controller.log" | Out-Host
+            $record.zip_exit_code = $LASTEXITCODE
+            if ($record.zip_exit_code -ne 0) { throw 'ZIP controller failed' }
+            if (!(Select-String -LiteralPath "$FixtureDirectory/zip-controller.log" -SimpleMatch 'ZIP_CONTROLLER_PASS' -Quiet)) { throw 'Missing ZIP completion marker' }
+        } finally {
+            & docker rm -f $zipName | Out-Null
+            $record.zip_container_removed = $LASTEXITCODE -eq 0
+        }
+        if (!$record.zip_container_removed) { throw 'ZIP controller cleanup failed' }
+    }
 } finally {
     & docker rm -f $name 2>&1 | Out-Null
     $record.removed = $LASTEXITCODE -eq 0
