@@ -22,19 +22,21 @@ func TestOSPreflightNoConnections(t *testing.T) {
 			hosts := inv["hosts"].(map[string]any)
 			for _, v := range hosts {
 				h := v.(map[string]any)
+				h["vars"] = map[string]any{"exe": `C:\x.exe`, "path": `C:\x.txt`}
 				clone := map[string]any{}
 				for k, x := range h {
 					clone[k] = x
 				}
 				clone["os"] = target
+				clone["vars"] = map[string]any{"exe": "relative", "path": "relative"}
 				hosts["zz-last"] = clone
 				break
 			}
 			raw, _ = json.Marshal(inv)
 			os.WriteFile("i", raw, 0600)
-			args := map[string]any{"executable": "relative", "argv": []any{}}
+			args := map[string]any{"executable": "${exe}", "argv": []any{}}
 			if kind == "file_content" {
-				args = map[string]any{"path": "relative", "content": ""}
+				args = map[string]any{"path": "${path}", "content": ""}
 			}
 			raw, _ = json.Marshal(map[string]any{"version": 1, "hosts": "all", "tasks": []any{map[string]any{"name": "bad", "module": kind, "args": args}}})
 			os.WriteFile("t", raw, 0600)
