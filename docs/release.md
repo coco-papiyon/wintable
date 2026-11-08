@@ -1,6 +1,6 @@
 # Windows配布候補と公開条件
 
-現状は公開不可です。[Issue #11の最新検証](https://github.com/coco-papiyon/wintable/issues/11#issuecomment-6717454311)は全体OKで、検証headは `40ba3c7675418c0df2e020ec68f2e5a6098918f8` です。ただし、その合格範囲は固定Server Core 2022コンテナの既存実測であり、本Issueの最終ZIPや配布commitの合格を示しません。製品の再配布ライセンスは未決定です。依存のBSDライセンスを製品のライセンスと読み替えません。権利者がLICENSEを決定してcommitするまで、候補作成はライセンス不足で失敗します。
+現状は公開不可です。[Issue #11の最新検証](https://github.com/coco-papiyon/wintable/issues/11#issuecomment-6717454311)は全体OKで、検証headは `40ba3c7675418c0df2e020ec68f2e5a6098918f8` です。ただし、その合格範囲は固定Server Core 2022コンテナの既存実測であり、本Issueの最終ZIPや配布commitの合格を示しません。製品本体は権利者の指定によりMITライセンスを採用し、リポジトリのLICENSEを同梱します。Go・依存ライブラリのライセンス本文と通知は別途保持します。残る公開条件は、配布commitへの全必須証跡の対応付けと、同一の最終ZIPによるV-13の合格です。
 
 ## 候補の生成
 

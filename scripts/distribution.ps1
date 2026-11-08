@@ -1,4 +1,4 @@
-param([string]$OutputDirectory = 'dist', [string]$ProductLicense)
+param([string]$OutputDirectory = 'dist', [string]$ProductLicense = 'LICENSE')
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 function Invoke-Go {
@@ -53,7 +53,7 @@ try {
         $inventory += [ordered]@{name=$parts[0]; version=$parts[1]; license=$name}
     }
     $inventory | ConvertTo-Json -Depth 5 | Set-Content "$licenses/index.json" -Encoding utf8
-    # The repository has no product license grant. Never invent one or package without the owner's decision.
+    # The owner-approved product license is tracked separately from dependency licenses.
     if (-not $ProductLicense -or -not (Test-Path -LiteralPath $ProductLicense -PathType Leaf)) {
         throw 'Product license required: supply -ProductLicense with an owner-approved redistribution license. Audit/build outputs retained; no ZIP created.'
     }
