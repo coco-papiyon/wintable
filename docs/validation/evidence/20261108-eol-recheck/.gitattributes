@@ -1,0 +1,2 @@
+# Preserve the original Windows verification output and its hashes.
+* -text -whitespace

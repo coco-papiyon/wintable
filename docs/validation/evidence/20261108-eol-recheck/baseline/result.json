@@ -1,0 +1,13 @@
+{
+  "source_sha": "64e7bd38cfc739f85cae4c622cd4214764b0e6f5",
+  "verified_input_files": 46,
+  "test_exit_code": 0,
+  "summary_exit_code": 1,
+  "source_coverage_sha256": "C4EC856C2E535DA734C1BFFD8D1B4619F26878D0D7B5F2F4B82569399E5F980E",
+  "evidence_coverage_sha256": "DDE7163F80F5650FEA7A36F24642FCD6086BA8CF0DD78BAB508E15D3F1C4300E",
+  "acceptance": "unconfirmed",
+  "prerequisites_passed": false,
+  "scenario_count": 18,
+  "passed_count": 18,
+  "finished_utc": "2026-11-08T04:48:56.6804930Z"
+}
