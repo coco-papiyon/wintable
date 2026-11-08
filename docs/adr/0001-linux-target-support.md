@@ -2,14 +2,14 @@
 
 - 状態: 採用（設計決定。Linux実行対応は未実装）
 - 日付: 2026-11-08
-- 要件: [Issue #23](https://github.com/coco-papiyon/wintable/issues/23)本文と実装計画。コメント0件。
-- 調査基準: main `53382ac87653bed136de50ddcf6f644505defa8a`
+- 要件: [Issue #23](https://github.com/coco-papiyon/wintable/issues/23)本文・実装計画と[検証指摘](https://github.com/coco-papiyon/wintable/issues/23#issuecomment-6715076392)。
+- 調査基準: main `fb1e92e02754def6b3d3c290c79573199282f843`（PR #21統合後）
 
 ## 背景と範囲
 
 Windows制御端末からLinuxへ、現行と同じ公開鍵SSH・known_hosts検証・全件事前検証で実行する。初期Linux moduleはcommandのみ。Linux制御端末、sudo/become、package、systemd、再起動、汎用shellは別Issueとする。本IssueはADR・分割案・試験設計を納品し、コード、fixture、CI、子Issueの起票は行わない。
 
-mainはcommandのみ標準CLIに登録済み。file_contentは入力検証のみで、[Issue #10](https://github.com/coco-papiyon/wintable/issues/10)はOPEN・別ブランチ実装中。[Issue #20](https://github.com/coco-papiyon/wintable/issues/20)のモジュール設計はmainへ統合済み。Linux file_contentをWindows実装済みという前提で共通化しない。
+mainはWindowsのcommandとfile_contentを標準CLIに登録済み。file_contentは[PR #21](https://github.com/coco-papiyon/wintable/pull/21)で統合され、[Issue #10](https://github.com/coco-papiyon/wintable/issues/10)はCLOSED。[Issue #20](https://github.com/coco-papiyon/wintable/issues/20)のモジュール設計も統合済み。確認根拠は `internal/cli/engine.go` の両Wrappers/DecodeResult登録、`internal/module/file_content.cs` と[現行仕様](../file-content-module.md)。Windowsコンテナの受け入れ済み範囲と未確認範囲は現行仕様と#10の最終検証を参照し、全OS・全競合の保証とはしない。
 
 ## 決定1: 対象環境と依存
 
@@ -46,7 +46,7 @@ inventory hostにリテラル `os` を追加し、`windows` / `linux` のみ受�
 | `internal/config/config.go` / `internal/inventory` | host OSの構造検証、taskは型と未知/重複キーを検査。対象パスの意味検証は展開後へ移す |
 | `internal/engine/plan.go` | HostPlanにOS、OS/moduleでbackend選択、全件能力確認後のみ実行可能Planを返す |
 | `internal/module/prepare.go` | 共通JSON生成とOS別Validate/Prepare分離。Windows CRT/UTF-16とLinuxバイト制限を分離 |
-| `internal/module/wrapper.go` / `command.cs` | Windows実装を保持。Linux固定Python receiverを別資源として追加 |
+| `internal/module/wrapper.go` / `receiver.cs` / `command.cs` / `file_content.cs` | Windows両moduleと共通受信処理を保持。Linux固定Python receiverを別資源として追加 |
 | `internal/cli/engine.go` / `internal/engine/run.go` | module名のみの登録からOS/moduleの固定起動行・decoder登録へ。未登録を接続前に検出 |
 | `internal/transport/ssh.go` / `internal/result` | 原則共用。SSH認証、stdin、制限、結果順・終了値の既存契約を維持 |
 | `tests/windows-ssh` / `build.ps1` / 設計書 | Windows回帰維持、Linux試験と起動長の別検査、対応表追加 |
@@ -73,6 +73,10 @@ executableは `/` 始まりのPOSIX絶対パス、NUL・制御文字・空・末
 
 ## 決定5: file_contentは独立した第二段階
 
+Windows実装の統合を確認した上で、Linuxの初期公開をcommandに限定する決定を維持する。理由はLinux固有の所有者・mode・ACL/xattr、dirfdとリンク競合、確定APIの設計・実証が別途必要なため。WindowsのDACL/ReplaceFile/祖先ハンドルによる名前変更拒否はそのまま移植できない。commandでOS選択・固定receiver・実SSH基盤を先に検証し、ファイル更新の安全性試験をDに分ける。同時公開案はこの実証をcommand公開の条件にまで追加するため採用しない。
+
+#10から継承する契約はpath/contentのみ、BOMなしUTF-8のバイト比較・改行保持、content 1MiB/要求2MiB、同値ok/false、新規・差分changed/true、親既存必須、通常ファイル以外とリンクの拒否、同一ディレクトリの排他一時ファイル、自動再送なし、比較時点CASなし、確定前の拒否false・確定API以後/清掃失敗/通信断null。file_content応答はcommandの5フィールドではなく、現行 `DecodeFileContent` と同じchangedまたはerror形式を基準にLinux用decoderを設計する。ドライブパス、reparse point/DACL、File.Replace/MoveはWindows backendに残す。
+
 contentはUTF-8、BOM追加なし・改行保持、1MiB以下。バイト一致はok/false、新規（空も含む）・差分はchanged/true。親既存必須、対象・全祖先symlinkと非通常ファイルを拒否する。初期引数はpath/contentのみ、所有者/mode変更は提供しない。既存UID/GIDとmodeを保持できなければ確定前に拒否し、新規はSSHユーザー所有・mode 0600（umaskで広がらない）とする。ACL/xattrを持つ既存ファイルは属性保持を保証する実装ができるまで拒否する。WindowsのDACL/reparse point規則は流用しない。
 
 Linuxではdirfd・no-followで祖先を辿り、同一ディレクトリの排他的tempへ書込・fsync後、既存は原子的replace、新規はno-replaceで確定する方式をDで実証する。パスの事前lstatのみでは競合を防げない。敵対的な祖先変更に対する境界、属性設定順、ディレクトリfsyncと確定APIはD着手時の詳細設計条件とする。比較時点CASは保証せず外部更新は最後の成功置換が残る。確定前の拒否はfailed/false、確定API開始以後や清掃失敗・通信断はfailed/null。実証できない競合・属性条件を対応済みに含めない。
@@ -86,7 +90,7 @@ Linuxではdirfd・no-followで祖先を辿り、同一ディレクトリの排�
 | A: OSスキーマとbackend境界 | config/inventory/plan、OS別Prepare/登録、互換性文書 | 本ADR | 旧Windows入力・診断の回帰、混在変数展開、未知OS/不正パス/未対応組合せは接続0。v1新旧互換表と境界試験あり |
 | B: Linux実SSH fixture | tests/linux-ssh、Dockerfile、固定lock、一時鍵・known_hosts、期限付き起動/清掃ランナー | 本ADR、Aと並行可 | Debian/Python/digest固定、通常ユーザー接続、誤認証・未知/変更鍵拒否、失敗時も専用リソース清掃。版とログ記録 |
 | C: Linux command | Python固定receiver、OS確認、argv、decoder、CLI登録 | A/B | 下記L01〜L06を製品CLIと実sshdで合格、子バイト列/結果一致、Windows回帰合格。固定起動長と要求境界を検査 |
-| D: Linux file_content | 安全な比較/置換、所有者/mode/属性・競合 | A/B/C、#10統合状況再確認 | L07合格、dirfd/置換方式を設計確定、属性保持と攻撃的リンク競合の証跡。不成立条件は拒否 |
+| D: Linux file_content | 安全な比較/置換、所有者/mode/属性・競合、専用decoder | A/B、Cの固定receiver配布・応答基盤。#10は統合済みで待機不要 | L07合格、#10由来のバイト/冪等性/サイズ/changed契約を維持。dirfd/置換方式を確定し、UID/GID/mode保持・ACL/xattr拒否と攻撃的リンク競合を実証。不成立条件は拒否。Windows両module回帰合格 |
 | E: CI・配布・文書 | Windows制御側Linux実SSHジョブ、Windows回帰、サンプルと対応表 | B/C、file_content公開はD後 | 固定Goとimageで再現、出力/清掃証跡保存、失敗/skipを区別。WindowsとLinux試験の両方を公開条件とする |
 
 Linux制御端末のビルド・パス・signal・配布検証、第二ディストリビューション、sudo/systemdは別案でありA〜Eへ暗黙に追加しない。
@@ -105,7 +109,7 @@ fixtureはsshd foreground、パスワード/rootログイン無効、通常runne
 | L04 拒否/プロトコル | 不存在、権限不足、ENOEXEC/E2BIG、不正JSON/重複/過大、OS/Python不一致、不正応答 | 子起動マーカーなし。正常拒否false、応答不能null、sanitized error。製品E2Eと生receiver負例を区別 |
 | L05 engine | 複数host/forks、失敗後skipped、送信中/実行中timeout/cancel、sshd切断 | 順序と結果契約一致、期限内解放、自動再送なし、残存子はコンテナ破棄で除去 |
 | L06 上限/回帰 | JSON2MiB・argv制限・各出力1MiB・応答3MiB境界、Windows単体/固定起動長/実SSH | 両stream超過でもdeadlockなし、Windows既存期待値一致。合成入力と実CLI入力を分けて記録 |
-| L07 file_content後続 | 新規→同値→差分、空/日本語/改行、symlink/祖先link、非通常、mode/UID/GID/ACL、権限、競合/清掃失敗 | 内容・属性・副作用を別probeで観測し決定5と一致。未実証経路は未確認 |
+| L07 file_content後続 | 新規→同値→差分、空/日本語/改行、symlink/祖先link、非通常、mode/UID/GID/ACL/xattr、権限、競合/清掃失敗、content1MiB/JSON2MiB境界 | 内容・属性・副作用を別probeで観測し決定5と一致。同値はmtime不変・tempなし、新規0600、既存属性保持、不対応属性は拒否。競合時リンク先不変・完全な内容、false/null、自身のtemp清掃を照合。未実証経路は未確認 |
 
 将来ランナー手順（現時点ではコマンド/fixture未実装）:
 
