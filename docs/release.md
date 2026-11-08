@@ -10,7 +10,7 @@ PowerShell 7、git、固定Go 1.27.3、ネットワーク接続を備えたWindo
 ./scripts/distribution.ps1 -OutputDirectory candidate -ProductLicense LICENSE
 ```
 
-出力先は未作成のフォルダーを指定します。監査は標準ライブラリを含む到達可能な脆弱性を検査します。検出・通信障害・ツール障害はすべて停止条件です。audit.jsonにはスキャナー、Go、DB更新情報、findingが保存されます。モジュールに存在するが到達しない脆弱性はgovulncheckのsymbolモードの対象外であり、別途リスクレビューします。ライセンスはgo list -m allの推移依存を含む固定版から収集し、Go本体のLICENSEと一覧を同梱します。ライセンス欠落も停止条件です。
+出力先は未作成のフォルダーを指定します。audit.jsonにはスキャナー、Go、DB更新情報、findingが保存されます。govulncheckのJSONモードはfindingがあっても終了0になるため、CIと候補生成は `go run ./scripts/auditcheck audit.json` で全findingを明示的に拒否します。到達性にかかわらずfindingが一つでもあれば停止します。空・不正なJSON、必須メタデータ欠落、通信障害・ツール障害も停止条件です。osvメッセージは脆弱性の参考情報であり、findingと区別します。ライセンスはgo list -m allの推移依存を含む固定版から収集し、Go本体のLICENSEと一覧を同梱します。ライセンス欠落も停止条件です。
 
 ZIPはexe、examples、利用手順、製品LICENSE、依存・Goライセンス、audit.json、commit/Go/ツール版を記したbuild.json、全配布ファイルのSHA256.jsonを含みます。ZIP自体のハッシュは外部 `.zip.sha256` へ出力します。buildvcsとtrimpathを使用します。同じ固定ソースから同じ手順で再作成できますが、監査DB・生成日時・ZIP時刻が変わるためZIPのバイト同一性は約束しません。
 

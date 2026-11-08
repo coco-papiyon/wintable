@@ -22,9 +22,10 @@ try {
     Invoke-Go -Arguments @('test','./...','-count=1')
     Invoke-Go -Arguments @('vet','./...')
     Invoke-Go -Arguments @('test','./internal/module','-run','^TestDistributionWrapper$','-count=1','-v')
-    # JSON includes scanner/database/toolchain configuration and findings. Any nonzero exit blocks packaging.
+    # JSON mode exits zero even with findings; explicitly reject them before staging.
     & go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -json ./... > "$out/audit.json"
     if ($LASTEXITCODE) { throw 'Vulnerability audit failed' }
+    Invoke-Go -Arguments @('run','./scripts/auditcheck',"$out/audit.json")
     $stage = New-Item -ItemType Directory -Path "$out/package"
     Invoke-Go -Arguments @('build','-trimpath','-buildvcs=true','-o',"$stage/wintable.exe",'./cmd/wintable')
     Invoke-Go -Arguments @('version','-m',"$stage/wintable.exe") | Set-Content "$stage/build-info.txt" -Encoding utf8

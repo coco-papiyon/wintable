@@ -32,6 +32,8 @@ jobs:
         run: |
           go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -json ./... > audit.json
           if ($LASTEXITCODE) { throw 'Dependency audit failed' }
+          go run ./scripts/auditcheck audit.json
+          if ($LASTEXITCODE) { throw 'Unresolved vulnerability finding or invalid audit record' }
       - name: Distribution gate regression tests
         shell: pwsh
         run: ./tests/distribution/test.ps1

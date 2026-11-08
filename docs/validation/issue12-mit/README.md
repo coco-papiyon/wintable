@@ -1,5 +1,7 @@
 # MIT配布候補・最終ZIPの検証記録
 
+この旧候補は監査に GO-2026-5932 のfindingが残っているため配布不可です。以下の実機試験成功は当時の実測記録として保持しますが、監査合格・公開可能を示しません。修正版依存とfinding拒否ゲートを用いた新しいZIP・証跡で置き換える必要があります。
+
 配布commit: `2a19a2becbd738b06929eb19825e395d936a8f17`。
 ZIP SHA-256: `66dd56eb63c85fde014a962a7d1bd1af5e2a7a70cb2decfde28e38cc044ae3c0`。
 実行exe SHA-256: `C1FEF694445F363E575D8374DCDB13E89F3DF66980D84EB5127AEE5EEBD9D68B`。
