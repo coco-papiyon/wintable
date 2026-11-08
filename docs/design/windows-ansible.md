@@ -254,3 +254,5 @@ Ctrl+Cで新規処理を止め接続を解放します。切断で対象プロ�
 I-08実装では固定コードをDeflate/base64で配布し、起動形から表示用の-NoLogoを省略する。タスク値は引き続きstdinのみ。file_contentの起動長・競合処理と検証範囲は[モジュール資料](../file-content-module.md)を参照。
 
 関連: [モジュール一覧と設計](modules.md)。
+
+Linux対象の追加設計: [ADR-0001: LinuxをSSH実行対象に追加する](../adr/0001-linux-target-support.md)。設計決定であり、現行CLIのLinux対応を示すものではありません。

@@ -21,7 +21,7 @@
 | プロセス | [ansible.windows.win_command](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_command_module.html) | command | 実行対応済み | CRT対応exeのみ。creates/removes/chdirなし |
 | PowerShell | [ansible.windows.win_powershell](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_powershell_module.html) | powershell | 保留：任意コードの結果契約が必要 | スクリプトのchanged自己申告を現行に導入しない |
 | シェル | [ansible.windows.win_shell](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_shell_module.html) | shell | 保留：引用と実行制限の再設計 | commandでシェル構文を解釈しない |
-| 内容配置・転送 | [ansible.windows.win_copy](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_copy_module.html) | file_content / copy | 前者は入力検証のみ・実装中、後者P2候補 | contentのみ。バイナリ・ディレクトリ転送は別設計 |
+| 内容配置・転送 | [ansible.windows.win_copy](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_copy_module.html) | file_content / copy | 前者は実行対応済み、後者P2候補 | contentのみ。バイナリ・ディレクトリ転送は別設計 |
 | ファイル・ディレクトリ | [ansible.windows.win_file](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_file_module.html) | file | P1候補：配置先を準備 | touch・再帰削除は初期案から除外 |
 | テンプレート | [ansible.windows.win_template](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_template_module.html) | template | 保留：描画言語と秘密管理が必要 | 現行の文字列変数置換はJinja2ではない |
 | 行編集 | [ansible.windows.win_lineinfile](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_lineinfile_module.html) | line | P2候補：既存設定の局所変更 | 初期案はリテラル完全一致のみ |
@@ -79,15 +79,15 @@ JSON v1は未知キー・重複キー・型違いを拒否する。対象ホス�
 
 成功はstatus=changed / changed=true / exit_code=0。失敗例として存在しない `C:\\missing.exe` は起動失敗、`cmd.exe`指定は接続前の入力不正、32,767単位の子起動行は接続前の上限超過。実機確認はWindows 11ローカルとServer Core 2022コンテナSSHまでで、Windows 11のSSH対象・フルServer 2022は未確認。詳細の試験項目・証跡はcommand詳細参照。
 
-## file_content：入力検証のみ／別ブランチ実装中
+## file_content：実行対応済み
 
-mainにはconfigとPrepareのpath/content検証とサイズ検査があるが、標準CLIのWrappersはcommandのみ。下記は採用済み設計と[Issue #10](https://github.com/coco-papiyon/wintable/issues/10)の実装案であり、mainの実行保証ではない。参照ブランチ `feature/issue_#10`、SHA `ea05cf966443cf95383c61e6a5d7857f1fd2ffc3` の [仕様書](https://github.com/coco-papiyon/wintable/blob/ea05cf966443cf95383c61e6a5d7857f1fd2ffc3/docs/file-content-module.md) を参照。取り込み後に対応状態を更新する。
+main `fb1e92e02754def6b3d3c290c79573199282f843` で再確認。標準CLIのWrappersとDecodeResultに登録済み。[Issue #10](https://github.com/coco-papiyon/wintable/issues/10)はPR #21で統合されCLOSED。採用済み契約・試験範囲の正本は[仕様書](../file-content-module.md)。Linuxは未実装で、[Linux対象ADR](../adr/0001-linux-target-support.md)の第二段階Dとする。
 
-pathは必須stringのドライブ絶対パス、contentは必須string（空可）、既定値なし。contentのUTF-8は1MiB以下、JSON全体2MiB以下。BOMを付加せず、LF/CRLF・末尾改行を保持しバイト比較する。同値はok/false、未存在は空内容でも新規作成でchanged/true、差分置換はchanged/trueを目指す。
+pathは必須stringのドライブ絶対パス、contentは必須string（空可）、既定値なし。contentのUTF-8は1MiB以下、JSON全体2MiB以下。BOMを付加せず、LF/CRLF・末尾改行を保持しバイト比較する。同値はok/false、未存在は空内容でも新規作成でchanged/true、差分置換はchanged/trueを返す。
 
-親ディレクトリは既存必須。対象・祖先のreparse point、通常ファイル以外、曖昧なWin32パスを拒否する。同一ディレクトリの排他的tempへ書込み・flush後、既存はFile.Replace、新規は上書きしないMoveで確定する。既存DACL保持、所有者管理なし。比較時点のCASは保証せず並行置換は最後の成功内容が残る。確定前の拒否はfailed/false、確定API以降の失敗・清掃失敗・通信断は変更不明null。自動再送なし。外部プロセスとの全競合、全ACLエラー経路、Windows 11 SSH・フルServerの実機確認は未完了。
+親ディレクトリは既存必須。対象・祖先のreparse point、通常ファイル以外、曖昧なWin32パスを拒否する。同一ディレクトリの排他的tempへ書込み・flush後、既存はFile.Replace、新規は上書きしないMoveで確定する。既存DACL保持、所有者管理なし。比較時点のCASは保証せず並行置換は最後の成功内容が残る。確定前の拒否はfailed/false、確定API以降の失敗・清掃失敗・通信断は変更不明null。自動再送なし。PR #21では同期した通常ファイル→symlink切替をコンテナで検証し、同値・異値とも拒否・リンク先不変・tempなしを確認済み。全外部競合・全ACLエラー経路、Windows 11 SSH・フルServerの個別確認は保証範囲外。
 
-将来の実行例（mainでの実行対応を表す例ではない）:
+現行Windowsでの実行例:
 
 ```json
 {"version":1,"hosts":"windows","tasks":[{"name":"設定配置","module":"file_content","args":{"path":"C:\\app\\config.txt","content":"日本語\r\n"}}]}
@@ -132,3 +132,5 @@ reboot案は `timeout_seconds:integer=600`、`message:string="wintable reboot"`�
 user/acl/template/powershell/shell/scheduled_task/updatesは採用未決定。順に秘密の非露出と更新比較、ACE継承と拒否優先、テンプレート言語と制御側読取、任意コードの結果検証、引用・シェル境界、実行主体と資格情報、長時間ジョブと再開点が未確定である。これらを調査して個別Issueで引数と受入試験を決定するまで、現行対応やP1/P2の確約に含めない。
 
 推奨順序は、file_contentの取り込みと安全置換の検証→P1のfile/service/registry/environment→読取結果基盤とfacts/stat/ping→転送・ハッシュ基盤とP2→再起動要求の結果契約→機能管理と再接続基盤。各段階でWindows 11 SSHとフルServer 2022の試験範囲を明示し、コンテナ試験だけで全環境合格としない。
+
+Linux対象の追加設計: [ADR-0001: LinuxをSSH実行対象に追加する](../adr/0001-linux-target-support.md)。設計決定であり、現行CLIのLinux対応を示すものではありません。

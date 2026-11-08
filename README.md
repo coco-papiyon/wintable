@@ -44,3 +44,5 @@ Ctrl+Cで新規処理を止め接続を解放します。切断で対象プロ�
 SSH接続の設定・依存監査・検証範囲は [SSH transport](docs/ssh-transport.md) を参照してください。
 
 関連: [モジュール一覧と設計](docs/design/modules.md)。
+
+Linux対象の追加設計: [ADR-0001: LinuxをSSH実行対象に追加する](docs/adr/0001-linux-target-support.md)。設計決定であり、現行CLIのLinux対応を示すものではありません。
