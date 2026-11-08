@@ -23,7 +23,7 @@ $env:CGO_ENABLED = '0'
 .\dist\wintable.exe run --inventory inventory.json --tasks tasks.json
 ```
 
-helpは終了0、不正引数は終了2。入力ファイルも検証し、不正入力は接続前に終了2となります。[サンプル](examples/)を参照してください。commandのみのrunは実際にSSHへ接続します。file_contentを含む計画は接続前に内部エラー（終了3）で拒否します。Ctrl+Cのcontextを伝播します。
+helpは終了0、不正引数は終了2。入力ファイルも検証し、不正入力は接続前に終了2となります。[サンプル](examples/)を参照してください。commandとfile_contentのrunは実際にSSHへ接続します。file_contentはBOMなしUTF-8のバイト比較を行い、差分があるときだけ安全な置換を行います。詳細は[file_contentモジュール](docs/file-content-module.md)を参照してください。Ctrl+Cのcontextを伝播します。
 
 `--include-output` は既定falseです。有効にすると任意コマンドの出力に秘密が含まれ得ます。完全な自動マスキングは保証しません。commandの実機検証範囲と未確認事項は [commandモジュール](docs/command-module.md) を参照してください。Windows CI・ZIP配布は後続Issueです。
 
@@ -39,7 +39,7 @@ helpは終了0、不正引数は終了2。入力ファイルも検証し、不�
 接続は10秒、各タスクは接続後に独立したtimeoutを持ちます。失敗ホストの後続はskipped、他ホストは続行し、自動再試行しません。
 接続失敗は先頭unreachable・後続skipped（changed=false）。実行中の通信断・期限切れはfailed・changed=null。親キャンセル時は確定済み結果を保持し、実行中はcancelled・null、未開始はcancelled・falseです。結果はホスト名・task_index順です。Close失敗は内部エラーですが、終了130が優先します。
 Ctrl+Cで新規処理を止め接続を解放します。切断で対象プロセス停止は保証できません。変更不明時は対象状態を確認してから手動で再実行してください。
-`cli.RunEngine` が全件事前検証から結果描画まで接続します。本番mainは固定commandラッパーとSSHConnectorを使います。模擬V-04/06を実機SSH検証の合格とは扱いません。
+`cli.RunEngine` が全件事前検証から結果描画まで接続します。本番mainは固定command/file_contentラッパーとSSHConnectorを使います。模擬V-04/06を実機SSH検証の合格とは扱いません。
 
 SSH接続の設定・依存監査・検証範囲は [SSH transport](docs/ssh-transport.md) を参照してください。
 

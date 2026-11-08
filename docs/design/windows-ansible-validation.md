@@ -66,4 +66,6 @@ I-03ではV-02/03/15/17の単体検査、V-16の合成最終行検査を追加�
 
 I-05: internal/engine/run_test.go で模擬V-04/06（forks=1/3/64、順序、失敗停止、接続返却時キャンセル、期限切れ、Close一回、Close失敗）を検証。実SSH・実Ctrl+C・対象プロセス状態は後続Issueで実測する。
 
+I-08ではfile_contentの固定受信コード・冪等書込み・CLI接続を実装。ローカルcmd/PowerShellとServer Core 2022/OpenSSHの試験内容、起動行7,985単位、ACL比較時のOS由来AIフラグ、競合の保証範囲と未確認項目は[file_contentモジュール](../file-content-module.md)を参照。両対象OSのV-08/09/10/14/15/16/18全体の合格とはしない。
+
 関連: [モジュール一覧と設計](modules.md)。

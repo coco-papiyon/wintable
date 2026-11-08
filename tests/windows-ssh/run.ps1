@@ -4,6 +4,7 @@ param(
     [string]$BaseImage = 'mcr.microsoft.com/windows/servercore:ltsc2022',
     [ValidateSet('hyperv','process')][string]$Isolation = 'hyperv',
     [string]$OpenSSHDirectory = "$env:WINDIR\System32\OpenSSH",
+    [string]$ModuleTestPattern = '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows)$',
     [string]$OutputDirectory
 )
 $ErrorActionPreference = 'Stop'
@@ -97,8 +98,8 @@ try {
     "${address} $($pub[0]) $($pub[1])" | Set-Content "$output/known_hosts" -Encoding utf8NoBOM
     @{ Address=$address; Port=22; User='wintablessh'; Container=$name } | ConvertTo-Json | Set-Content "$output/fixture.json" -Encoding utf8NoBOM
     $env:WINTABLE_SSH_FIXTURE = $output
-    $manifest.command_test_command = 'go test ./internal/module -run ^TestCommand(Windows|SSHLaunchAndDisconnect)$ -count=1 -v -timeout=4m'
-    & go test ./internal/module -run '^TestCommand(Windows|SSHLaunchAndDisconnect)$' -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/command-test.log"
+    $manifest.command_test_command = "go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=4m"
+    & go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/command-test.log"
     $manifest.command_test_exit_code = $LASTEXITCODE
     if ($LASTEXITCODE) { throw 'command module acceptance failed' }
     $manifest.test_command = 'go test ./internal/transport -run ^TestWindowsOpenSSH$ -count=1 -v -timeout=4m'

@@ -4,7 +4,7 @@ commandはCRT規則でargvを受け取るWindows絶対パスの.exeに限定し�
 
 ## 固定コードとプロトコル
 
-`internal/module/command.cs`を埋め込み、gzip/base64で固定PowerShellブートストラップに格納し、全体をUTF-16LE/base64のEncodedCommandへ変換します。圧縮は配布コードの符号化で、タスクごとのコード生成・分割送信は行いません。ソースはサイズ制限のためコンパクトに保っています。Add-TypeはPowerShell 5.1に付属する.NET FrameworkのC#コンパイラを使用します。実行時コンパイルが禁止される対象環境は未対応です。コンパイラの一時ファイルにもタスク値は入りません。
+`internal/module/receiver.cs`と`command.cs`を埋め込み、Deflate/base64で固定PowerShellブートストラップに格納し、全体をUTF-16LE/base64のEncodedCommandへ変換します。圧縮は配布コードの符号化で、タスクごとのコード生成・分割送信は行いません。ソースはサイズ制限のためコンパクトに保っています。Add-TypeはPowerShell 5.1に付属する.NET FrameworkのC#コンパイラを使用します。実行時コンパイルが禁止される対象環境は未対応です。コンパイラの一時ファイルにもタスク値は入りません。
 
 タスク値はPreparedが一度だけ生成したBOMなしUTF-8 JSONをstdinへ送信し、EOF後に実行します。受信側は最大2,097,153バイトまで読み、2MiB超過、不正UTF-8/BOM、末尾データ、重複キー（エスケープ後も照合）、未知キー、型違い、不正サロゲートを実行前に拒否します。受信パーサーはこのスキーマに必要な文字列・文字列配列・オブジェクトだけを扱い、深さも制限します。診断は定型で本文や解析例外を返しません。
 
@@ -16,11 +16,11 @@ stdout/stderrは別々のバイトストリームで並行回収し、各1MiBを
 
 ## 起動行とビルド検査
 
-対象構成はWindowsディレクトリがC:\Windows、OpenSSHのDefaultShellがC:\Windows\System32\cmd.exe、既定の/c、PTYなしです。他のシェル、カスタムDefaultShellCommandOption・shell引数は対象外です。SSH execへ送るのは`powershell.exe -NoLogo -NoProfile -NonInteractive -EncodedCommand <固定base64>`です。
+対象構成はWindowsディレクトリがC:\Windows、OpenSSHのDefaultShellがC:\Windows\System32\cmd.exe、既定の/c、PTYなしです。他のシェル、カスタムDefaultShellCommandOption・shell引数は対象外です。SSH execへ送るのは`powershell.exe -NoProfile -NonInteractive -EncodedCommand <固定base64>`です。
 
-計測対象は`"C:\Windows\System32\cmd.exe" /c "<SSH execの固定行>"`全体です。[OpenSSHの実装](https://github.com/PowerShell/openssh-portable/blob/latestw_all/contrib/win32/win32compat/w32-doexec.c)のshellの引用符と非PTY/cmd分岐の構築を基準にしています（w32-doexec.cのdo_exec_windows）。GoのWrapperLaunchLineが同じ式を組み立て、UTF16Lenで測ります。今回のコードは7,401単位です。
+計測対象は`"C:\Windows\System32\cmd.exe" /c "<SSH execの固定行>"`全体です。[OpenSSHの実装](https://github.com/PowerShell/openssh-portable/blob/latestw_all/contrib/win32/win32compat/w32-doexec.c)のshellの引用符と非PTY/cmd分岐の構築を基準にしています（w32-doexec.cのdo_exec_windows）。GoのWrapperLaunchLineが同じ式を組み立て、UTF16Lenで測ります。現行コードは7,185単位です（Issue #10で受信パーサー共通化と配布ローダーを縮小）。
 
-`build.ps1`はTestDistributionWrapperを必須実行してからビルドし、実行時もcli.RunEngineが最初の接続前に同じ最終行を検査します。上限8,000超過は配布物不備として終了3です。合成7,999/8,000/8,001単位の境界もテストします。Server Core 2022の実OpenSSH経由で起動中のcmd.exeをCIMから取得し、実行ファイルパスの大文字小文字以外は構築式と完全一致し、7,401単位であることを確認しました。採取値はwrapper-launch.jsonに保存します。
+`build.ps1`はTestDistributionWrapperを必須実行してからビルドし、実行時もcli.RunEngineが最初の接続前に同じ最終行を検査します。上限8,000超過は配布物不備として終了3です。合成7,999/8,000/8,001単位の境界もテストします。Server Core 2022の実OpenSSH経由で起動中のcmd.exeをCIMから取得し、実行ファイルパスの大文字小文字以外は構築式と完全一致し、Issue #9時点では7,401単位、Issue #10の回帰試験では7,185単位であることを確認しました。採取値はwrapper-launch.jsonに保存します。
 
 ## 検証と未確認事項
 

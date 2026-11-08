@@ -21,7 +21,15 @@ import (
 
 // This test uses only the disposable, authenticated Docker fixture. Holding a
 // partial JSON request keeps the real shell alive for independent observation.
-func TestCommandSSHLaunchAndDisconnect(t *testing.T) {
+func TestCommandSSHLaunchAndDisconnect(t *testing.T)     { testWrapperSSHLaunchAndDisconnect(t, false) }
+func TestFileContentSSHLaunchAndDisconnect(t *testing.T) { testWrapperSSHLaunchAndDisconnect(t, true) }
+func testWrapperSSHLaunchAndDisconnect(t *testing.T, file bool) {
+	command := CommandWrapper()
+	suffix := ""
+	if file {
+		command = FileContentWrapper()
+		suffix = "-file"
+	}
 	fixture := os.Getenv("WINTABLE_SSH_FIXTURE")
 	if fixture == "" {
 		t.Skip("requires disposable Windows SSH fixture")
@@ -73,11 +81,14 @@ func TestCommandSSHLaunchAndDisconnect(t *testing.T) {
 	var stdout, stderr bytes.Buffer
 	session.Stdout = &stdout
 	session.Stderr = &stderr
-	if err = session.Start(CommandWrapper()); err != nil {
+	if err = session.Start(command); err != nil {
 		t.Fatal(err)
 	}
-	marker := `C:\fixture\partial-request-marker`
+	marker := `C:\fixture\partial-request-marker` + suffix
 	input, _ := json.Marshal(map[string]any{"module": "command", "args": map[string]any{"executable": `C:\fixture\日本語 空白.exe`, "argv": []string{"--marker", marker}}})
+	if file {
+		input, _ = json.Marshal(map[string]any{"module": "file_content", "args": map[string]any{"path": marker, "content": "日本語"}})
+	}
 	if _, err = stdin.Write(input[:len(input)-1]); err != nil {
 		t.Fatal(err)
 	}
@@ -93,15 +104,15 @@ func TestCommandSSHLaunchAndDisconnect(t *testing.T) {
 	}
 	// CIM observes the command line supplied to the running process, not sshd's
 	// truncated debug log or a reconstruction from the exec request.
-	out := docker(`$ErrorActionPreference='Stop';$p=$null;for($i=0;$i -lt 40;$i++){ $p=@(Get-CimInstance Win32_Process -Filter "Name='cmd.exe'" | Where-Object {$_.CommandLine -like '*-EncodedCommand*'});if($p.Count){break};Start-Sleep -Milliseconds 250 };if($p.Count -ne 1){throw 'expected one wrapper shell'};if(Test-Path C:\fixture\partial-request-marker){throw 'executed before EOF'};$p[0].CommandLine | ConvertTo-Json -Compress`)
+	out := docker(`$ErrorActionPreference='Stop';$p=$null;for($i=0;$i -lt 40;$i++){ $p=@(Get-CimInstance Win32_Process -Filter "Name='cmd.exe'" | Where-Object {$_.CommandLine.Contains('` + command[len(command)/2:len(command)/2+80] + `')});if($p.Count){break};Start-Sleep -Milliseconds 250 };if($p.Count -ne 1){throw 'expected one wrapper shell'};if(Test-Path '` + marker + `'){throw 'executed before EOF'};$p[0].CommandLine | ConvertTo-Json -Compress`)
 	var line string
 	if err = json.Unmarshal(bytes.TrimSpace(out), &line); err != nil {
 		t.Fatal(err)
 	}
-	if err = os.WriteFile(filepath.Join(fixture, "wrapper-launch.json"), out, 0600); err != nil {
+	if err = os.WriteFile(filepath.Join(fixture, "wrapper-launch"+suffix+".json"), out, 0600); err != nil {
 		t.Fatal(err)
 	}
-	want := WrapperLaunchLine(CommandWrapper())
+	want := WrapperLaunchLine(command)
 	t.Logf("observed shell UTF-16 units=%d, model=%d", UTF16Len(line), UTF16Len(want))
 	const shell = `"C:\Windows\System32\cmd.exe"`
 	if len(line) < len(shell) || !strings.EqualFold(line[:len(shell)], shell) || line[len(shell):] != want[len(shell):] {
@@ -121,10 +132,13 @@ func TestCommandSSHLaunchAndDisconnect(t *testing.T) {
 	var body, diag bytes.Buffer
 	fragmented.Stdout = &body
 	fragmented.Stderr = &diag
-	if err = fragmented.Start(CommandWrapper()); err != nil {
+	if err = fragmented.Start(command); err != nil {
 		t.Fatal(err)
 	}
 	valid, _ := json.Marshal(map[string]any{"module": "command", "args": map[string]any{"executable": `C:\fixture\日本語 空白.exe`, "argv": []string{"--assert-absent", marker}}})
+	if file {
+		valid, _ = json.Marshal(map[string]any{"module": "file_content", "args": map[string]any{"path": marker + "-valid", "content": "日本語😀\r\n"}})
+	}
 	for n := 0; n < len(valid); n += 7 {
 		if _, err = pipe.Write(valid[n:min(n+7, len(valid))]); err != nil {
 			t.Fatal(err)
@@ -138,6 +152,9 @@ func TestCommandSSHLaunchAndDisconnect(t *testing.T) {
 	}
 	code := 0
 	row := DecodeCommand(transport.Response{Communication: transport.CommunicationComplete, ExitCode: &code, Stdout: body.Bytes(), Stderr: diag.Bytes()}, false)
+	if file {
+		row = DecodeFileContent(transport.Response{Communication: transport.CommunicationComplete, ExitCode: &code, Stdout: body.Bytes(), Stderr: diag.Bytes()})
+	}
 	if row.Status != result.Changed {
 		t.Fatalf("fragmented UTF-8 request: %+v", row)
 	}
@@ -156,6 +173,6 @@ func TestCommandSSHLaunchAndDisconnect(t *testing.T) {
 	case <-time.After(10 * time.Second):
 		t.Fatal("disconnect hung")
 	}
-	docker(`Start-Sleep -Seconds 2;if(Test-Path C:\fixture\partial-request-marker){throw 'partial request executed after disconnect'}`)
+	docker(`Start-Sleep -Seconds 2;if(Test-Path '` + marker + `'){throw 'partial request executed after disconnect'}`)
 	t.Log("partial JSON disconnect: returned within 10 seconds; no child side effect before/after disconnect")
 }

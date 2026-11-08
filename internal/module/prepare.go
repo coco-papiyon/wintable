@@ -125,11 +125,11 @@ func Prepare(host string, task int, kind string, args map[string]any) (Prepared,
 		}
 	case "file_content":
 		path, ok := args["path"].(string)
-		if !ok || !config.WindowsAbsolute(path) {
+		if !ok || !utf8.ValidString(path) || !config.WindowsAbsolute(path) {
 			return bad()
 		}
 		content, ok := args["content"].(string)
-		if !ok {
+		if !ok || !utf8.ValidString(content) {
 			return bad()
 		}
 		if e := size(len(content), ContentLimit); e != nil {
