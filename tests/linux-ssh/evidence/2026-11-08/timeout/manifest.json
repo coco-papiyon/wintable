@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "run_id": "ed8da0e6011243acbe19b6281b3df45f",
+  "source_sha": "1f9c7b2577aa58a3683dfa45931efd040679cf6e",
+  "source_status": [
+    ""
+  ],
+  "started_utc": "2026-11-08T05:57:58.6188088Z",
+  "controller_os": "Microsoft Windows NT 10.0.26300.0",
+  "controller_arch": "X64",
+  "docker_context": "desktop-linux",
+  "container": "wintable-linux-ed8da0e6011243acbe19b6281b3df45f",
+  "network": "wintable-linux-ed8da0e6011243acbe19b6281b3df45f",
+  "image_tag": "wintable-linux-ssh:ed8da0e6011243acbe19b6281b3df45f",
+  "volumes": "unnecessary",
+  "status": "failed",
+  "fault": "timeout",
+  "cleanup": [
+    {
+      "kind": "container",
+      "remaining": 0
+    },
+    {
+      "kind": "network",
+      "remaining": 0
+    },
+    {
+      "kind": "image",
+      "remaining": 0
+    },
+    {
+      "kind": "credentials",
+      "remaining": 0
+    }
+  ],
+  "product": "not_run (#28)",
+  "lock_sha256": "A09C3E2C35C5491B84E6BE14DF3C4773965CA9580301B04ED66623100E4931CB",
+  "transport_test_sha256": "34D6E62D252320945178B14D359190EC9E93C51170A08E9A40A6E66087D3488E",
+  "fixture_hashes": [
+    {
+      "sha256": "374A8F95B6B1537E85749A5F3BF2419B951B127B1BC422B36234B8A4C1200E8E",
+      "name": ".dockerignore"
+    },
+    {
+      "sha256": "79C4E75A71CE4172319AC2D55449C11A4CEC6A5358A2A537B74164869122E51F",
+      "name": ".gitattributes"
+    },
+    {
+      "sha256": "1DEA6DA3F5355547218317077B4C700A7920F6C98E7B6253C40B4909332DFC57",
+      "name": "Dockerfile"
+    },
+    {
+      "sha256": "A09C3E2C35C5491B84E6BE14DF3C4773965CA9580301B04ED66623100E4931CB",
+      "name": "fixture.lock.json"
+    },
+    {
+      "sha256": "84FB7D6EDA8B8B421AA2AAE39FF2E3058B7806A5EFA7673770145D5009AF2036",
+      "name": "packages.install"
+    },
+    {
+      "sha256": "2D60072C87159AF3357CE9413B8C37CFD0C60DD8F86456E5F6888B46629D0923",
+      "name": "probe.py"
+    },
+    {
+      "sha256": "84A88EBAA51B2C2752C76DC4AEF21706976A8C4A380EABEB7FD69735E4089B7F",
+      "name": "README.md"
+    },
+    {
+      "sha256": "5ADD3E69DF6588846F5CCF38AF2F1710BFC6E4FDC8416E6B23F549B633ADA95B",
+      "name": "run.ps1"
+    },
+    {
+      "sha256": "0C427D81E1E8E4DC7BC933E70E1D7BDE343CFF2D029B3551AFDA128C53261896",
+      "name": "sshd_config"
+    },
+    {
+      "sha256": "9C52B789F7E0F984229AE2B2D869A756440104E31A1AA78F254F70C6ABFE63E6",
+      "name": "start.sh"
+    },
+    {
+      "sha256": "516F06B0D60128452FB8A391D1EF34E67A8977603EA7FEA7D88F40BF9C2B853E",
+      "name": "verify.ps1"
+    },
+    {
+      "sha256": "6A3BA229433831389377B35733B5FF440E817253861FE4CC8538F76947F1F435",
+      "name": "versions.py"
+    }
+  ],
+  "docker": {
+    "Client": {
+      "Version": "29.9.2",
+      "ApiVersion": "1.56",
+      "DefaultAPIVersion": "1.56",
+      "GitCommit": "a82e528",
+      "GoVersion": "go1.26.10",
+      "Os": "windows",
+      "Arch": "amd64",
+      "BuildTime": "Tue Oct 20 19:44:07 2026",
+      "Context": "desktop-linux"
+    },
+    "Server": {
+      "Platform": {
+        "Name": "Docker Desktop 4.98.0 (245422)"
+      },
+      "Version": "29.9.2",
+      "ApiVersion": "1.56",
+      "MinAPIVersion": "1.40",
+      "Os": "linux",
+      "Arch": "amd64",
+      "Components": [
+        {
+          "Name": "Engine",
+          "Version": "29.9.2",
+          "Details": {
+            "ApiVersion": "1.56",
+            "Arch": "amd64",
+            "BuildTime": "Tue Oct 20 18:45:02 2026",
+            "Experimental": "false",
+            "GitCommit": "0367cbe",
+            "GoVersion": "go1.26.10",
+            "KernelVersion": "6.18.54.1-microsoft-standard-WSL2",
+            "MinAPIVersion": "1.40",
+            "Module": "github.com/moby/moby/v2",
+            "ModuleVersion": "v2.0.0+unknown",
+            "Os": "linux"
+          }
+        },
+        {
+          "Name": "containerd",
+          "Version": "v2.4.2",
+          "Details": {
+            "GitCommit": "b7a25261e029d68978bbf290df0a62fc819b3c51"
+          }
+        },
+        {
+          "Name": "runc",
+          "Version": "1.5.2",
+          "Details": {
+            "GitCommit": "v1.5.2-0-g29dd3dc2"
+          }
+        },
+        {
+          "Name": "docker-init",
+          "Version": "0.19.0",
+          "Details": {
+            "GitCommit": "de40ad0"
+          }
+        }
+      ],
+      "GitCommit": "0367cbe",
+      "GoVersion": "go1.26.10",
+      "KernelVersion": "6.18.54.1-microsoft-standard-WSL2",
+      "BuildTime": "2026-10-20T18:45:02.000000000+00:00"
+    }
+  },
+  "go": "go version go1.27.3 windows/amd64",
+  "image_id": "sha256:c728846cb4536208ef204b7d686345c1edd0efccad59b97e1034efa6c06a9f6d",
+  "docker_port": 64828,
+  "failure": "deadline_exceeded (run child)",
+  "test_finished_utc": "2026-11-08T05:58:02.9014267Z",
+  "cleanup_ok": true,
+  "finished_utc": "2026-11-08T05:58:04.9268363Z"
+}

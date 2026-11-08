@@ -1,0 +1,471 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.22kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/debian:13-slim@sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 118B done
+#3 DONE 0.0s
+
+#4 [1/7] FROM docker.io/library/debian:13-slim@sha256:7378260c0a098d27ac206225db5e7d92b8c7c84ea7afccc86eeb513756bbd392
+#4 CACHED
+
+#5 [internal] load build context
+#5 transferring context: 156B done
+#5 DONE 0.0s
+
+#6 [2/7] RUN rm -f /etc/apt/sources.list.d/*;     printf '%s\n' 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20261105T000000Z/ trixie main' 'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20261105T000000Z/ trixie-security main' > /etc/apt/sources.list
+#6 DONE 0.2s
+
+#7 [3/7] COPY packages.install /tmp/packages.install
+#7 DONE 0.0s
+
+#8 [4/7] RUN apt-get update;     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $(tr -d '\r' < /tmp/packages.install);     rm -rf /var/lib/apt/lists/* /etc/ssh/ssh_host_* /tmp/packages.install;     useradd --create-home --shell /bin/sh runner;     usermod --password '*' runner;     install -d -m 0755 /run/sshd /fixture;     install -d -o runner -g runner -m 0700 /home/runner/.ssh /fixture/results
+#8 0.321 Get:1 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie InRelease [140 kB]
+#8 0.412 Get:2 http://snapshot.debian.org/archive/debian-security/20261105T000000Z trixie-security InRelease [43.4 kB]
+#8 0.492 Get:3 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 Packages [9678 kB]
+#8 2.357 Get:4 http://snapshot.debian.org/archive/debian-security/20261105T000000Z trixie-security/main amd64 Packages [298 kB]
+#8 3.142 Fetched 10.2 MB in 3s (3447 kB/s)
+#8 3.142 Reading package lists...
+#8 4.031 Reading package lists...
+#8 4.798 Building dependency tree...
+#8 4.965 Reading state information...
+#8 4.990 apt is already the newest version (3.0.4).
+#8 4.990 apt set to manually installed.
+#8 4.990 base-files is already the newest version (13.8+deb13u7).
+#8 4.990 base-files set to manually installed.
+#8 4.990 base-passwd is already the newest version (3.6.7).
+#8 4.990 base-passwd set to manually installed.
+#8 4.990 bash is already the newest version (5.2.37-2+b10).
+#8 4.990 bash set to manually installed.
+#8 4.990 bsdutils is already the newest version (1:2.41.5-0+deb13u1).
+#8 4.990 bsdutils set to manually installed.
+#8 4.990 coreutils is already the newest version (9.7-3).
+#8 4.990 coreutils set to manually installed.
+#8 4.990 dash is already the newest version (0.5.12-12).
+#8 4.990 dash set to manually installed.
+#8 4.990 debconf is already the newest version (1.5.91).
+#8 4.990 debconf set to manually installed.
+#8 4.990 debian-archive-keyring is already the newest version (2025.1).
+#8 4.990 debian-archive-keyring set to manually installed.
+#8 4.990 debianutils is already the newest version (5.23.2).
+#8 4.990 debianutils set to manually installed.
+#8 4.990 diffutils is already the newest version (1:3.10-4).
+#8 4.990 diffutils set to manually installed.
+#8 4.990 dpkg is already the newest version (1.22.22).
+#8 4.990 dpkg set to manually installed.
+#8 4.990 findutils is already the newest version (4.10.0-3).
+#8 4.990 findutils set to manually installed.
+#8 4.990 gcc-14-base is already the newest version (14.2.0-19).
+#8 4.990 gcc-14-base set to manually installed.
+#8 4.990 grep is already the newest version (3.11-4).
+#8 4.990 grep set to manually installed.
+#8 4.990 gzip is already the newest version (1.13-1+deb13u1).
+#8 4.990 gzip set to manually installed.
+#8 4.990 hostname is already the newest version (3.25).
+#8 4.990 hostname set to manually installed.
+#8 4.990 init-system-helpers is already the newest version (1.69~deb13u1).
+#8 4.990 init-system-helpers set to manually installed.
+#8 4.990 libacl1 is already the newest version (2.3.2-2+b1).
+#8 4.990 libacl1 set to manually installed.
+#8 4.990 libapt-pkg7.0 is already the newest version (3.0.4).
+#8 4.990 libapt-pkg7.0 set to manually installed.
+#8 4.990 libattr1 is already the newest version (1:2.5.2-3).
+#8 4.990 libattr1 set to manually installed.
+#8 4.990 libaudit-common is already the newest version (1:4.0.2-2+deb13u1).
+#8 4.990 libaudit-common set to manually installed.
+#8 4.990 libaudit1 is already the newest version (1:4.0.2-2+deb13u1).
+#8 4.990 libaudit1 set to manually installed.
+#8 4.990 libblkid1 is already the newest version (2.41.5-0+deb13u1).
+#8 4.990 libblkid1 set to manually installed.
+#8 4.990 libbsd0 is already the newest version (0.12.2-2).
+#8 4.990 libbsd0 set to manually installed.
+#8 4.990 libbz2-1.0 is already the newest version (1.0.8-6).
+#8 4.990 libbz2-1.0 set to manually installed.
+#8 4.990 libc-bin is already the newest version (2.41-12+deb13u4).
+#8 4.990 libc-bin set to manually installed.
+#8 4.990 libc6 is already the newest version (2.41-12+deb13u4).
+#8 4.990 libc6 set to manually installed.
+#8 4.990 libcap-ng0 is already the newest version (0.8.5-4+b1).
+#8 4.990 libcap-ng0 set to manually installed.
+#8 4.990 libcap2 is already the newest version (1:2.75-10+deb13u1+b3).
+#8 4.990 libcap2 set to manually installed.
+#8 4.990 libcrypt1 is already the newest version (1:4.4.38-1).
+#8 4.990 libcrypt1 set to manually installed.
+#8 4.990 libdb5.3t64 is already the newest version (5.3.28+dfsg2-9).
+#8 4.990 libdb5.3t64 set to manually installed.
+#8 4.990 libdebconfclient0 is already the newest version (0.280).
+#8 4.990 libdebconfclient0 set to manually installed.
+#8 4.990 libgcc-s1 is already the newest version (14.2.0-19).
+#8 4.990 libgcc-s1 set to manually installed.
+#8 4.990 libgmp10 is already the newest version (2:6.3.0+dfsg-3).
+#8 4.990 libgmp10 set to manually installed.
+#8 4.990 libhogweed6t64 is already the newest version (3.10.1-1).
+#8 4.990 libhogweed6t64 set to manually installed.
+#8 4.990 liblastlog2-2 is already the newest version (2.41.5-0+deb13u1).
+#8 4.990 liblastlog2-2 set to manually installed.
+#8 4.990 liblz4-1 is already the newest version (1.10.0-4).
+#8 4.990 liblz4-1 set to manually installed.
+#8 4.990 liblzma5 is already the newest version (5.8.1-1+deb13u2).
+#8 4.990 liblzma5 set to manually installed.
+#8 4.990 libmd0 is already the newest version (1.1.0-2+b1).
+#8 4.990 libmd0 set to manually installed.
+#8 4.990 libmount1 is already the newest version (2.41.5-0+deb13u1).
+#8 4.990 libmount1 set to manually installed.
+#8 4.990 libnettle8t64 is already the newest version (3.10.1-1).
+#8 4.990 libnettle8t64 set to manually installed.
+#8 4.990 libpam-modules-bin is already the newest version (1.7.0-5).
+#8 4.990 libpam-modules-bin set to manually installed.
+#8 4.990 libpam-modules is already the newest version (1.7.0-5).
+#8 4.990 libpam-modules set to manually installed.
+#8 4.990 libpam-runtime is already the newest version (1.7.0-5).
+#8 5.233 libpam-runtime set to manually installed.
+#8 5.233 libpam0g is already the newest version (1.7.0-5).
+#8 5.233 libpam0g set to manually installed.
+#8 5.233 libpcre2-8-0 is already the newest version (10.46-1~deb13u3).
+#8 5.233 libpcre2-8-0 set to manually installed.
+#8 5.233 libseccomp2 is already the newest version (2.6.0-2).
+#8 5.233 libseccomp2 set to manually installed.
+#8 5.233 libselinux1 is already the newest version (3.8.1-1).
+#8 5.233 libselinux1 set to manually installed.
+#8 5.233 libsemanage-common is already the newest version (3.8.1-1).
+#8 5.233 libsemanage-common set to manually installed.
+#8 5.233 libsemanage2 is already the newest version (3.8.1-1).
+#8 5.233 libsemanage2 set to manually installed.
+#8 5.233 libsepol2 is already the newest version (3.8.1-1).
+#8 5.233 libsepol2 set to manually installed.
+#8 5.233 libsmartcols1 is already the newest version (2.41.5-0+deb13u1).
+#8 5.233 libsmartcols1 set to manually installed.
+#8 5.233 libsqlite3-0 is already the newest version (3.46.1-7+deb13u2).
+#8 5.233 libsqlite3-0 set to manually installed.
+#8 5.233 libssl3t64 is already the newest version (3.5.7-1~deb13u3).
+#8 5.233 libssl3t64 set to manually installed.
+#8 5.233 libstdc++6 is already the newest version (14.2.0-19).
+#8 5.233 libstdc++6 set to manually installed.
+#8 5.233 libsystemd0 is already the newest version (257.13-1~deb13u1).
+#8 5.233 libsystemd0 set to manually installed.
+#8 5.233 libtinfo6 is already the newest version (6.5+20250216-2).
+#8 5.233 libtinfo6 set to manually installed.
+#8 5.233 libudev1 is already the newest version (257.13-1~deb13u1).
+#8 5.233 libudev1 set to manually installed.
+#8 5.233 libuuid1 is already the newest version (2.41.5-0+deb13u1).
+#8 5.233 libuuid1 set to manually installed.
+#8 5.233 libxxhash0 is already the newest version (0.8.3-2).
+#8 5.233 libxxhash0 set to manually installed.
+#8 5.233 libzstd1 is already the newest version (1.5.7+dfsg-1).
+#8 5.233 libzstd1 set to manually installed.
+#8 5.233 login.defs is already the newest version (1:4.17.4-2).
+#8 5.233 login.defs set to manually installed.
+#8 5.233 login is already the newest version (1:4.16.0-2+really2.41.5-0+deb13u1).
+#8 5.233 login set to manually installed.
+#8 5.233 mawk is already the newest version (1.3.4.20250131-1).
+#8 5.233 mawk set to manually installed.
+#8 5.233 mount is already the newest version (2.41.5-0+deb13u1).
+#8 5.233 mount set to manually installed.
+#8 5.233 ncurses-base is already the newest version (6.5+20250216-2).
+#8 5.233 ncurses-base set to manually installed.
+#8 5.233 ncurses-bin is already the newest version (6.5+20250216-2).
+#8 5.233 ncurses-bin set to manually installed.
+#8 5.233 openssl-provider-legacy is already the newest version (3.5.7-1~deb13u3).
+#8 5.233 openssl-provider-legacy set to manually installed.
+#8 5.233 passwd is already the newest version (1:4.17.4-2).
+#8 5.233 passwd set to manually installed.
+#8 5.233 perl-base is already the newest version (5.40.1-6+deb13u1).
+#8 5.233 perl-base set to manually installed.
+#8 5.233 sed is already the newest version (4.9-2+deb13u1).
+#8 5.233 sed set to manually installed.
+#8 5.233 sqv is already the newest version (1.3.0-3+b2).
+#8 5.233 sqv set to manually installed.
+#8 5.233 sysvinit-utils is already the newest version (3.14-4).
+#8 5.233 sysvinit-utils set to manually installed.
+#8 5.233 tar is already the newest version (1.35+dfsg-3.1).
+#8 5.233 tar set to manually installed.
+#8 5.233 tzdata is already the newest version (2026f-0+deb13u1).
+#8 5.233 tzdata set to manually installed.
+#8 5.233 util-linux is already the newest version (2.41.5-0+deb13u1).
+#8 5.233 util-linux set to manually installed.
+#8 5.233 zlib1g is already the newest version (1:1.3.dfsg+really1.3.1-1+b1).
+#8 5.233 zlib1g set to manually installed.
+#8 5.233 Suggested packages:
+#8 5.233   liblocale-gettext-perl perl cron quota krb5-doc krb5-user libarchive13t64
+#8 5.233   libbpf1 libcryptsetup12 libdw1t64 libelf1t64 libgcrypt20 libidn2-0 libip4tc2
+#8 5.233   libp11-kit0 libpwquality1 libqrencode4 libtss2-rc0t64 keychain libpam-ssh
+#8 5.233   monkeysphere ssh-askpass molly-guard ufw python3-doc python3-tk python3-venv
+#8 5.233   python3.13-venv python3.13-doc binutils binfmt-support readline-doc
+#8 5.233   systemd-container systemd-homed systemd-userdbd systemd-boot
+#8 5.233   systemd-resolved systemd-repart libtss2-tcti-device0 polkitd
+#8 5.233 Recommended packages:
+#8 5.233   krb5-locales libgpm2 libkmod2 xauth default-logind | logind | libpam-systemd
+#8 5.233   ncurses-term psmisc linux-sysctl-defaults ca-certificates
+#8 5.233   default-dbus-system-bus | dbus-system-bus systemd-timesyncd | time-daemon
+#8 5.233   systemd-cryptsetup
+#8 5.535 The following NEW packages will be installed:
+#8 5.535   adduser libapparmor1 libcbor0.10 libcom-err2 libedit2 libexpat1 libffi8
+#8 5.535   libfido2-1 libgssapi-krb5-2 libk5crypto3 libkeyutils1 libkrb5-3
+#8 5.535   libkrb5support0 libncursesw6 libproc2-0 libpython3-stdlib
+#8 5.536   libpython3.13-minimal libpython3.13-stdlib libreadline8t64 libsystemd-shared
+#8 5.537   libtext-charwidth-perl libtext-wrapi18n-perl libwrap0 libwtmpdb0 media-types
+#8 5.539   netbase openssh-client openssh-server openssh-sftp-server procps python3
+#8 5.539   python3-minimal python3.13 python3.13-minimal readline-common runit-helper
+#8 5.539   sensible-utils systemd ucf
+#8 5.782 0 upgraded, 39 newly installed, 0 to remove and 0 not upgraded.
+#8 5.782 Need to get 15.5 MB of archives.
+#8 5.782 After this operation, 56.8 MB of additional disk space will be used.
+#8 5.782 Get:1 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libsystemd-shared amd64 257.13-1~deb13u1 [2155 kB]
+#8 6.111 Get:2 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libapparmor1 amd64 4.1.0-1 [43.7 kB]
+#8 6.117 Get:3 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 systemd amd64 257.13-1~deb13u1 [3094 kB]
+#8 6.611 Get:4 http://snapshot.debian.org/archive/debian-security/20261105T000000Z trixie-security/main amd64 libexpat1 amd64 2.9.0-1~deb13u1 [126 kB]
+#8 6.628 Get:5 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 adduser all 3.152 [191 kB]
+#8 6.661 Get:6 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libedit2 amd64 3.1-20250104-1 [93.8 kB]
+#8 6.675 Get:7 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libcbor0.10 amd64 0.10.2-2 [28.3 kB]
+#8 6.678 Get:8 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libfido2-1 amd64 1.15.0-1+b1 [78.7 kB]
+#8 6.693 Get:9 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libkrb5support0 amd64 1.21.3-5+deb13u1 [33.1 kB]
+#8 6.697 Get:10 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libcom-err2 amd64 1.47.2-3+b12 [25.0 kB]
+#8 6.700 Get:11 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libk5crypto3 amd64 1.21.3-5+deb13u1 [81.2 kB]
+#8 6.709 Get:12 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libkeyutils1 amd64 1.6.3-6 [9456 B]
+#8 6.711 Get:13 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libkrb5-3 amd64 1.21.3-5+deb13u1 [326 kB]
+#8 6.770 Get:14 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libgssapi-krb5-2 amd64 1.21.3-5+deb13u1 [138 kB]
+#8 6.790 Get:15 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 openssh-client amd64 1:10.0p1-7+deb13u4 [990 kB]
+#8 6.963 Get:16 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 openssh-sftp-server amd64 1:10.0p1-7+deb13u4 [65.3 kB]
+#8 6.969 Get:17 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libncursesw6 amd64 6.5+20250216-2 [135 kB]
+#8 6.987 Get:18 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libproc2-0 amd64 2:4.0.4-9 [65.6 kB]
+#8 7.002 Get:19 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 procps amd64 2:4.0.4-9 [882 kB]
+#8 7.134 Get:20 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libtext-charwidth-perl amd64 0.04-11+b4 [9476 B]
+#8 7.135 Get:21 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libtext-wrapi18n-perl all 0.06-10 [8808 B]
+#8 7.136 Get:22 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 sensible-utils all 0.0.25 [25.0 kB]
+#8 7.139 Get:23 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 ucf all 3.0052 [43.3 kB]
+#8 7.144 Get:24 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 runit-helper all 2.16.4 [7296 B]
+#8 7.145 Get:25 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libwrap0 amd64 7.6.q-36 [55.3 kB]
+#8 7.153 Get:26 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libwtmpdb0 amd64 0.73.0-3+deb13u1 [13.1 kB]
+#8 7.153 Get:27 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 openssh-server amd64 1:10.0p1-7+deb13u4 [602 kB]
+#8 7.249 Get:28 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libpython3.13-minimal amd64 3.13.5-2+deb13u5 [863 kB]
+#8 7.374 Get:29 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 python3.13-minimal amd64 3.13.5-2+deb13u5 [2225 kB]
+#8 7.756 Get:30 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 python3-minimal amd64 3.13.5-1 [27.2 kB]
+#8 7.760 Get:31 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 media-types all 13.0.0 [29.3 kB]
+#8 7.763 Get:32 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 netbase all 6.5 [12.4 kB]
+#8 7.764 Get:33 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libffi8 amd64 3.4.8-2 [24.1 kB]
+#8 7.768 Get:34 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 readline-common all 8.2-6 [69.4 kB]
+#8 7.790 Get:35 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libreadline8t64 amd64 8.2-6 [169 kB]
+#8 7.820 Get:36 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libpython3.13-stdlib amd64 3.13.5-2+deb13u5 [1959 kB]
+#8 8.179 Get:37 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 python3.13 amd64 3.13.5-2+deb13u5 [757 kB]
+#8 8.336 Get:38 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 libpython3-stdlib amd64 3.13.5-1 [10.2 kB]
+#8 8.338 Get:39 http://snapshot.debian.org/archive/debian/20261105T000000Z trixie/main amd64 python3 amd64 3.13.5-1 [28.2 kB]
+#8 10.00 Preconfiguring packages ...
+#8 10.05 Fetched 15.5 MB in 3s (5569 kB/s)
+#8 10.07 Selecting previously unselected package libsystemd-shared:amd64.
+#8 10.07 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4951 files and directories currently installed.)
+#8 10.08 Preparing to unpack .../libsystemd-shared_257.13-1~deb13u1_amd64.deb ...
+#8 10.08 Unpacking libsystemd-shared:amd64 (257.13-1~deb13u1) ...
+#8 10.22 Selecting previously unselected package libapparmor1:amd64.
+#8 10.22 Preparing to unpack .../libapparmor1_4.1.0-1_amd64.deb ...
+#8 10.23 Unpacking libapparmor1:amd64 (4.1.0-1) ...
+#8 10.26 Setting up libsystemd-shared:amd64 (257.13-1~deb13u1) ...
+#8 10.31 Selecting previously unselected package systemd.
+#8 10.31 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 4964 files and directories currently installed.)
+#8 10.31 Preparing to unpack .../systemd_257.13-1~deb13u1_amd64.deb ...
+#8 10.33 Unpacking systemd (257.13-1~deb13u1) ...
+#8 10.53 Selecting previously unselected package libexpat1:amd64.
+#8 10.54 Preparing to unpack .../libexpat1_2.9.0-1~deb13u1_amd64.deb ...
+#8 10.54 Unpacking libexpat1:amd64 (2.9.0-1~deb13u1) ...
+#8 10.57 Selecting previously unselected package adduser.
+#8 10.57 Preparing to unpack .../archives/adduser_3.152_all.deb ...
+#8 10.58 Unpacking adduser (3.152) ...
+#8 10.61 Setting up adduser (3.152) ...
+#8 10.66 Selecting previously unselected package libedit2:amd64.
+#8 10.66 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 5995 files and directories currently installed.)
+#8 10.67 Preparing to unpack .../00-libedit2_3.1-20250104-1_amd64.deb ...
+#8 10.67 Unpacking libedit2:amd64 (3.1-20250104-1) ...
+#8 10.71 Selecting previously unselected package libcbor0.10:amd64.
+#8 10.71 Preparing to unpack .../01-libcbor0.10_0.10.2-2_amd64.deb ...
+#8 10.71 Unpacking libcbor0.10:amd64 (0.10.2-2) ...
+#8 10.75 Selecting previously unselected package libfido2-1:amd64.
+#8 10.75 Preparing to unpack .../02-libfido2-1_1.15.0-1+b1_amd64.deb ...
+#8 10.75 Unpacking libfido2-1:amd64 (1.15.0-1+b1) ...
+#8 10.79 Selecting previously unselected package libkrb5support0:amd64.
+#8 10.79 Preparing to unpack .../03-libkrb5support0_1.21.3-5+deb13u1_amd64.deb ...
+#8 10.79 Unpacking libkrb5support0:amd64 (1.21.3-5+deb13u1) ...
+#8 10.82 Selecting previously unselected package libcom-err2:amd64.
+#8 10.82 Preparing to unpack .../04-libcom-err2_1.47.2-3+b12_amd64.deb ...
+#8 10.83 Unpacking libcom-err2:amd64 (1.47.2-3+b12) ...
+#8 10.86 Selecting previously unselected package libk5crypto3:amd64.
+#8 10.86 Preparing to unpack .../05-libk5crypto3_1.21.3-5+deb13u1_amd64.deb ...
+#8 10.86 Unpacking libk5crypto3:amd64 (1.21.3-5+deb13u1) ...
+#8 10.90 Selecting previously unselected package libkeyutils1:amd64.
+#8 10.90 Preparing to unpack .../06-libkeyutils1_1.6.3-6_amd64.deb ...
+#8 10.90 Unpacking libkeyutils1:amd64 (1.6.3-6) ...
+#8 10.93 Selecting previously unselected package libkrb5-3:amd64.
+#8 10.93 Preparing to unpack .../07-libkrb5-3_1.21.3-5+deb13u1_amd64.deb ...
+#8 10.94 Unpacking libkrb5-3:amd64 (1.21.3-5+deb13u1) ...
+#8 10.98 Selecting previously unselected package libgssapi-krb5-2:amd64.
+#8 10.99 Preparing to unpack .../08-libgssapi-krb5-2_1.21.3-5+deb13u1_amd64.deb ...
+#8 10.99 Unpacking libgssapi-krb5-2:amd64 (1.21.3-5+deb13u1) ...
+#8 11.03 Selecting previously unselected package openssh-client.
+#8 11.03 Preparing to unpack .../09-openssh-client_1%3a10.0p1-7+deb13u4_amd64.deb ...
+#8 11.04 Unpacking openssh-client (1:10.0p1-7+deb13u4) ...
+#8 11.12 Selecting previously unselected package openssh-sftp-server.
+#8 11.12 Preparing to unpack .../10-openssh-sftp-server_1%3a10.0p1-7+deb13u4_amd64.deb ...
+#8 11.12 Unpacking openssh-sftp-server (1:10.0p1-7+deb13u4) ...
+#8 11.16 Selecting previously unselected package libncursesw6:amd64.
+#8 11.16 Preparing to unpack .../11-libncursesw6_6.5+20250216-2_amd64.deb ...
+#8 11.16 Unpacking libncursesw6:amd64 (6.5+20250216-2) ...
+#8 11.20 Selecting previously unselected package libproc2-0:amd64.
+#8 11.20 Preparing to unpack .../12-libproc2-0_2%3a4.0.4-9_amd64.deb ...
+#8 11.20 Unpacking libproc2-0:amd64 (2:4.0.4-9) ...
+#8 11.25 Selecting previously unselected package procps.
+#8 11.25 Preparing to unpack .../13-procps_2%3a4.0.4-9_amd64.deb ...
+#8 11.26 Unpacking procps (2:4.0.4-9) ...
+#8 11.32 Selecting previously unselected package libtext-charwidth-perl:amd64.
+#8 11.32 Preparing to unpack .../14-libtext-charwidth-perl_0.04-11+b4_amd64.deb ...
+#8 11.32 Unpacking libtext-charwidth-perl:amd64 (0.04-11+b4) ...
+#8 11.35 Selecting previously unselected package libtext-wrapi18n-perl.
+#8 11.35 Preparing to unpack .../15-libtext-wrapi18n-perl_0.06-10_all.deb ...
+#8 11.35 Unpacking libtext-wrapi18n-perl (0.06-10) ...
+#8 11.38 Selecting previously unselected package sensible-utils.
+#8 11.38 Preparing to unpack .../16-sensible-utils_0.0.25_all.deb ...
+#8 11.38 Unpacking sensible-utils (0.0.25) ...
+#8 11.41 Selecting previously unselected package ucf.
+#8 11.41 Preparing to unpack .../17-ucf_3.0052_all.deb ...
+#8 11.42 Moving old data out of the way
+#8 11.42 Unpacking ucf (3.0052) ...
+#8 11.44 Selecting previously unselected package runit-helper.
+#8 11.45 Preparing to unpack .../18-runit-helper_2.16.4_all.deb ...
+#8 11.45 Unpacking runit-helper (2.16.4) ...
+#8 11.48 Selecting previously unselected package libwrap0:amd64.
+#8 11.48 Preparing to unpack .../19-libwrap0_7.6.q-36_amd64.deb ...
+#8 11.49 Unpacking libwrap0:amd64 (7.6.q-36) ...
+#8 11.52 Selecting previously unselected package libwtmpdb0:amd64.
+#8 11.53 Preparing to unpack .../20-libwtmpdb0_0.73.0-3+deb13u1_amd64.deb ...
+#8 11.53 Unpacking libwtmpdb0:amd64 (0.73.0-3+deb13u1) ...
+#8 11.57 Selecting previously unselected package openssh-server.
+#8 11.57 Preparing to unpack .../21-openssh-server_1%3a10.0p1-7+deb13u4_amd64.deb ...
+#8 11.58 Unpacking openssh-server (1:10.0p1-7+deb13u4) ...
+#8 11.64 Selecting previously unselected package libpython3.13-minimal:amd64.
+#8 11.65 Preparing to unpack .../22-libpython3.13-minimal_3.13.5-2+deb13u5_amd64.deb ...
+#8 11.65 Unpacking libpython3.13-minimal:amd64 (3.13.5-2+deb13u5) ...
+#8 11.73 Selecting previously unselected package python3.13-minimal.
+#8 11.74 Preparing to unpack .../23-python3.13-minimal_3.13.5-2+deb13u5_amd64.deb ...
+#8 11.74 Unpacking python3.13-minimal (3.13.5-2+deb13u5) ...
+#8 11.88 Setting up libpython3.13-minimal:amd64 (3.13.5-2+deb13u5) ...
+#8 11.89 Setting up libexpat1:amd64 (2.9.0-1~deb13u1) ...
+#8 11.90 Setting up python3.13-minimal (3.13.5-2+deb13u5) ...
+#8 12.64 Selecting previously unselected package python3-minimal.
+#8 12.64 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 6776 files and directories currently installed.)
+#8 12.64 Preparing to unpack .../0-python3-minimal_3.13.5-1_amd64.deb ...
+#8 12.65 Unpacking python3-minimal (3.13.5-1) ...
+#8 12.68 Selecting previously unselected package media-types.
+#8 12.68 Preparing to unpack .../1-media-types_13.0.0_all.deb ...
+#8 12.68 Unpacking media-types (13.0.0) ...
+#8 12.72 Selecting previously unselected package netbase.
+#8 12.72 Preparing to unpack .../2-netbase_6.5_all.deb ...
+#8 12.72 Unpacking netbase (6.5) ...
+#8 12.76 Selecting previously unselected package libffi8:amd64.
+#8 12.76 Preparing to unpack .../3-libffi8_3.4.8-2_amd64.deb ...
+#8 12.76 Unpacking libffi8:amd64 (3.4.8-2) ...
+#8 12.79 Selecting previously unselected package readline-common.
+#8 12.79 Preparing to unpack .../4-readline-common_8.2-6_all.deb ...
+#8 12.80 Unpacking readline-common (8.2-6) ...
+#8 12.84 Selecting previously unselected package libreadline8t64:amd64.
+#8 12.84 Preparing to unpack .../5-libreadline8t64_8.2-6_amd64.deb ...
+#8 12.85 Adding 'diversion of /lib/x86_64-linux-gnu/libhistory.so.8 to /lib/x86_64-linux-gnu/libhistory.so.8.usr-is-merged by libreadline8t64'
+#8 12.85 Adding 'diversion of /lib/x86_64-linux-gnu/libhistory.so.8.2 to /lib/x86_64-linux-gnu/libhistory.so.8.2.usr-is-merged by libreadline8t64'
+#8 12.86 Adding 'diversion of /lib/x86_64-linux-gnu/libreadline.so.8 to /lib/x86_64-linux-gnu/libreadline.so.8.usr-is-merged by libreadline8t64'
+#8 12.86 Adding 'diversion of /lib/x86_64-linux-gnu/libreadline.so.8.2 to /lib/x86_64-linux-gnu/libreadline.so.8.2.usr-is-merged by libreadline8t64'
+#8 12.87 Unpacking libreadline8t64:amd64 (8.2-6) ...
+#8 12.91 Selecting previously unselected package libpython3.13-stdlib:amd64.
+#8 12.91 Preparing to unpack .../6-libpython3.13-stdlib_3.13.5-2+deb13u5_amd64.deb ...
+#8 12.91 Unpacking libpython3.13-stdlib:amd64 (3.13.5-2+deb13u5) ...
+#8 13.05 Selecting previously unselected package python3.13.
+#8 13.05 Preparing to unpack .../7-python3.13_3.13.5-2+deb13u5_amd64.deb ...
+#8 13.06 Unpacking python3.13 (3.13.5-2+deb13u5) ...
+#8 13.09 Selecting previously unselected package libpython3-stdlib:amd64.
+#8 13.09 Preparing to unpack .../8-libpython3-stdlib_3.13.5-1_amd64.deb ...
+#8 13.09 Unpacking libpython3-stdlib:amd64 (3.13.5-1) ...
+#8 13.13 Setting up python3-minimal (3.13.5-1) ...
+#8 13.33 Selecting previously unselected package python3.
+#8 13.33 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7274 files and directories currently installed.)
+#8 13.33 Preparing to unpack .../python3_3.13.5-1_amd64.deb ...
+#8 13.34 Unpacking python3 (3.13.5-1) ...
+#8 13.38 Setting up media-types (13.0.0) ...
+#8 13.41 Setting up libtext-charwidth-perl:amd64 (0.04-11+b4) ...
+#8 13.42 Setting up runit-helper (2.16.4) ...
+#8 13.43 Setting up libkeyutils1:amd64 (1.6.3-6) ...
+#8 13.44 Setting up libapparmor1:amd64 (4.1.0-1) ...
+#8 13.45 Setting up libcbor0.10:amd64 (0.10.2-2) ...
+#8 13.47 Setting up libedit2:amd64 (3.1-20250104-1) ...
+#8 13.48 Setting up systemd (257.13-1~deb13u1) ...
+#8 13.52 Created symlink '/etc/systemd/system/getty.target.wants/getty@tty1.service' 竊・'/usr/lib/systemd/system/getty@.service'.
+#8 13.52 Created symlink '/etc/systemd/system/multi-user.target.wants/remote-fs.target' 竊・'/usr/lib/systemd/system/remote-fs.target'.
+#8 13.53 Created symlink '/etc/systemd/system/sysinit.target.wants/systemd-pstore.service' 竊・'/usr/lib/systemd/system/systemd-pstore.service'.
+#8 13.53 Initializing machine ID from random generator.
+#8 13.56 Creating group 'systemd-journal' with GID 999.
+#8 13.56 Creating group 'systemd-network' with GID 998.
+#8 13.56 Creating user 'systemd-network' (systemd Network Management) with UID 998 and GID 998.
+#8 13.58 /usr/lib/tmpfiles.d/legacy.conf:14: Duplicate line for path "/run/lock", ignoring.
+#8 13.63 Setting up libcom-err2:amd64 (1.47.2-3+b12) ...
+#8 13.64 Setting up libtext-wrapi18n-perl (0.06-10) ...
+#8 13.65 Setting up libkrb5support0:amd64 (1.21.3-5+deb13u1) ...
+#8 13.66 Setting up libwrap0:amd64 (7.6.q-36) ...
+#8 13.68 Setting up libproc2-0:amd64 (2:4.0.4-9) ...
+#8 13.69 Setting up libncursesw6:amd64 (6.5+20250216-2) ...
+#8 13.71 Setting up libk5crypto3:amd64 (1.21.3-5+deb13u1) ...
+#8 13.74 Setting up libffi8:amd64 (3.4.8-2) ...
+#8 13.75 Setting up sensible-utils (0.0.25) ...
+#8 13.76 Setting up procps (2:4.0.4-9) ...
+#8 13.80 Setting up netbase (6.5) ...
+#8 13.82 Setting up libwtmpdb0:amd64 (0.73.0-3+deb13u1) ...
+#8 13.85 Setting up libkrb5-3:amd64 (1.21.3-5+deb13u1) ...
+#8 13.86 Setting up libfido2-1:amd64 (1.15.0-1+b1) ...
+#8 13.87 Setting up readline-common (8.2-6) ...
+#8 13.88 Setting up libgssapi-krb5-2:amd64 (1.21.3-5+deb13u1) ...
+#8 13.90 Setting up ucf (3.0052) ...
+#8 13.92 Setting up libreadline8t64:amd64 (8.2-6) ...
+#8 13.93 Setting up libpython3.13-stdlib:amd64 (3.13.5-2+deb13u5) ...
+#8 13.94 Setting up libpython3-stdlib:amd64 (3.13.5-1) ...
+#8 13.95 Setting up python3.13 (3.13.5-2+deb13u5) ...
+#8 14.79 Setting up openssh-client (1:10.0p1-7+deb13u4) ...
+#8 14.97 Created symlink '/etc/systemd/user/sockets.target.wants/ssh-agent.socket' 竊・'/usr/lib/systemd/user/ssh-agent.socket'.
+#8 14.99 Setting up python3 (3.13.5-1) ...
+#8 15.08 Setting up openssh-sftp-server (1:10.0p1-7+deb13u4) ...
+#8 15.09 Setting up openssh-server (1:10.0p1-7+deb13u4) ...
+#8 15.23 Creating config file /etc/ssh/sshd_config with new version
+#8 15.26 Creating SSH2 RSA key; this may take some time ...
+#8 15.55 3072 SHA256:g8bta9dzYcDPdtuPsy8ic8wQicgeoUcvqGiCT2OKjfI root@buildkitsandbox (RSA)
+#8 15.55 Creating SSH2 ECDSA key; this may take some time ...
+#8 15.56 256 SHA256:kcEz/8DHEJmvKPYm8JeYocUn0TslZgaQvnKHAtqMKT4 root@buildkitsandbox (ECDSA)
+#8 15.56 Creating SSH2 ED25519 key; this may take some time ...
+#8 15.57 256 SHA256:67HBnNoOiZBsPL42xGteCdLC31T7GOsIAuUSjSH97Q0 root@buildkitsandbox (ED25519)
+#8 15.58 Creating user 'sshd' (sshd user) with UID 997 and GID 65534.
+#8 15.59 runit: ssh: start action denied by policy-rc.d
+#8 15.61 invoke-rc.d: could not determine current runlevel
+#8 15.61 invoke-rc.d: policy-rc.d denied execution of start.
+#8 15.71 Created symlink '/etc/systemd/system/sshd.service' 竊・'/usr/lib/systemd/system/ssh.service'.
+#8 15.71 Created symlink '/etc/systemd/system/multi-user.target.wants/ssh.service' 竊・'/usr/lib/systemd/system/ssh.service'.
+#8 15.89 Created symlink '/etc/systemd/system/ssh.service.wants/sshd-keygen.service' 竊・'/usr/lib/systemd/system/sshd-keygen.service'.
+#8 15.89 Created symlink '/etc/systemd/system/sshd.service.wants/sshd-keygen.service' 竊・'/usr/lib/systemd/system/sshd-keygen.service'.
+#8 15.89 Created symlink '/etc/systemd/system/sshd@.service.wants/sshd-keygen.service' 竊・'/usr/lib/systemd/system/sshd-keygen.service'.
+#8 15.89 Created symlink '/etc/systemd/system/ssh.socket.wants/sshd-keygen.service' 竊・'/usr/lib/systemd/system/sshd-keygen.service'.
+#8 15.91 Processing triggers for libc-bin (2.41-12+deb13u4) ...
+#8 DONE 16.2s
+
+#9 [5/7] COPY sshd_config /etc/ssh/sshd_config
+#9 DONE 0.0s
+
+#10 [6/7] COPY probe.py versions.py start.sh /fixture/
+#10 DONE 0.1s
+
+#11 [7/7] RUN chmod 0555 /fixture/start.sh /fixture/probe.py /fixture/versions.py
+#11 DONE 0.2s
+
+#12 exporting to image
+#12 exporting layers
+#12 exporting layers 0.6s done
+#12 writing image sha256:aa2fcb067b896d24da7110e40cef96935992773421bf1b2ca5a6ef0dbdf8b2c8 done
+#12 naming to docker.io/library/wintable-linux-ssh:48d78f4dfefa4575b1f7ac23d9a71109 done
+#12 DONE 0.6s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/wiff7g2u4ucs9s6asr98dwht4
+
