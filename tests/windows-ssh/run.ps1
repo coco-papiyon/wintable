@@ -104,15 +104,19 @@ try {
         $env:WINTABLE_VALIDATION_EXE = [IO.Path]::GetFullPath($ValidationExecutable)
         & "$repo/tests/validation/clean-controller.ps1" -Executable $ValidationExecutable -FixtureDirectory $output -BaseImage $BaseImage -Isolation $Isolation
         $manifest.clean_controller = 'see controller.json and controller.log'
-        $manifest.cli_test_command = 'go test ./internal/cli -run ^TestWindowsCLIProcess$ -count=1 -v -timeout=2m'
-        & go test ./internal/cli -run '^TestWindowsCLIProcess$' -count=1 -v -timeout=2m 2>&1 | Tee-Object "$output/cli-test.log"
-        $manifest.cli_test_exit_code = $LASTEXITCODE
-        if ($LASTEXITCODE) { throw 'CLI process acceptance failed' }
     }
     $manifest.command_test_command = "go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=4m"
     & go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/command-test.log"
     $manifest.command_test_exit_code = $LASTEXITCODE
     if ($LASTEXITCODE) { throw 'command module acceptance failed' }
+    # Cancellation may leave a target wrapper running. Run process-observation
+    # cases before cancellation; never interpret cancellation as remote kill.
+    if ($ValidationExecutable) {
+        $manifest.cli_test_command = 'go test ./internal/cli -run ^TestWindowsCLIProcess$ -count=1 -v -timeout=2m'
+        & go test ./internal/cli -run '^TestWindowsCLIProcess$' -count=1 -v -timeout=2m 2>&1 | Tee-Object "$output/cli-test.log"
+        $manifest.cli_test_exit_code = $LASTEXITCODE
+        if ($LASTEXITCODE) { throw 'CLI process acceptance failed' }
+    }
     $manifest.test_command = 'go test ./internal/transport -run ^TestWindowsOpenSSH$ -count=1 -v -timeout=4m'
     & go test ./internal/transport -run '^TestWindowsOpenSSH$' -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/test.log"
     $result = $LASTEXITCODE

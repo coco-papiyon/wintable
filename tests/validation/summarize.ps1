@@ -57,13 +57,16 @@ foreach ($row in $rows | Where-Object scenario -ne 'V-13') {
 $details | Export-Csv "$root/coverage.csv" -NoTypeInformation -Encoding utf8NoBOM
 $rows | Export-Csv "$root/scenarios.csv" -NoTypeInformation -Encoding utf8NoBOM
 $prerequisites = $true
+if (!(Test-Path -LiteralPath "$root/coverage.json") -or
+    (Get-FileHash "$root/coverage.json" -Algorithm SHA256).Hash -ne $manifest.coverage_sha256 -or
+    (Get-FileHash "$PSScriptRoot/coverage.json" -Algorithm SHA256).Hash -ne $manifest.coverage_sha256) { $prerequisites=$false }
 foreach ($name in 'test','vet','build','wrappers','module_binary','native_container') {
     $check = @($manifest.checks | Where-Object name -eq $name)
     if ($check.Count -ne 1 -or $null -eq $check[0].exit_code -or $check[0].exit_code -ne 0 -or !(Test-Path -LiteralPath "$root/$($check[0].log)")) { $prerequisites=$false }
 }
 if (!(Test-Path "$root/ssh/manifest.json")) { $prerequisites=$false } else {
     $ssh = Get-Content "$root/ssh/manifest.json" -Raw | ConvertFrom-Json
-    if ($ssh.source_sha -ne $manifest.source_sha -or $ssh.failure -or $ssh.container_removed -ne $true -or $ssh.image_removed -ne $true) { $prerequisites=$false }
+    if ($ssh.source_sha -ne $manifest.source_sha -or @($ssh.source_status).Count -or $ssh.failure -or $ssh.container_removed -ne $true -or $ssh.image_removed -ne $true) { $prerequisites=$false }
     foreach ($name in 'test_exit_code','command_test_exit_code','cli_test_exit_code') { if ($null -eq $ssh.$name -or $ssh.$name -ne 0) { $prerequisites=$false } }
 }
 if ($manifest.failure -or $manifest.native_container_removed -ne $true -or @($manifest.source_status).Count -or @($tests | Where-Object status -eq 'FAIL').Count) { $prerequisites=$false }
@@ -75,3 +78,4 @@ Get-ChildItem $root -Recurse -File | Where-Object { $_.Name -ne 'sha256.csv' -an
     ForEach-Object { [pscustomobject]@{ path=[IO.Path]::GetRelativePath($root,$_.FullName); sha256=(Get-FileHash $_.FullName -Algorithm SHA256).Hash } } |
     Export-Csv "$root/sha256.csv" -NoTypeInformation -Encoding utf8NoBOM
 if ($manifest.acceptance -ne 'passed') { exit 1 }
+exit 0

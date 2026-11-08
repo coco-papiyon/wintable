@@ -28,12 +28,14 @@ try {
         Write-Output "PASS $mode"
     }
     $coverage = Get-Content "$PSScriptRoot/coverage.json" -Raw | ConvertFrom-Json
-    foreach ($mode in 'complete','missing-case','skipped-case','failed-case','duplicate-case','dirty-source','failed-vet','ssh-wrong-source','ssh-missing-exit','ssh-not-removed','native-not-removed','missing-vet-log') {
+    foreach ($mode in 'complete','missing-case','skipped-case','failed-case','duplicate-case','dirty-source','failed-vet','ssh-wrong-source','ssh-missing-exit','ssh-not-removed','native-not-removed','missing-vet-log','wrong-coverage-hash','missing-coverage') {
         $records = @(foreach ($group in $coverage) { foreach ($property in $group.checks.PSObject.Properties) { foreach ($name in $property.Value) { [pscustomobject]@{ log=$property.Name; test=$name } } } })
         foreach ($group in ($records | Group-Object log)) {
             @($group.Group.test | Sort-Object -Unique | ForEach-Object { "--- PASS: $_ (0.01s)" }) | Set-Content "$root/$($group.Name)"
         }
         $manifest = @{ source_sha='source'; exe_sha256='binary'; source_status=@(); native_container_removed=$true; acceptance='unconfirmed'; checks=@() }
+        Copy-Item -LiteralPath "$PSScriptRoot/coverage.json" -Destination "$root/coverage.json" -Force
+        $manifest.coverage_sha256=(Get-FileHash "$root/coverage.json" -Algorithm SHA256).Hash
         foreach ($name in 'test','vet','build','wrappers','module_binary','native_container') {
             $log = "$name.log"
             if ($name -eq 'native_container') { $log='native-container.log' }
@@ -41,7 +43,7 @@ try {
             $manifest.checks += @{name=$name;exit_code=0;log=$log}
         }
         $controller = @{ source_sha='source'; exe_sha256='binary'; exit_code=0; removed=$true }
-        $ssh = @{source_sha='source';container_removed=$true;image_removed=$true;test_exit_code=0;command_test_exit_code=0;cli_test_exit_code=0}
+        $ssh = @{source_sha='source';source_status=@();container_removed=$true;image_removed=$true;test_exit_code=0;command_test_exit_code=0;cli_test_exit_code=0}
         'CLEAN_CONTROLLER_PASS' | Set-Content "$root/ssh/controller.log"
         switch ($mode) {
             'missing-case' { (Get-Content "$root/test.log") | Where-Object { $_ -notmatch 'TestSelect ' } | Set-Content "$root/test.log" }
@@ -55,11 +57,14 @@ try {
             'ssh-not-removed' { $ssh.container_removed=$false }
             'native-not-removed' { $manifest.native_container_removed=$false }
             'missing-vet-log' { Remove-Item -LiteralPath "$root/vet.log" }
+            'wrong-coverage-hash' { $manifest.coverage_sha256='other' }
+            'missing-coverage' { Remove-Item -LiteralPath "$root/coverage.json" }
         }
         $manifest | ConvertTo-Json -Depth 8 | Set-Content "$root/manifest.json"
         $controller | ConvertTo-Json | Set-Content "$root/ssh/controller.json"
         $ssh | ConvertTo-Json | Set-Content "$root/ssh/manifest.json"
         & "$PSScriptRoot/summarize.ps1" -EvidenceDirectory $root
+        if (($mode -eq 'complete' -and $LASTEXITCODE -ne 0) -or ($mode -ne 'complete' -and $LASTEXITCODE -ne 1)) { throw "Incorrect exit code for $mode" }
         $actual = Get-Content "$root/manifest.json" -Raw | ConvertFrom-Json
         $expected = if ($mode -eq 'complete') { 'passed' } else { 'unconfirmed' }
         if ($actual.acceptance -ne $expected) { throw "Incorrect acceptance for $mode : $($actual.acceptance)" }

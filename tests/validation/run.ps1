@@ -10,6 +10,7 @@ if (!$OutputDirectory) { $OutputDirectory = "$repo/.cache/validation/$([Guid]::N
 $output = [IO.Path]::GetFullPath($OutputDirectory)
 if (Test-Path -LiteralPath $output) { throw 'Evidence directory must be new' }
 New-Item -ItemType Directory -Path $output | Out-Null
+Copy-Item -LiteralPath "$PSScriptRoot/coverage.json" -Destination "$output/coverage.json"
 $manifest = [ordered]@{
     source_sha = $null; source_status = @(); started_utc = [DateTime]::UtcNow.ToString('o')
     base_image = $BaseImage; checks = @(); acceptance = 'unconfirmed'
@@ -30,6 +31,7 @@ try {
     $manifest.source_sha = (& git rev-parse HEAD)
     $manifest.source_status = @(& git status --short)
     $manifest.runner_sha256 = (Get-FileHash $PSCommandPath -Algorithm SHA256).Hash
+    $manifest.coverage_sha256 = (Get-FileHash "$output/coverage.json" -Algorithm SHA256).Hash
     $manifest.go = (& go version)
     $manifest.controller = @{ os=[Environment]::OSVersion.VersionString; architecture=$env:PROCESSOR_ARCHITECTURE; powershell=$PSVersionTable.PSVersion.ToString() }
     Invoke-Check test @('test','./...','-count=1','-v','-timeout=8m')
