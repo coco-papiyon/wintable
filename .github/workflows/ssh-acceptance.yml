@@ -34,6 +34,9 @@ jobs:
           ./tests/ci/check-package.ps1 -Directory dist/package -SourceSHA '${{ github.sha }}'
           ./tests/ci/test-gate.ps1
           ./tests/validation/test-summary.ps1
+          New-Item dist/shared -ItemType Directory | Out-Null
+          Copy-Item dist/package dist/shared/package -Recurse
+          Copy-Item dist/package.zip dist/shared/package.zip
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -44,7 +47,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: candidate
-          path: dist/package/
+          path: dist/shared/
           if-no-files-found: error
           retention-days: 7
   windows:
@@ -63,11 +66,9 @@ jobs:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: candidate
-          path: dist/package
+          path: dist
       - run: |
-          New-Item .cache -ItemType Directory -Force | Out-Null
-          Compress-Archive -Path dist/package/* -DestinationPath .cache/windows-candidate.zip
-          $env:WINTABLE_DISTRIBUTION_ZIP="$pwd/.cache/windows-candidate.zip"
+          $env:WINTABLE_DISTRIBUTION_ZIP="$pwd/dist/package.zip"
           ./tests/validation/run.ps1 -DistributionDirectory "$pwd/dist/package" -OutputDirectory "$pwd/.cache/ci/windows"
       - if: always()
         run: ./tests/ci/export-evidence.ps1 -Kind windows -InputDirectory .cache/ci/windows -OutputDirectory .cache/upload
@@ -94,7 +95,7 @@ jobs:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: candidate
-          path: dist/package
+          path: dist
       - run: |
           ./tests/ci/check-package.ps1 -Directory dist/package -SourceSHA '${{ github.sha }}'
           Copy-Item dist/package/wintable.exe dist/wintable.exe
@@ -121,7 +122,7 @@ jobs:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: candidate
-          path: dist/package
+          path: dist
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           pattern: '*-evidence'
@@ -129,7 +130,7 @@ jobs:
           merge-multiple: true
       - run: |
           ./tests/ci/gate.ps1 -EvidenceDirectory .cache/evidence -DistributionDirectory dist/package -SourceSHA '${{ github.sha }}' -WindowsJob '${{ needs.windows.result }}' -LinuxJob '${{ needs.linux.result }}'
-          Compress-Archive -Path dist/package/* -DestinationPath dist/wintable-windows-amd64.zip
+          Copy-Item dist/package.zip dist/wintable-windows-amd64.zip
           'Both OS targets passed. Mixed real SSH E2E: unconfirmed.' >> $env:GITHUB_STEP_SUMMARY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

@@ -17,7 +17,7 @@ $ph=Read-JSON 'linux/product-hash.json'
 $example=Read-JSON 'linux/document-example.json'
 $controller=Read-JSON 'windows/ssh/controller.json'
 if ($null -eq $controller.zip_exit_code -or $controller.zip_exit_code -ne 0 -or
-    $controller.zip_container_removed -ne $true -or $controller.zip_sha256 -notmatch '^[a-fA-F0-9]{64}$' -or
+    $controller.zip_container_removed -ne $true -or $controller.zip_sha256 -cne (Get-FileHash -LiteralPath "$DistributionDirectory.zip").Hash -or
     !(Select-String -LiteralPath "$EvidenceDirectory/windows/ssh/zip-controller.log" -SimpleMatch 'ZIP_CONTROLLER_PASS' -Quiet)) {
     throw 'Windows ZIP controller acceptance incomplete'
 }

@@ -3,6 +3,8 @@
 `.github/workflows/ssh-acceptance.yml` はpushされたSHAを全ジョブで明示checkoutする。
 固定Go 1.27.3でWindows amd64 exeを一度buildし、配布manifestとSHA-256を付ける。
 Windows対象ジョブとLinux対象ジョブは同じartifactを取得し再buildしない。
+artifactには配布ディレクトリと生成済みZIPを含める。WindowsのZIP導入検査で使った
+ZIPハッシュを最終ゲートで照合し、検証後に再梱包せず同じZIPを合格artifactへコピーする。
 配布候補には埋込Windows/Python receiverを含むexe、README、docs、examplesを同梱し、
 ZIP展開後の全ファイルhashとexe helpを検査する。ランタイムの外部Pythonソース配布は不要。
 候補作成は既存の `scripts/distribution.ps1` を再利用し、依存脆弱性監査、MITライセンス、
@@ -72,8 +74,7 @@ Copy-Item dist/package/wintable.exe dist/wintable.exe
 ./tests/ci/test-gate.ps1
 ./tests/validation/test-summary.ps1
 # Windows containersモード
-Compress-Archive -Path dist/package/* -DestinationPath dist/windows-candidate.zip
-$env:WINTABLE_DISTRIBUTION_ZIP="$pwd/dist/windows-candidate.zip"
+$env:WINTABLE_DISTRIBUTION_ZIP="$pwd/dist/package.zip"
 ./tests/validation/run.ps1 -DistributionDirectory "$pwd/dist/package" -OutputDirectory .cache/ci/windows
 # 専用Linux containers環境で、同じcheckoutと配布物を使う
 ./tests/linux-ssh/run.ps1 -DockerContext desktop-linux -ProductTestScript ./tests/linux-ssh/product.ps1 -OutputDirectory .cache/ci/linux

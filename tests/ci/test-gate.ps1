@@ -6,13 +6,15 @@ function Save($object,$path) { $object | ConvertTo-Json -Depth 15 | Set-Content 
 try {
     'synthetic executable bytes' | Set-Content "$root/package/wintable.exe"
     $hash=(Get-FileHash "$root/package/wintable.exe").Hash
+    'synthetic ZIP bytes' | Set-Content "$root/package.zip"
+    $zipHash=(Get-FileHash "$root/package.zip").Hash
     $paths=@('wintable.exe','README.md','LICENSE','audit.json','build.json','SHA256.json','licenses/index.json','licenses/Go-LICENSE','docs/usage.md','docs/release.md','docs/file-content-module.md','docs/linux-command.md','docs/support.md','docs/ci.md','examples/linux-inventory.json','examples/linux-command.json','examples/mixed-inventory.json','examples/mixed-command.json')
     foreach ($path in $paths | Select-Object -Skip 1) {
         New-Item (Split-Path "$root/package/$path") -ItemType Directory -Force | Out-Null
         'synthetic' | Set-Content "$root/package/$path"
     }
     Save @{source_sha='source';go='go version go1.27.3 windows/amd64';files=@($paths | ForEach-Object {@{path=$_;sha256=(Get-FileHash "$root/package/$_").Hash}})} 'package/distribution.json'
-    foreach ($mode in 'valid','skip','missing','duplicate','null-exit','wrong-source','wrong-binary','versions','cleanup','deadline','job-failed','job-skipped','job-cancelled','missing-artifact','windows-missing','zip-missing','zip-failed','zip-not-removed') {
+    foreach ($mode in 'valid','skip','missing','duplicate','null-exit','wrong-source','wrong-binary','versions','cleanup','deadline','job-failed','job-skipped','job-cancelled','missing-artifact','windows-missing','zip-missing','zip-failed','zip-not-removed','zip-wrong-hash') {
         $wc=Get-Content "$PSScriptRoot/../validation/coverage.json" -Raw | ConvertFrom-Json
         foreach ($file in @($wc | ForEach-Object {$_.checks.PSObject.Properties.Name}) | Sort-Object -Unique) {
             $names=@($wc | ForEach-Object {$_.checks.PSObject.Properties | Where-Object Name -ceq $file | ForEach-Object Value}) | Sort-Object -Unique
@@ -26,7 +28,7 @@ try {
         })
         $w=@{source_sha='source';exe_sha256=$hash;acceptance='passed';prerequisites_passed=$true;checks=$checks;source_status=@();native_container_removed=$true;coverage_sha256=(Get-FileHash "$root/windows/coverage.json").Hash}
         $ws=@{source_sha='source';source_status=@();container_removed=$true;image_removed=$true;test_exit_code=0;command_test_exit_code=0;cli_test_exit_code=0}
-        $controller=@{source_sha='source';exe_sha256=$hash;exit_code=0;removed=$true;zip_exit_code=0;zip_container_removed=$true;zip_sha256=('a'*64)}
+        $controller=@{source_sha='source';exe_sha256=$hash;exit_code=0;removed=$true;zip_exit_code=0;zip_container_removed=$true;zip_sha256=$zipHash}
         'ZIP_CONTROLLER_PASS' | Set-Content "$root/windows/ssh/zip-controller.log"
         'CLEAN_CONTROLLER_PASS' | Set-Content "$root/windows/ssh/controller.log"
         foreach ($name in 'TestHostOS','TestOSSchemaBoundaries','TestOSPreflightNoConnections','TestMixedBackends','TestLinuxBoundaries','TestLinuxFixedBackend','TestLinuxDecoder') { "--- PASS: $name (0.01s)" | Add-Content "$root/windows/test.log" }
@@ -55,6 +57,7 @@ try {
             'zip-missing' { $controller.zip_exit_code=$null }
             'zip-failed' { $controller.zip_exit_code=1 }
             'zip-not-removed' { $controller.zip_container_removed=$false }
+            'zip-wrong-hash' { $controller.zip_sha256=('0'*64) }
         }
         Save $w 'windows/manifest.json'; Save $ws 'windows/ssh/manifest.json'
         Save $controller 'windows/ssh/controller.json'
