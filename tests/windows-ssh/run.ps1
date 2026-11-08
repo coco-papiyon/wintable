@@ -44,6 +44,14 @@ function Invoke-Docker {
 }
 $oldFixture = $env:WINTABLE_SSH_FIXTURE
 $oldExecutable = $env:WINTABLE_VALIDATION_EXE
+$regularModulePattern = $ModuleTestPattern
+$interruptionPattern = $null
+if ($ModuleTestPattern -ceq '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows)$') {
+    # A cut connection need not terminate its remote descendants. Complete
+    # ordinary receiver/size observations before leaving such processes behind.
+    $regularModulePattern = '^Test(CommandWindows|FileContentSSH|FileContentLinkSwapWindows)$'
+    $interruptionPattern = '^Test(Command|FileContent)SSHLaunchAndDisconnect$'
+}
 $created = $false
 $built = $false
 $result = 1
@@ -105,8 +113,8 @@ try {
         & "$repo/tests/validation/clean-controller.ps1" -Executable $ValidationExecutable -FixtureDirectory $output -BaseImage $BaseImage -Isolation $Isolation
         $manifest.clean_controller = 'see controller.json and controller.log'
     }
-    $manifest.command_test_command = "go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=8m"
-    & go test ./internal/module -run $ModuleTestPattern -count=1 -v -timeout=8m 2>&1 | Tee-Object "$output/command-test.log"
+    $manifest.command_test_command = "go test ./internal/module -run $regularModulePattern -count=1 -v -timeout=8m"
+    & go test ./internal/module -run $regularModulePattern -count=1 -v -timeout=8m 2>&1 | Tee-Object "$output/command-test.log"
     $manifest.command_test_exit_code = $LASTEXITCODE
     if ($LASTEXITCODE) { throw 'command module acceptance failed' }
     # Cancellation may leave a target wrapper running. Run process-observation
@@ -117,6 +125,16 @@ try {
         $manifest.cli_test_exit_code = $LASTEXITCODE
         if ($LASTEXITCODE) { throw 'CLI process acceptance failed' }
     }
+    if ($interruptionPattern) {
+        $manifest.interruption_test_command = "go test ./internal/module -run $interruptionPattern -count=1 -v -timeout=2m"
+        & go test ./internal/module -run $interruptionPattern -count=1 -v -timeout=2m 2>&1 | Tee-Object "$output/command-test.log" -Append
+        $manifest.interruption_test_exit_code = $LASTEXITCODE
+        if ($LASTEXITCODE) {
+            $manifest.command_test_exit_code = $LASTEXITCODE
+            throw 'module interruption acceptance failed'
+        }
+    }
+    # This suite's final disconnect stops sshd, so it must remain last.
     $manifest.test_command = 'go test ./internal/transport -run ^TestWindowsOpenSSH$ -count=1 -v -timeout=4m'
     & go test ./internal/transport -run '^TestWindowsOpenSSH$' -count=1 -v -timeout=4m 2>&1 | Tee-Object "$output/test.log"
     $result = $LASTEXITCODE
