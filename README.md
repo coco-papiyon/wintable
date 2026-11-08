@@ -2,6 +2,11 @@
 
 Windowsネイティブで動作するGo製の構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、commandモジュール、結果集計・描画を実装しています。Windows file_contentとLinux commandも実装済みです。
 
+- [ZIPの導入・SSH準備・利用手順](docs/usage.md)
+- [Windows CI・監査・ZIP作成と公開条件](docs/release.md)
+
+Windows CIと配布候補生成を整備しています。[Issue #11の全必須検証は合格済み](https://github.com/coco-papiyon/wintable/issues/11#issuecomment-6717454311)です。本体は[MITライセンス](LICENSE)です。Go・依存ライブラリのライセンスと通知も配布物に保持します。[最終ZIPのV-13と配布commitの全18シナリオを確認済み](docs/validation/issue12-audit-fixed/README.md)です。公開前に実ログ・最新監査・ライセンスの人手レビューを行います。
+
 - [Windows版Ansible相当ツールの設計](docs/design/windows-ansible.md)
 - [検証計画と後続実装](docs/design/windows-ansible-validation.md)
 - [Windowsコンテナの証跡収集と未確認項目](docs/validation/windows-container.md)

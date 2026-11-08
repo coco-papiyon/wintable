@@ -1,0 +1,50 @@
+Usage: wintable run --inventory FILE --tasks FILE [options]
+       wintable help | --help | run --help
+
+Options:
+  --inventory FILE     Required static inventory JSON v1 (no default)
+  --tasks FILE         Required tasks JSON v1 (no default)
+  --limit HOSTS        Comma-separated exact host names (default: selected hosts)
+  --forks N            Concurrent hosts, 1..64 (default: 5)
+  --timeout DURATION   Positive Go duration per task (default: 60s)
+  --format FORMAT      text or json (default: text)
+  --vars-file FILE     String dictionary JSON (default: none)
+  --include-output     Include stdout/stderr bodies (default: false)
+
+Scope: Windows 11 / Windows Server 2022 or later, amd64 control and target;
+SSH public-key authentication, mandatory known_hosts, cmd.exe default shell,
+PowerShell 5.1+, independent JSON v1; command and file_content modules.
+Unsupported: Ansible YAML/Jinja/collections, roles/handlers/facts/become/vault,
+dynamic inventory, check mode, retries, rollback, WinRM, arm64 and Linux targets.
+Output bodies may contain secrets from arbitrary commands. Automatic masking
+is not guaranteed; enable --include-output only when appropriate.
+
+Input files are strictly validated before execution. No connections are made yet.
+Valid run options report execution_not_implemented and exit 3 until the engine
+is integrated. Result rendering is available through RunResults.
+Exit codes: 0 success/help, 1 target failure, 2 input, 3 internal, 130 cancelled.
+{"hosts":[{"host":"target","tasks":[{"host":"target","task":"command","task_index":0,"status":"changed","changed":true,"exit_code":0,"duration_ms":1726,"stdout_base64":"ZWFmOWFkZTQ1YmZmXHdpbnRhYmxlc3NoDQo=","stderr_base64":"","stdout_truncated":false,"stderr_truncated":false},{"host":"target","task":"file","task_index":1,"status":"changed","changed":true,"exit_code":null,"duration_ms":1580,"stdout_truncated":false,"stderr_truncated":false}],"counts":{"ok":0,"changed":2,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}],"counts":{"ok":0,"changed":2,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}
+{"hosts":[{"host":"target","tasks":[{"host":"target","task":"command","task_index":0,"status":"changed","changed":true,"exit_code":0,"duration_ms":1661,"stdout_base64":"ZWFmOWFkZTQ1YmZmXHdpbnRhYmxlc3NoDQo=","stderr_base64":"","stdout_truncated":false,"stderr_truncated":false},{"host":"target","task":"file","task_index":1,"status":"ok","changed":false,"exit_code":null,"duration_ms":1532,"stdout_truncated":false,"stderr_truncated":false}],"counts":{"ok":1,"changed":1,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}],"counts":{"ok":1,"changed":1,"failed":0,"unreachable":0,"skipped":0,"cancelled":0}}
+{
+    "user":  "User Manager\\ContainerUser",
+    "non_admin":  true,
+    "install":  "C:\\Users\\ContainerUser\\AppData\\Local\\Temp\\日本語 ZIP 配布",
+    "zip_sha256":  "66DD56EB63C85FDE014A962A7D1BD1AF5E2A7A70CB2DECFDE28E38CC044AE3C0",
+    "exe_sha256":  "C1FEF694445F363E575D8374DCDB13E89F3DF66980D84EB5127AEE5EEBD9D68B",
+    "build":  {
+                  "source_commit":  "2a19a2becbd738b06929eb19825e395d936a8f17",
+                  "go":  "go1.27.3",
+                  "scanner":  "govulncheck v1.9.0",
+                  "created_utc":  "2026-11-08T14:10:12.4950432Z",
+                  "release_status":  "candidate; requires acceptance evidence"
+              },
+    "tools_absent":  [
+                         "go",
+                         "wsl",
+                         "python",
+                         "python3",
+                         "py"
+                     ],
+    "exit_code":  0
+}
+ZIP_CONTROLLER_PASS

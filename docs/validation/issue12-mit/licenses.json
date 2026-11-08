@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Go",
+    "version": "go1.27.3",
+    "license": "Go-LICENSE"
+  },
+  {
+    "name": "golang.org/x/crypto",
+    "version": "v0.58.0",
+    "license": "golang.org-x-crypto-LICENSE"
+  },
+  {
+    "name": "golang.org/x/net",
+    "version": "v0.60.0",
+    "license": "golang.org-x-net-LICENSE"
+  },
+  {
+    "name": "golang.org/x/sys",
+    "version": "v0.49.0",
+    "license": "golang.org-x-sys-LICENSE"
+  },
+  {
+    "name": "golang.org/x/term",
+    "version": "v0.47.0",
+    "license": "golang.org-x-term-LICENSE"
+  },
+  {
+    "name": "golang.org/x/text",
+    "version": "v0.43.0",
+    "license": "golang.org-x-text-LICENSE"
+  }
+]

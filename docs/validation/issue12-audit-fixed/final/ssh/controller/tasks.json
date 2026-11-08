@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    {
+      "args": {
+        "executable": "C:\\Windows\\System32\\whoami.exe",
+        "argv": []
+      },
+      "module": "command",
+      "name": "command"
+    },
+    {
+      "args": {
+        "content": "日本語 \"quoted\"\n",
+        "path": "C:\\fixture\\clean-wintable-controller-730b522ad2a4.txt"
+      },
+      "module": "file_content",
+      "name": "file"
+    }
+  ],
+  "version": 1,
+  "hosts": "all"
+}

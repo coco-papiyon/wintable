@@ -1,0 +1,47 @@
+name: Windows CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2022
+    env:
+      GOTOOLCHAIN: go1.27.3
+      GOOS: windows
+      GOARCH: amd64
+      CGO_ENABLED: '0'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
+        with:
+          go-version: '1.27.3'
+          check-latest: false
+      - name: Verify toolchain
+        shell: pwsh
+        run: |
+          if ((go version) -ne 'go version go1.27.3 windows/amd64') { throw 'Wrong Go version' }
+      - run: go mod verify
+      - run: go test ./... -count=1
+      - run: go vet ./...
+      - run: go test ./internal/module -run '^TestDistributionWrapper$' -count=1 -v
+      - run: go build -trimpath -buildvcs=true -o dist/wintable.exe ./cmd/wintable
+      - name: Vulnerability audit
+        shell: pwsh
+        run: |
+          go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -json ./... > audit.json
+          if ($LASTEXITCODE) { throw 'Dependency audit failed' }
+          go run ./scripts/auditcheck audit.json
+          if ($LASTEXITCODE) { throw 'Unresolved vulnerability finding or invalid audit record' }
+      - name: Distribution gate regression tests
+        shell: pwsh
+        run: ./tests/distribution/test.ps1
+      - name: Preserve audit record
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: audit-${{ github.sha }}
+          path: audit.json
+          if-no-files-found: warn
+          retention-days: 30

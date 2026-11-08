@@ -1,0 +1,59 @@
+{
+  "source_sha": "c698817112724af47d7147d74fa21386dc5507f8",
+  "source_status": [],
+  "started_utc": "2026-11-08T13:41:30.0709144Z",
+  "base_image": "mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09",
+  "checks": [
+    {
+      "exit_code": 0,
+      "command": "go test ./... -count=1 -v -timeout=8m",
+      "log": "test.log",
+      "name": "test"
+    },
+    {
+      "exit_code": 0,
+      "command": "go vet ./...",
+      "log": "vet.log",
+      "name": "vet"
+    },
+    {
+      "exit_code": 0,
+      "command": "go test ./internal/module -run ^TestDistributionWrapper$ -count=1 -v",
+      "log": "wrappers.log",
+      "name": "wrappers"
+    },
+    {
+      "exit_code": 0,
+      "command": "go build -trimpath -o C:\\data\\dev\\github\\wintable\\.cache\\issue12\\dist\\mit-release-acceptance/wintable.exe ./cmd/wintable",
+      "log": "build.log",
+      "name": "build"
+    },
+    {
+      "exit_code": 0,
+      "command": "go test -c -o C:\\data\\dev\\github\\wintable\\.cache\\issue12\\dist\\mit-release-acceptance/module.test.exe ./internal/module",
+      "log": "module_binary.log",
+      "name": "module_binary"
+    },
+    {
+      "exit_code": 0,
+      "command": "docker run --name wintable-native-54173954c240 --isolation hyperv --mount type=bind,source=C:\\data\\dev\\github\\wintable\\.cache\\issue12\\dist\\mit-release-acceptance,target=C:/validation,readonly mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09 C:/validation/module.test.exe -test.run=^TestFileContentWindows$ -test.v -test.timeout=3m",
+      "log": "native-container.log",
+      "name": "native_container"
+    }
+  ],
+  "acceptance": "unconfirmed",
+  "launch_measurement": "UTF-16 code units of cmd.exe /c plus quoted fixed wrapper; non-BMP counts as 2; limit 8000",
+  "runner_sha256": "46E3DA7FB5D76AA537E69AD00E5F28E4D7364E44A731AD241BE27E94C7B5B1D9",
+  "coverage_sha256": "C4EC856C2E535DA734C1BFFD8D1B4619F26878D0D7B5F2F4B82569399E5F980E",
+  "go": "go version go1.27.3 windows/amd64",
+  "controller": {
+    "architecture": "AMD64",
+    "os": "Microsoft Windows NT 10.0.26300.0",
+    "powershell": "7.6.9"
+  },
+  "native_container_removed": true,
+  "exe_sha256": "ACDB70B6445CC8AB0708E1A09C26F719F3887AC7BC5BF3CDC19F36131B037C81",
+  "failure": "command module acceptance failed",
+  "finished_utc": "2026-11-08T13:47:28.1093326Z",
+  "prerequisites_passed": false
+}
