@@ -1,0 +1,532 @@
+?   	github.com/coco-papiyon/wintable/cmd/wintable	[no test files]
+=== RUN   TestHelp
+--- PASS: TestHelp (0.00s)
+=== RUN   TestInvalidInputNeverExecutes
+=== RUN   TestInvalidInputNeverExecutes/#00
+=== RUN   TestInvalidInputNeverExecutes/unknown
+=== RUN   TestInvalidInputNeverExecutes/run
+=== RUN   TestInvalidInputNeverExecutes/help_extra
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i
+=== RUN   TestInvalidInputNeverExecutes/run_--tasks_t
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--unknown
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--check
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--become
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--retry_1
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--forks_0
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--forks_65
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--forks_-1
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--forks_bad
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--timeout_0s
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--timeout_-1s
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--timeout_bad
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--format_yaml
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--format_
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--include-output=bad
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--inventory_
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--tasks__
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_extra
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--_extra
+=== RUN   TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--inventory
+--- PASS: TestInvalidInputNeverExecutes (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/#00 (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/unknown (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/help_extra (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--tasks_t (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--unknown (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--check (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--become (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--retry_1 (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--forks_0 (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--forks_65 (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--forks_-1 (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--forks_bad (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--timeout_0s (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--timeout_-1s (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--timeout_bad (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--format_yaml (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--format_ (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--include-output=bad (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--inventory_ (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--tasks__ (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_extra (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--_extra (0.00s)
+    --- PASS: TestInvalidInputNeverExecutes/run_--inventory_i.json_--tasks_t.json_--inventory (0.00s)
+=== RUN   TestOptionsAndContext
+--- PASS: TestOptionsAndContext (0.02s)
+=== RUN   TestCancellation
+--- PASS: TestCancellation (0.03s)
+=== RUN   TestFoundationDoesNotReportSuccess
+--- PASS: TestFoundationDoesNotReportSuccess (0.02s)
+=== RUN   TestHelpOutputFailure
+--- PASS: TestHelpOutputFailure (0.00s)
+=== RUN   TestInvalidValueIsNotEchoed
+--- PASS: TestInvalidValueIsNotEchoed (0.00s)
+=== RUN   TestFilesRejectedBeforeExecutor
+=== RUN   TestFilesRejectedBeforeExecutor/i
+=== RUN   TestFilesRejectedBeforeExecutor/t
+=== RUN   TestFilesRejectedBeforeExecutor/v
+--- PASS: TestFilesRejectedBeforeExecutor (0.04s)
+    --- PASS: TestFilesRejectedBeforeExecutor/i (0.02s)
+    --- PASS: TestFilesRejectedBeforeExecutor/t (0.01s)
+    --- PASS: TestFilesRejectedBeforeExecutor/v (0.01s)
+=== RUN   TestV01NeverExecutes
+=== RUN   TestV01NeverExecutes/i
+=== RUN   TestV01NeverExecutes/iversion:_1
+=== RUN   TestV01NeverExecutes/i[]
+=== RUN   TestV01NeverExecutes/i{}_{}
+=== RUN   TestV01NeverExecutes/i�
+=== RUN   TestV01NeverExecutes/i\ufeff\ufeff{}
+=== RUN   TestV01NeverExecutes/i{"SECRET":1,"SECRET":2}
+=== RUN   TestV01NeverExecutes/i{"version":"1"}
+=== RUN   TestV01NeverExecutes/i{"version":2}
+=== RUN   TestV01NeverExecutes/i{"version":1,"unknown":"secret"}
+=== RUN   TestV01NeverExecutes/i{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"unknown","args":{}}]}
+=== RUN   TestV01NeverExecutes/i{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe","argv":[],"unknown":true}}]}
+=== RUN   TestV01NeverExecutes/i{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe"}}]}
+=== RUN   TestV01NeverExecutes/t
+=== RUN   TestV01NeverExecutes/tversion:_1
+=== RUN   TestV01NeverExecutes/t[]
+=== RUN   TestV01NeverExecutes/t{}_{}
+=== RUN   TestV01NeverExecutes/t�
+=== RUN   TestV01NeverExecutes/t\ufeff\ufeff{}
+=== RUN   TestV01NeverExecutes/t{"SECRET":1,"SECRET":2}
+=== RUN   TestV01NeverExecutes/t{"version":"1"}
+=== RUN   TestV01NeverExecutes/t{"version":2}
+=== RUN   TestV01NeverExecutes/t{"version":1,"unknown":"secret"}
+=== RUN   TestV01NeverExecutes/t{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"unknown","args":{}}]}
+=== RUN   TestV01NeverExecutes/t{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe","argv":[],"unknown":true}}]}
+=== RUN   TestV01NeverExecutes/t{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe"}}]}
+=== RUN   TestV01NeverExecutes/v
+=== RUN   TestV01NeverExecutes/vversion:_1
+=== RUN   TestV01NeverExecutes/v[]
+=== RUN   TestV01NeverExecutes/v{}_{}
+=== RUN   TestV01NeverExecutes/v�
+=== RUN   TestV01NeverExecutes/v\ufeff\ufeff{}
+=== RUN   TestV01NeverExecutes/v{"SECRET":1,"SECRET":2}
+=== RUN   TestV01NeverExecutes/v{"version":"1"}
+    cli_test.go:183: valid string dictionary
+=== RUN   TestV01NeverExecutes/v{"version":2}
+=== RUN   TestV01NeverExecutes/v{"version":1,"unknown":"secret"}
+=== RUN   TestV01NeverExecutes/v{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"unknown","args":{}}]}
+=== RUN   TestV01NeverExecutes/v{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe","argv":[],"unknown":true}}]}
+=== RUN   TestV01NeverExecutes/v{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe"}}]}
+--- PASS: TestV01NeverExecutes (0.34s)
+    --- PASS: TestV01NeverExecutes/i (0.00s)
+    --- PASS: TestV01NeverExecutes/iversion:_1 (0.01s)
+    --- PASS: TestV01NeverExecutes/i[] (0.00s)
+    --- PASS: TestV01NeverExecutes/i{}_{} (0.01s)
+    --- PASS: TestV01NeverExecutes/i� (0.00s)
+    --- PASS: TestV01NeverExecutes/i\ufeff\ufeff{} (0.01s)
+    --- PASS: TestV01NeverExecutes/i{"SECRET":1,"SECRET":2} (0.02s)
+    --- PASS: TestV01NeverExecutes/i{"version":"1"} (0.00s)
+    --- PASS: TestV01NeverExecutes/i{"version":2} (0.01s)
+    --- PASS: TestV01NeverExecutes/i{"version":1,"unknown":"secret"} (0.01s)
+    --- PASS: TestV01NeverExecutes/i{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"unknown","args":{}}]} (0.01s)
+    --- PASS: TestV01NeverExecutes/i{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe","argv":[],"unknown":true}}]} (0.01s)
+    --- PASS: TestV01NeverExecutes/i{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe"}}]} (0.01s)
+    --- PASS: TestV01NeverExecutes/t (0.01s)
+    --- PASS: TestV01NeverExecutes/tversion:_1 (0.01s)
+    --- PASS: TestV01NeverExecutes/t[] (0.00s)
+    --- PASS: TestV01NeverExecutes/t{}_{} (0.01s)
+    --- PASS: TestV01NeverExecutes/t� (0.01s)
+    --- PASS: TestV01NeverExecutes/t\ufeff\ufeff{} (0.01s)
+    --- PASS: TestV01NeverExecutes/t{"SECRET":1,"SECRET":2} (0.01s)
+    --- PASS: TestV01NeverExecutes/t{"version":"1"} (0.01s)
+    --- PASS: TestV01NeverExecutes/t{"version":2} (0.01s)
+    --- PASS: TestV01NeverExecutes/t{"version":1,"unknown":"secret"} (0.01s)
+    --- PASS: TestV01NeverExecutes/t{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"unknown","args":{}}]} (0.01s)
+    --- PASS: TestV01NeverExecutes/t{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe","argv":[],"unknown":true}}]} (0.01s)
+    --- PASS: TestV01NeverExecutes/t{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe"}}]} (0.01s)
+    --- PASS: TestV01NeverExecutes/v (0.01s)
+    --- PASS: TestV01NeverExecutes/vversion:_1 (0.01s)
+    --- PASS: TestV01NeverExecutes/v[] (0.01s)
+    --- PASS: TestV01NeverExecutes/v{}_{} (0.01s)
+    --- PASS: TestV01NeverExecutes/v� (0.01s)
+    --- PASS: TestV01NeverExecutes/v\ufeff\ufeff{} (0.01s)
+    --- PASS: TestV01NeverExecutes/v{"SECRET":1,"SECRET":2} (0.01s)
+    --- SKIP: TestV01NeverExecutes/v{"version":"1"} (0.00s)
+    --- PASS: TestV01NeverExecutes/v{"version":2} (0.01s)
+    --- PASS: TestV01NeverExecutes/v{"version":1,"unknown":"secret"} (0.02s)
+    --- PASS: TestV01NeverExecutes/v{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"unknown","args":{}}]} (0.02s)
+    --- PASS: TestV01NeverExecutes/v{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe","argv":[],"unknown":true}}]} (0.01s)
+    --- PASS: TestV01NeverExecutes/v{"version":1,"hosts":"all","tasks":[{"name":"secret","module":"command","args":{"executable":"C:\\a.exe"}}]} (0.01s)
+=== RUN   TestDiagnosticFailurePriority
+--- PASS: TestDiagnosticFailurePriority (0.00s)
+=== RUN   TestResultExecutorBoundary
+--- PASS: TestResultExecutorBoundary (0.01s)
+=== RUN   TestLastHostLastTaskFailsBeforeExecutor
+=== RUN   TestLastHostLastTaskFailsBeforeExecutor/last
+=== RUN   TestLastHostLastTaskFailsBeforeExecutor/last#01
+=== RUN   TestLastHostLastTaskFailsBeforeExecutor/last#02
+--- PASS: TestLastHostLastTaskFailsBeforeExecutor (0.06s)
+    --- PASS: TestLastHostLastTaskFailsBeforeExecutor/last (0.01s)
+    --- PASS: TestLastHostLastTaskFailsBeforeExecutor/last#01 (0.01s)
+    --- PASS: TestLastHostLastTaskFailsBeforeExecutor/last#02 (0.03s)
+=== RUN   TestWrapperCheckedBeforeExecution
+--- PASS: TestWrapperCheckedBeforeExecution (0.03s)
+=== RUN   TestBuiltInFileContent
+--- PASS: TestBuiltInFileContent (0.01s)
+=== RUN   TestRunEngine
+--- PASS: TestRunEngine (0.02s)
+=== RUN   TestLegacyRuntimeTaskAndOutput
+--- PASS: TestLegacyRuntimeTaskAndOutput (0.09s)
+=== RUN   TestOSPreflightNoConnections
+--- PASS: TestOSPreflightNoConnections (0.07s)
+=== RUN   TestRunResultsOutputFailurePriority
+=== RUN   TestRunResultsOutputFailurePriority/json/error/ok/none
+=== RUN   TestRunResultsOutputFailurePriority/json/error/ok/stdout
+=== RUN   TestRunResultsOutputFailurePriority/json/error/ok/stderr
+=== RUN   TestRunResultsOutputFailurePriority/json/error/error/none
+=== RUN   TestRunResultsOutputFailurePriority/json/error/error/stdout
+=== RUN   TestRunResultsOutputFailurePriority/json/error/error/stderr
+=== RUN   TestRunResultsOutputFailurePriority/json/error/short/none
+=== RUN   TestRunResultsOutputFailurePriority/json/error/short/stdout
+=== RUN   TestRunResultsOutputFailurePriority/json/error/short/stderr
+=== RUN   TestRunResultsOutputFailurePriority/json/short/ok/none
+=== RUN   TestRunResultsOutputFailurePriority/json/short/ok/stdout
+=== RUN   TestRunResultsOutputFailurePriority/json/short/ok/stderr
+=== RUN   TestRunResultsOutputFailurePriority/json/short/error/none
+=== RUN   TestRunResultsOutputFailurePriority/json/short/error/stdout
+=== RUN   TestRunResultsOutputFailurePriority/json/short/error/stderr
+=== RUN   TestRunResultsOutputFailurePriority/json/short/short/none
+=== RUN   TestRunResultsOutputFailurePriority/json/short/short/stdout
+=== RUN   TestRunResultsOutputFailurePriority/json/short/short/stderr
+=== RUN   TestRunResultsOutputFailurePriority/text/error/ok/none
+=== RUN   TestRunResultsOutputFailurePriority/text/error/ok/stdout
+=== RUN   TestRunResultsOutputFailurePriority/text/error/ok/stderr
+=== RUN   TestRunResultsOutputFailurePriority/text/error/error/none
+=== RUN   TestRunResultsOutputFailurePriority/text/error/error/stdout
+=== RUN   TestRunResultsOutputFailurePriority/text/error/error/stderr
+=== RUN   TestRunResultsOutputFailurePriority/text/error/short/none
+=== RUN   TestRunResultsOutputFailurePriority/text/error/short/stdout
+=== RUN   TestRunResultsOutputFailurePriority/text/error/short/stderr
+=== RUN   TestRunResultsOutputFailurePriority/text/short/ok/none
+=== RUN   TestRunResultsOutputFailurePriority/text/short/ok/stdout
+=== RUN   TestRunResultsOutputFailurePriority/text/short/ok/stderr
+=== RUN   TestRunResultsOutputFailurePriority/text/short/error/none
+=== RUN   TestRunResultsOutputFailurePriority/text/short/error/stdout
+=== RUN   TestRunResultsOutputFailurePriority/text/short/error/stderr
+=== RUN   TestRunResultsOutputFailurePriority/text/short/short/none
+=== RUN   TestRunResultsOutputFailurePriority/text/short/short/stdout
+=== RUN   TestRunResultsOutputFailurePriority/text/short/short/stderr
+--- PASS: TestRunResultsOutputFailurePriority (0.17s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/error/ok/none (0.01s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/error/ok/stdout (0.01s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/error/ok/stderr (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/error/error/none (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/error/error/stdout (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/error/error/stderr (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/error/short/none (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/error/short/stdout (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/error/short/stderr (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/short/ok/none (0.01s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/short/ok/stdout (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/short/ok/stderr (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/short/error/none (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/short/error/stdout (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/short/error/stderr (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/short/short/none (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/short/short/stdout (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/json/short/short/stderr (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/error/ok/none (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/error/ok/stdout (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/error/ok/stderr (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/error/error/none (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/error/error/stdout (0.01s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/error/error/stderr (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/error/short/none (0.02s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/error/short/stdout (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/error/short/stderr (0.03s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/short/ok/none (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/short/ok/stdout (0.01s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/short/ok/stderr (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/short/error/none (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/short/error/stdout (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/short/error/stderr (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/short/short/none (0.01s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/short/short/stdout (0.00s)
+    --- PASS: TestRunResultsOutputFailurePriority/text/short/short/stderr (0.00s)
+=== RUN   TestWindowsCLIConsoleHelper
+--- PASS: TestWindowsCLIConsoleHelper (0.00s)
+=== RUN   TestWindowsCLIProcess
+    process_windows_test.go:84: run validation runner with disposable SSH fixture
+--- SKIP: TestWindowsCLIProcess (0.00s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/cli	2.351s
+=== RUN   TestValid
+--- PASS: TestValid (0.02s)
+=== RUN   TestStrictJSON
+=== RUN   TestStrictJSON/#00
+=== RUN   TestStrictJSON/_
+=== RUN   TestStrictJSON/---_version:_1
+=== RUN   TestStrictJSON/[]
+=== RUN   TestStrictJSON/null
+=== RUN   TestStrictJSON/{}_{}
+=== RUN   TestStrictJSON/{}x
+=== RUN   TestStrictJSON/{
+=== RUN   TestStrictJSON/{"x":1,}
+=== RUN   TestStrictJSON/{/*comment*/}
+=== RUN   TestStrictJSON/{"x":1,"x":2}
+=== RUN   TestStrictJSON/{"x":{"a":1,"a":2}}
+=== RUN   TestStrictJSON/{"x":[{"a":1,"a":2}]}
+=== RUN   TestStrictJSON/\ufeff\ufeff{}
+=== RUN   TestStrictJSON/{"x":"�"}
+--- PASS: TestStrictJSON (0.07s)
+    --- PASS: TestStrictJSON/#00 (0.00s)
+    --- PASS: TestStrictJSON/_ (0.00s)
+    --- PASS: TestStrictJSON/---_version:_1 (0.00s)
+    --- PASS: TestStrictJSON/[] (0.00s)
+    --- PASS: TestStrictJSON/null (0.00s)
+    --- PASS: TestStrictJSON/{}_{} (0.00s)
+    --- PASS: TestStrictJSON/{}x (0.00s)
+    --- PASS: TestStrictJSON/{ (0.00s)
+    --- PASS: TestStrictJSON/{"x":1,} (0.00s)
+    --- PASS: TestStrictJSON/{/*comment*/} (0.01s)
+    --- PASS: TestStrictJSON/{"x":1,"x":2} (0.01s)
+    --- PASS: TestStrictJSON/{"x":{"a":1,"a":2}} (0.01s)
+    --- PASS: TestStrictJSON/{"x":[{"a":1,"a":2}]} (0.01s)
+    --- PASS: TestStrictJSON/\ufeff\ufeff{} (0.01s)
+    --- PASS: TestStrictJSON/{"x":"�"} (0.00s)
+=== RUN   TestSchemas
+--- PASS: TestSchemas (0.26s)
+=== RUN   TestWindowsPaths
+--- PASS: TestWindowsPaths (0.00s)
+=== RUN   TestMissingFile
+--- PASS: TestMissingFile (0.00s)
+=== RUN   TestSamples
+--- PASS: TestSamples (0.00s)
+=== RUN   TestHostOS
+--- PASS: TestHostOS (0.03s)
+=== RUN   TestOSSchemaBoundaries
+--- PASS: TestOSSchemaBoundaries (0.04s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/config	1.489s
+=== RUN   TestMixedBackends
+--- PASS: TestMixedBackends (0.03s)
+=== RUN   TestWindowsOSDefaultEquivalence
+--- PASS: TestWindowsOSDefaultEquivalence (0.01s)
+=== RUN   TestCommandResultBoundary
+--- PASS: TestCommandResultBoundary (0.00s)
+=== RUN   TestNoPartialPlan
+--- PASS: TestNoPartialPlan (0.06s)
+=== RUN   TestPlanSnapshot
+--- PASS: TestPlanSnapshot (0.06s)
+=== RUN   TestClassifiedTransportErrors
+=== RUN   TestClassifiedTransportErrors/connect/authentication
+=== RUN   TestClassifiedTransportErrors/connect/host_key
+=== RUN   TestClassifiedTransportErrors/connect/unknown_host_key
+=== RUN   TestClassifiedTransportErrors/connect/changed_host_key
+=== RUN   TestClassifiedTransportErrors/connect/internal
+=== RUN   TestClassifiedTransportErrors/connect/wrapped
+=== RUN   TestClassifiedTransportErrors/connect/unknown_code
+=== RUN   TestClassifiedTransportErrors/connect/raw
+=== RUN   TestClassifiedTransportErrors/run/authentication
+=== RUN   TestClassifiedTransportErrors/run/host_key
+=== RUN   TestClassifiedTransportErrors/run/unknown_host_key
+=== RUN   TestClassifiedTransportErrors/run/changed_host_key
+=== RUN   TestClassifiedTransportErrors/run/internal
+=== RUN   TestClassifiedTransportErrors/run/wrapped
+=== RUN   TestClassifiedTransportErrors/run/unknown_code
+=== RUN   TestClassifiedTransportErrors/run/raw
+--- PASS: TestClassifiedTransportErrors (0.00s)
+    --- PASS: TestClassifiedTransportErrors/connect/authentication (0.00s)
+    --- PASS: TestClassifiedTransportErrors/connect/host_key (0.00s)
+    --- PASS: TestClassifiedTransportErrors/connect/unknown_host_key (0.00s)
+    --- PASS: TestClassifiedTransportErrors/connect/changed_host_key (0.00s)
+    --- PASS: TestClassifiedTransportErrors/connect/internal (0.00s)
+    --- PASS: TestClassifiedTransportErrors/connect/wrapped (0.00s)
+    --- PASS: TestClassifiedTransportErrors/connect/unknown_code (0.00s)
+    --- PASS: TestClassifiedTransportErrors/connect/raw (0.00s)
+    --- PASS: TestClassifiedTransportErrors/run/authentication (0.00s)
+    --- PASS: TestClassifiedTransportErrors/run/host_key (0.00s)
+    --- PASS: TestClassifiedTransportErrors/run/unknown_host_key (0.00s)
+    --- PASS: TestClassifiedTransportErrors/run/changed_host_key (0.00s)
+    --- PASS: TestClassifiedTransportErrors/run/internal (0.00s)
+    --- PASS: TestClassifiedTransportErrors/run/wrapped (0.00s)
+    --- PASS: TestClassifiedTransportErrors/run/unknown_code (0.00s)
+    --- PASS: TestClassifiedTransportErrors/run/raw (0.00s)
+=== RUN   TestParallelFailure
+=== RUN   TestParallelFailure/1
+=== RUN   TestParallelFailure/3
+=== RUN   TestParallelFailure/64
+--- PASS: TestParallelFailure (0.06s)
+    --- PASS: TestParallelFailure/1 (0.04s)
+    --- PASS: TestParallelFailure/3 (0.01s)
+    --- PASS: TestParallelFailure/64 (0.01s)
+=== RUN   TestCancellationAndDeadline
+=== RUN   TestCancellationAndDeadline/false
+=== RUN   TestCancellationAndDeadline/true
+--- PASS: TestCancellationAndDeadline (0.00s)
+    --- PASS: TestCancellationAndDeadline/false (0.00s)
+    --- PASS: TestCancellationAndDeadline/true (0.00s)
+=== RUN   TestConnectCleanup
+=== RUN   TestConnectCleanup/failure
+=== RUN   TestConnectCleanup/cancel
+=== RUN   TestConnectCleanup/close
+--- PASS: TestConnectCleanup (0.00s)
+    --- PASS: TestConnectCleanup/failure (0.00s)
+    --- PASS: TestConnectCleanup/cancel (0.00s)
+    --- PASS: TestConnectCleanup/close (0.00s)
+=== RUN   TestTransportFailuresAndFreshDeadlines
+=== RUN   TestTransportFailuresAndFreshDeadlines/connect_deadline
+=== RUN   TestTransportFailuresAndFreshDeadlines/lost
+=== RUN   TestTransportFailuresAndFreshDeadlines/success
+--- PASS: TestTransportFailuresAndFreshDeadlines (0.05s)
+    --- PASS: TestTransportFailuresAndFreshDeadlines/connect_deadline (0.00s)
+    --- PASS: TestTransportFailuresAndFreshDeadlines/lost (0.00s)
+    --- PASS: TestTransportFailuresAndFreshDeadlines/success (0.05s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/engine	1.928s
+=== RUN   TestSelect
+--- PASS: TestSelect (0.00s)
+=== RUN   TestVariables
+--- PASS: TestVariables (0.00s)
+=== RUN   TestExpand
+--- PASS: TestExpand (0.00s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/inventory	1.137s
+=== RUN   TestLinuxBoundaries
+--- PASS: TestLinuxBoundaries (0.01s)
+=== RUN   TestCommandSSHLaunchAndDisconnect
+    command_ssh_windows_test.go:35: requires disposable Windows SSH fixture
+--- SKIP: TestCommandSSHLaunchAndDisconnect (0.00s)
+=== RUN   TestFileContentSSHLaunchAndDisconnect
+    command_ssh_windows_test.go:35: requires disposable Windows SSH fixture
+--- SKIP: TestFileContentSSHLaunchAndDisconnect (0.00s)
+=== RUN   TestCommandWindows
+    command_windows_test.go:41: CRT parser: msvcrt.dll __wgetmainargs; local exe=C:\Users\cocoo\AppData\Local\Temp\TestCommandWindows3360710465\001\日本語 空白.exe
+=== RUN   TestCommandWindows/cmd
+=== RUN   TestCommandWindows/cmd/wrapper_launch_boundaries
+    command_windows_test.go:133: real wrapper launch accepted: 7999 UTF-16 units mode=cmd
+    command_windows_test.go:133: real wrapper launch accepted: 8000 UTF-16 units mode=cmd
+=== RUN   TestCommandWindows/cmd/CRT_roundtrip
+=== RUN   TestCommandWindows/cmd/nonzero_and_bytes
+=== RUN   TestCommandWindows/cmd/receiver_boundaries
+=== RUN   TestCommandWindows/cmd/invalid_before_execution
+=== RUN   TestCommandWindows/cmd/EOF_required
+=== NAME  TestCommandWindows/cmd
+    command_windows_test.go:289: launch units=7185 mode=cmd
+--- PASS: TestCommandWindows (27.32s)
+    --- PASS: TestCommandWindows/cmd (26.57s)
+        --- PASS: TestCommandWindows/cmd/wrapper_launch_boundaries (1.59s)
+        --- PASS: TestCommandWindows/cmd/CRT_roundtrip (0.72s)
+        --- PASS: TestCommandWindows/cmd/nonzero_and_bytes (5.31s)
+        --- PASS: TestCommandWindows/cmd/receiver_boundaries (8.57s)
+        --- PASS: TestCommandWindows/cmd/invalid_before_execution (8.29s)
+        --- PASS: TestCommandWindows/cmd/EOF_required (2.09s)
+=== RUN   TestFileContentLinkSwapWindows
+    file_content_race_windows_test.go:34: file symlink privilege unavailable: symlink C:\Users\cocoo\AppData\Local\Temp\TestFileContentLinkSwapWindows2307531853\001\referent C:\Users\cocoo\AppData\Local\Temp\TestFileContentLinkSwapWindows2307531853\001\probe: A required privilege is not held by the client.
+--- SKIP: TestFileContentLinkSwapWindows (0.00s)
+=== RUN   TestFileContentSSH
+    file_content_ssh_windows_test.go:21: requires disposable Windows SSH fixture
+--- SKIP: TestFileContentSSH (0.00s)
+=== RUN   TestFileContentResponse
+--- PASS: TestFileContentResponse (0.00s)
+=== RUN   TestFileContentInvalidUTF8
+--- PASS: TestFileContentInvalidUTF8 (0.00s)
+=== RUN   TestFileContentWindows
+    file_content_windows_test.go:150: symlink privilege unavailable; junction reparse tests ran
+    file_content_windows_test.go:189: real cmd/Windows PowerShell file_content wrapper=7997 UTF-16 units; bytes, idempotence, limits, cleanup, locked file, DACL passed
+--- PASS: TestFileContentWindows (27.86s)
+=== RUN   TestLinuxCommandSSH
+    linux_command_ssh_test.go:29: run Linux fixture with product.ps1
+--- SKIP: TestLinuxCommandSSH (0.00s)
+=== RUN   TestLinuxDecoder
+--- PASS: TestLinuxDecoder (0.07s)
+=== RUN   TestLinuxFixedBackend
+--- PASS: TestLinuxFixedBackend (0.00s)
+=== RUN   TestCRT
+--- PASS: TestCRT (0.00s)
+=== RUN   TestContentBoundary
+--- PASS: TestContentBoundary (0.02s)
+=== RUN   TestJSONBoundaryAndOwnership
+--- PASS: TestJSONBoundaryAndOwnership (0.02s)
+=== RUN   TestWrapperBoundary
+--- PASS: TestWrapperBoundary (0.00s)
+=== RUN   TestSafeSizeDiagnostic
+--- PASS: TestSafeSizeDiagnostic (0.00s)
+=== RUN   TestCommandResponse
+--- PASS: TestCommandResponse (0.02s)
+=== RUN   TestDistributionWrapper
+    wrapper_test.go:6: Linux fixed launch bytes: 3474
+    wrapper_test.go:10: file_content wrapper UTF-16 units: 7997
+    wrapper_test.go:24: wrapper UTF-16 units: 7185
+--- PASS: TestDistributionWrapper (0.01s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/module	56.689s
+=== RUN   TestReportContract
+--- PASS: TestReportContract (0.00s)
+=== RUN   TestInvalidInternalResults
+--- PASS: TestInvalidInternalResults (0.00s)
+=== RUN   TestCaptureBoundaries
+--- PASS: TestCaptureBoundaries (0.10s)
+=== RUN   TestExitPriority
+--- PASS: TestExitPriority (0.00s)
+=== RUN   TestFinishFailuresAndCancellation
+--- PASS: TestFinishFailuresAndCancellation (0.00s)
+=== RUN   TestRenderBoundsExistingOutput
+--- PASS: TestRenderBoundsExistingOutput (0.01s)
+=== RUN   TestClassifiedTaskFailures
+--- PASS: TestClassifiedTaskFailures (0.00s)
+=== RUN   TestNullableResultRoundTrip
+--- PASS: TestNullableResultRoundTrip (0.00s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/result	1.436s
+=== RUN   TestLinuxOpenSSH
+    ssh_linux_container_test.go:27: run tests/linux-ssh/run.ps1
+--- SKIP: TestLinuxOpenSSH (0.00s)
+=== RUN   TestSSHTransferAndReuse
+--- PASS: TestSSHTransferAndReuse (11.20s)
+=== RUN   TestSSHRejectKeysAndAuthentication
+=== RUN   TestSSHRejectKeysAndAuthentication/unknown
+=== RUN   TestSSHRejectKeysAndAuthentication/changed
+=== RUN   TestSSHRejectKeysAndAuthentication/auth
+=== RUN   TestSSHRejectKeysAndAuthentication/missing_known
+=== RUN   TestSSHRejectKeysAndAuthentication/invalid_key
+=== RUN   TestSSHRejectKeysAndAuthentication/encrypted
+=== RUN   TestSSHRejectKeysAndAuthentication/wrong_passphrase
+=== RUN   TestSSHRejectKeysAndAuthentication/missing_passphrase
+--- PASS: TestSSHRejectKeysAndAuthentication (0.75s)
+    --- PASS: TestSSHRejectKeysAndAuthentication/unknown (0.02s)
+    --- PASS: TestSSHRejectKeysAndAuthentication/changed (0.02s)
+    --- PASS: TestSSHRejectKeysAndAuthentication/auth (0.02s)
+    --- PASS: TestSSHRejectKeysAndAuthentication/missing_known (0.01s)
+    --- PASS: TestSSHRejectKeysAndAuthentication/invalid_key (0.02s)
+    --- PASS: TestSSHRejectKeysAndAuthentication/encrypted (0.27s)
+    --- PASS: TestSSHRejectKeysAndAuthentication/wrong_passphrase (0.25s)
+    --- PASS: TestSSHRejectKeysAndAuthentication/missing_passphrase (0.14s)
+=== RUN   TestSSHHandshakeCancellation
+--- PASS: TestSSHHandshakeCancellation (0.10s)
+=== RUN   TestSSHExecRejected
+--- PASS: TestSSHExecRejected (0.02s)
+=== RUN   TestSSHDeadlineAndDisconnect
+=== RUN   TestSSHDeadlineAndDisconnect/blocked_exec
+=== RUN   TestSSHDeadlineAndDisconnect/blocked_send
+=== RUN   TestSSHDeadlineAndDisconnect/output_wait
+=== RUN   TestSSHDeadlineAndDisconnect/disconnect
+=== RUN   TestSSHDeadlineAndDisconnect/close
+--- PASS: TestSSHDeadlineAndDisconnect (0.57s)
+    --- PASS: TestSSHDeadlineAndDisconnect/blocked_exec (0.17s)
+    --- PASS: TestSSHDeadlineAndDisconnect/blocked_send (0.17s)
+    --- PASS: TestSSHDeadlineAndDisconnect/output_wait (0.17s)
+    --- PASS: TestSSHDeadlineAndDisconnect/disconnect (0.02s)
+    --- PASS: TestSSHDeadlineAndDisconnect/close (0.04s)
+=== RUN   TestBoundedOutputBoundary
+--- PASS: TestBoundedOutputBoundary (0.00s)
+=== RUN   TestWrapperEnvelopeBoundary
+--- PASS: TestWrapperEnvelopeBoundary (0.00s)
+=== RUN   TestWindowsOpenSSH
+    ssh_windows_container_test.go:33: run tests/windows-ssh/run.ps1
+--- SKIP: TestWindowsOpenSSH (0.00s)
+=== RUN   TestProcessAndCommunicationAreIndependent
+=== RUN   TestProcessAndCommunicationAreIndependent/success
+=== RUN   TestProcessAndCommunicationAreIndependent/process_failure
+=== RUN   TestProcessAndCommunicationAreIndependent/transport_failure
+--- PASS: TestProcessAndCommunicationAreIndependent (0.00s)
+    --- PASS: TestProcessAndCommunicationAreIndependent/success (0.00s)
+    --- PASS: TestProcessAndCommunicationAreIndependent/process_failure (0.00s)
+    --- PASS: TestProcessAndCommunicationAreIndependent/transport_failure (0.00s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/transport	14.643s

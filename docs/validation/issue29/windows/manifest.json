@@ -1,0 +1,59 @@
+{
+  "source_sha": "0623209ff3004aa704ddf05d1abfa9e2811a1386",
+  "source_status": [],
+  "started_utc": "2026-11-08T11:32:58.3094693Z",
+  "base_image": "mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09",
+  "checks": [
+    {
+      "command": "go test ./... -count=1 -v -timeout=8m",
+      "exit_code": 0,
+      "name": "test",
+      "log": "test.log"
+    },
+    {
+      "command": "go vet ./...",
+      "exit_code": 0,
+      "name": "vet",
+      "log": "vet.log"
+    },
+    {
+      "command": "go test ./internal/module -run ^TestDistributionWrapper$ -count=1 -v",
+      "exit_code": 0,
+      "name": "wrappers",
+      "log": "wrappers.log"
+    },
+    {
+      "command": "verify common distribution",
+      "exit_code": 0,
+      "name": "build",
+      "log": "build.log"
+    },
+    {
+      "command": "go test -c -o C:\\data\\dev\\github\\wintable\\.cache\\issue29\\.cache\\ci\\windows/module.test.exe ./internal/module",
+      "exit_code": 0,
+      "name": "module_binary",
+      "log": "module_binary.log"
+    },
+    {
+      "command": "docker run --name wintable-native-9b0db9869060 --isolation hyperv --mount type=bind,source=C:\\data\\dev\\github\\wintable\\.cache\\issue29\\.cache\\ci\\windows,target=C:/validation,readonly mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09 C:/validation/module.test.exe -test.run=^TestFileContentWindows$ -test.v -test.timeout=3m",
+      "exit_code": 0,
+      "name": "native_container",
+      "log": "native-container.log"
+    }
+  ],
+  "acceptance": "passed",
+  "launch_measurement": "UTF-16 code units of cmd.exe /c plus quoted fixed wrapper; non-BMP counts as 2; limit 8000",
+  "runner_sha256": "F5A5DCC3E385747A740859D8AAE5F9C7812E8BC54413EA2DEA3D2CBB881DBFBF",
+  "coverage_sha256": "C4EC856C2E535DA734C1BFFD8D1B4619F26878D0D7B5F2F4B82569399E5F980E",
+  "go": "go version go1.27.3 windows/amd64",
+  "controller": {
+    "os": "Microsoft Windows NT 10.0.26300.0",
+    "powershell": "7.6.9",
+    "architecture": "AMD64"
+  },
+  "native_container_removed": true,
+  "exe_sha256": "0498845FA630949B21D259EA04C6B22A6470031694330591EACD5C7EE058034C",
+  "ssh_fixture": "completed; see ssh/manifest.json for commands and exit codes",
+  "finished_utc": "2026-11-08T11:39:22.3546289Z",
+  "prerequisites_passed": true
+}

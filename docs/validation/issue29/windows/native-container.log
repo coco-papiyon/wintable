@@ -1,0 +1,4 @@
+=== RUN   TestFileContentWindows
+    file_content_windows_test.go:189: real cmd/Windows PowerShell file_content wrapper=7997 UTF-16 units; bytes, idempotence, limits, cleanup, locked file, DACL passed
+--- PASS: TestFileContentWindows (65.87s)
+PASS

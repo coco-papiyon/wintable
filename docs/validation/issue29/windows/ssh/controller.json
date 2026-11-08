@@ -1,0 +1,9 @@
+{
+  "base_image": "mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09",
+  "isolation": "hyperv",
+  "source_sha": "0623209ff3004aa704ddf05d1abfa9e2811a1386",
+  "exit_code": 0,
+  "removed": true,
+  "exe_sha256": "0498845FA630949B21D259EA04C6B22A6470031694330591EACD5C7EE058034C",
+  "command": "docker run --name wintable-controller-c15b3e0d1c68 --isolation hyperv --mount type=bind,source=C:\\data\\dev\\github\\wintable\\.cache\\issue29\\.cache\\ci\\windows\\ssh\\controller,target=C:/validation,readonly mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09 powershell.exe -NoProfile -File C:/validation/cases.ps1"
+}
