@@ -12,7 +12,10 @@ if ($principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
 foreach ($tool in 'go','wsl','python','python3','py') {
     if (Get-Command $tool -ErrorAction SilentlyContinue) { throw "Unexpected tool: $tool" }
 }
-$install = Join-Path $env:TEMP '日本語 ZIP 配布'
+# ASCII source also works when Windows PowerShell 5.1 reads a BOM-less script.
+$folder = (-join ([char[]]@(0x65e5,0x672c,0x8a9e))) + ' ZIP ' + (-join ([char[]]@(0x914d,0x5e03)))
+$install = Join-Path $env:TEMP $folder
+if ($install -notmatch '[\u3040-\u9fff]' -or $install -notmatch ' ') { throw 'Japanese/space path missing' }
 Expand-Archive -LiteralPath C:/validation/candidate.zip -DestinationPath $install
 $rows = Get-Content "$install/SHA256.json" -Raw | ConvertFrom-Json
 foreach ($row in $rows) {
