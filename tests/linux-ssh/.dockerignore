@@ -1,0 +1,7 @@
+*
+!Dockerfile
+!packages.install
+!sshd_config
+!probe.py
+!versions.py
+!start.sh

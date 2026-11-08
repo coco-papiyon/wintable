@@ -3,6 +3,10 @@ package module
 import "testing"
 
 func TestDistributionWrapper(t *testing.T) {
+	t.Logf("Linux fixed launch bytes: %d", len(LinuxCommandWrapper()))
+	if err := ValidateLinuxWrapper(LinuxCommandWrapper()); err != nil {
+		t.Fatal(err)
+	}
 	t.Logf("file_content wrapper UTF-16 units: %d", UTF16Len(WrapperLaunchLine(FileContentWrapper())))
 	if err := ValidateFileContentWrapper(); err != nil {
 		t.Fatal(err)

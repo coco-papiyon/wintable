@@ -1,5 +1,7 @@
 # commandモジュール（I-07）
 
+この文書はWindows backendの契約。Linux backendは [Linux command](linux-command.md) を参照。
+
 commandはCRT規則でargvを受け取るWindows絶対パスの.exeに限定します。cmd.exe、バッチ、.com/.ps1、独自引数解析exe、シェル構文は対応しません。コマンドは非冪等です。終了0はchanged=true、非0はfailed/changed=nullで子の終了値を返します。通信断・期限切れは変更不明で、自動再送しません。
 
 ## 固定コードとプロトコル

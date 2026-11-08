@@ -1,7 +1,6 @@
 package module
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/coco-papiyon/wintable/internal/config"
 	"github.com/coco-papiyon/wintable/internal/transport"
@@ -138,15 +137,5 @@ func Prepare(host string, task int, kind string, args map[string]any) (Prepared,
 	default:
 		return bad()
 	}
-	data, e := json.Marshal(struct {
-		Module string         `json:"module"`
-		Args   map[string]any `json:"args"`
-	}{kind, args})
-	if e != nil {
-		return bad()
-	}
-	if e = size(len(data), JSONLimit); e != nil {
-		return Prepared{}, e
-	}
-	return Prepared{data}, nil
+	return Serialize(host, task, kind, args)
 }

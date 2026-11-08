@@ -1,0 +1,74 @@
+[
+  {
+    "exit_code": 0,
+    "actual_status": "passed",
+    "physical_remaining": 0,
+    "case": "normal",
+    "expected_exit": "0",
+    "run_id": "48d78f4dfefa4575b1f7ac23d9a71109",
+    "cleanup_ok": true
+  },
+  {
+    "exit_code": 1,
+    "actual_status": "failed",
+    "physical_remaining": 0,
+    "case": "partial",
+    "expected_exit": "nonzero",
+    "run_id": "6add41e6702d45acbadee6cdab3b4236",
+    "cleanup_ok": true
+  },
+  {
+    "exit_code": 1,
+    "actual_status": "failed",
+    "physical_remaining": 0,
+    "case": "startup",
+    "expected_exit": "nonzero",
+    "run_id": "5ff64f485aa84494a1c6a017d6a40e34",
+    "cleanup_ok": true
+  },
+  {
+    "exit_code": 1,
+    "actual_status": "failed",
+    "physical_remaining": 0,
+    "case": "test",
+    "expected_exit": "nonzero",
+    "run_id": "1f54c5329bbe463ead5e1a410e3dfc0e",
+    "cleanup_ok": true
+  },
+  {
+    "exit_code": 1,
+    "actual_status": "failed",
+    "physical_remaining": 0,
+    "case": "ready-timeout",
+    "expected_exit": "nonzero",
+    "run_id": "39754b25f1104b529b887c60aa61ce34",
+    "cleanup_ok": true
+  },
+  {
+    "exit_code": 1,
+    "actual_status": "failed",
+    "physical_remaining": 0,
+    "case": "timeout",
+    "expected_exit": "nonzero",
+    "run_id": "ed8da0e6011243acbe19b6281b3df45f",
+    "cleanup_ok": true
+  },
+  {
+    "exit_code": 1,
+    "actual_status": "failed",
+    "physical_remaining": 0,
+    "case": "cleanup",
+    "expected_exit": "nonzero",
+    "run_id": "87c6a74b20a34b57932001a25de36706",
+    "cleanup_ok": false
+  },
+  {
+    "exit_code": 1,
+    "actual_status": "failed",
+    "physical_remaining": 0,
+    "case": "bad-lock",
+    "expected_exit": "nonzero",
+    "run_id": "2ca9c9677190484b8ab45bf372c44ece",
+    "cleanup_ok": true
+  }
+]

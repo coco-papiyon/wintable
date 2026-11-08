@@ -18,6 +18,7 @@ const ConnectionTimeout = 10 * time.Second
 // Decode returns only module-owned status, changed and classified error fields.
 // Engine owns identity, timing, transport errors, exit code and output capture.
 type Runtime struct {
+	Backends  module.Backends
 	Connector transport.Connector
 	Wrappers  map[string]string
 	Decode    func(TaskPlan, transport.Response) (result.Status, *bool, *result.Error)
@@ -28,7 +29,7 @@ type Runtime struct {
 // Execute consumes an entirely validated plan. It never retries or reserializes
 // payloads. Slots remain occupied until session cleanup has completed.
 func (r Runtime) Execute(ctx context.Context, p *Plan, forks int, timeout time.Duration, output bool) ([]result.TaskResult, error) {
-	if p == nil || forks < 1 || forks > 64 || timeout <= 0 || r.Connector == nil || (r.Decode == nil && r.DecodeResult == nil) {
+	if p == nil || forks < 1 || forks > 64 || timeout <= 0 || r.Connector == nil {
 		return nil, result.PublicError("internal_error")
 	}
 	hosts := append([]HostPlan(nil), p.Hosts...)
@@ -38,7 +39,11 @@ func (r Runtime) Execute(ctx context.Context, p *Plan, forks int, timeout time.D
 			return nil, result.PublicError("internal_error")
 		}
 		for _, t := range h.Tasks {
-			if module.ValidateWrapper(r.Wrappers[t.Module]) != nil {
+			if t.Backend != nil {
+				if t.Backend.Target != (module.Key{OS: h.OS, Module: t.Module}) || t.Backend.Check() != nil {
+					return nil, result.PublicError("internal_error")
+				}
+			} else if (h.OS != "" && h.OS != "windows") || (r.Decode == nil && r.DecodeResult == nil) || module.ValidateWrapper(r.Wrappers[t.Module]) != nil {
 				return nil, result.PublicError("internal_error")
 			}
 		}
@@ -160,7 +165,12 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 		if ctx.Err() != nil {
 			return append(rows, unstarted(h, i, result.Cancelled, "cancelled")...), nil
 		}
-		request, _ := t.Payload.Request(r.Wrappers[t.Module])
+		var request transport.Request
+		if t.Backend != nil {
+			request = t.Backend.Request(t.Payload)
+		} else {
+			request, _ = t.Payload.Request(r.Wrappers[t.Module])
+		}
 		taskCtx, stop := context.WithTimeout(ctx, timeout)
 		done, watched := make(chan struct{}), make(chan struct{})
 		go func() {
@@ -179,7 +189,7 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 		deadline := taskCtx.Err() != nil || errors.Is(runErr, context.DeadlineExceeded)
 		stop()
 		row := result.TaskResult{Host: h.Name, Task: t.Name, TaskIndex: i, DurationMS: time.Since(start).Milliseconds(), ExitCode: response.ExitCode}
-		if r.DecodeResult != nil {
+		if r.DecodeResult != nil || t.Backend != nil {
 			row.ExitCode = nil
 		} // outer wrapper status is never a child exit code
 		switch {
@@ -193,8 +203,13 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 			row.Status = result.Failed
 			row.Error = transportError(runErr, "connection_lost")
 		default:
-			if r.DecodeResult != nil {
-				decoded := r.DecodeResult(t, response, output)
+			if r.DecodeResult != nil || t.Backend != nil {
+				var decoded result.TaskResult
+				if t.Backend != nil {
+					decoded = t.Backend.Decode(response, output)
+				} else {
+					decoded = r.DecodeResult(t, response, output)
+				}
 				row.Status, row.Changed, row.Error, row.ExitCode = decoded.Status, decoded.Changed, decoded.Error, decoded.ExitCode
 				row.StdoutBase64, row.StderrBase64 = decoded.StdoutBase64, decoded.StderrBase64
 				row.StdoutTruncated, row.StderrTruncated = decoded.StdoutTruncated, decoded.StderrTruncated
@@ -210,7 +225,7 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 				row.Error = result.PublicError(row.Error.Code)
 			}
 		}
-		if output && r.DecodeResult == nil {
+		if output && r.DecodeResult == nil && t.Backend == nil {
 			a, b := result.NewCapture(true), result.NewCapture(true)
 			a.Write(response.Stdout)
 			b.Write(response.Stderr)

@@ -52,3 +52,22 @@ SSH接続の設定・依存監査・検証範囲は [SSH transport](docs/ssh-tra
 関連: [モジュール一覧と設計](docs/design/modules.md)。
 
 Linux対象の追加設計: [ADR-0001: LinuxをSSH実行対象に追加する](docs/adr/0001-linux-target-support.md)。設計決定であり、現行CLIのLinux対応を示すものではありません。
+
+## inventory OSとCLI互換性
+
+hostの `os` はリテラル `windows` / `linux` のみ。省略は `windows`。
+空文字・null・変数式・未知値、defaults/groupのosは拒否する。
+対象パスはホスト別変数展開後にOS/module backendが検査する。
+制御側の鍵・known_hostsのパス解決とは独立している。
+
+| inventory v1 | OS追加前CLI | 本CLI |
+| --- | --- | --- |
+| os省略 | Windows両module | Windows両module（従来と同じ） |
+| os: windows | 未知キーで終了2 | Windows両module |
+| os: linux | 未知キーで終了2 | commandのみ。file_contentは接続前に終了2 |
+
+inventory/tasksのversion=1、結果形式は維持する。Linux command backendを実装済み。
+対象はDebian 13 amd64、OpenSSH、POSIX互換/bin/sh、/usr/bin/python3のCPython 3.13系。
+Windows制御端末から使用する。対応公開・CIは#29、Linux file_contentは後続実装。
+実行契約と検証範囲は [Linux command](docs/linux-command.md) を参照。
+詳細は [backend境界](docs/backend-boundary.md) を参照。
