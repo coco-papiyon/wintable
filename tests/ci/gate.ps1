@@ -15,6 +15,12 @@ $ws=Read-JSON 'windows/ssh/manifest.json'
 $l=Read-JSON 'linux/manifest.json'
 $ph=Read-JSON 'linux/product-hash.json'
 $example=Read-JSON 'linux/document-example.json'
+$controller=Read-JSON 'windows/ssh/controller.json'
+if ($null -eq $controller.zip_exit_code -or $controller.zip_exit_code -ne 0 -or
+    $controller.zip_container_removed -ne $true -or $controller.zip_sha256 -notmatch '^[a-fA-F0-9]{64}$' -or
+    !(Select-String -LiteralPath "$EvidenceDirectory/windows/ssh/zip-controller.log" -SimpleMatch 'ZIP_CONTROLLER_PASS' -Quiet)) {
+    throw 'Windows ZIP controller acceptance incomplete'
+}
 if (@($l.source_status | Where-Object { $_ }).Count -or $l.go -notmatch 'go1\.27\.3') { throw 'Linux source/toolchain mismatch' }
 foreach ($m in @($w,$ws,$l,$example)) { if ($m.source_sha -cne $SourceSHA) { throw 'Evidence source mismatch' } }
 foreach ($h in @($w.exe_sha256,$ph.Hash,$example.exe_sha256)) { if ($h -cne $hash) { throw 'Evidence executable mismatch' } }

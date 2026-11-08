@@ -13,7 +13,7 @@ try {
         New-Item -ItemType Directory (Split-Path $path) -Force | Out-Null
         Set-Content $path 'synthetic gate test; not a distribution'
     }
-    if ((Get-Content "$root/scripts/distribution.ps1" -Raw) -notmatch 'docs/linux-command\.md') { throw 'Linux documentation missing from distribution staging' }
+    if ((Get-Content "$root/scripts/distribution.ps1" -Raw) -notmatch 'Copy-Item docs/\*\.md') { throw 'Module and support documentation missing from distribution staging' }
     $sha = 'a' * 40
     @(@{name='Go';version='go1.27.3';license='Go-LICENSE'}) | ConvertTo-Json -AsArray | Set-Content "$stage/licenses/index.json"
     @{source_commit=$sha} | ConvertTo-Json | Set-Content "$stage/build.json"

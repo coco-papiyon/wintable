@@ -12,7 +12,7 @@ try {
         'synthetic' | Set-Content "$root/package/$path"
     }
     Save @{source_sha='source';go='go version go1.27.3 windows/amd64';files=@($paths | ForEach-Object {@{path=$_;sha256=(Get-FileHash "$root/package/$_").Hash}})} 'package/distribution.json'
-    foreach ($mode in 'valid','skip','missing','duplicate','null-exit','wrong-source','wrong-binary','versions','cleanup','deadline','job-failed','job-skipped','job-cancelled','missing-artifact','windows-missing') {
+    foreach ($mode in 'valid','skip','missing','duplicate','null-exit','wrong-source','wrong-binary','versions','cleanup','deadline','job-failed','job-skipped','job-cancelled','missing-artifact','windows-missing','zip-missing','zip-failed','zip-not-removed') {
         $wc=Get-Content "$PSScriptRoot/../validation/coverage.json" -Raw | ConvertFrom-Json
         foreach ($file in @($wc | ForEach-Object {$_.checks.PSObject.Properties.Name}) | Sort-Object -Unique) {
             $names=@($wc | ForEach-Object {$_.checks.PSObject.Properties | Where-Object Name -ceq $file | ForEach-Object Value}) | Sort-Object -Unique
@@ -26,7 +26,8 @@ try {
         })
         $w=@{source_sha='source';exe_sha256=$hash;acceptance='passed';prerequisites_passed=$true;checks=$checks;source_status=@();native_container_removed=$true;coverage_sha256=(Get-FileHash "$root/windows/coverage.json").Hash}
         $ws=@{source_sha='source';source_status=@();container_removed=$true;image_removed=$true;test_exit_code=0;command_test_exit_code=0;cli_test_exit_code=0}
-        Save @{source_sha='source';exe_sha256=$hash;exit_code=0;removed=$true} 'windows/ssh/controller.json'
+        $controller=@{source_sha='source';exe_sha256=$hash;exit_code=0;removed=$true;zip_exit_code=0;zip_container_removed=$true;zip_sha256=('a'*64)}
+        'ZIP_CONTROLLER_PASS' | Set-Content "$root/windows/ssh/zip-controller.log"
         'CLEAN_CONTROLLER_PASS' | Set-Content "$root/windows/ssh/controller.log"
         foreach ($name in 'TestHostOS','TestOSSchemaBoundaries','TestOSPreflightNoConnections','TestMixedBackends','TestLinuxBoundaries','TestLinuxFixedBackend','TestLinuxDecoder') { "--- PASS: $name (0.01s)" | Add-Content "$root/windows/test.log" }
         $l=@{source_sha='source';go='go version go1.27.3 windows/amd64';source_status=@();lock_sha256=(Get-FileHash "$PSScriptRoot/../linux-ssh/fixture.lock.json").Hash;status='passed';cleanup_ok=$true;product=@{exit_code=0};started_utc='2026-11-08T00:00:00Z';finished_utc='2026-11-08T00:02:00Z';cleanup=@('container','network','image','credentials' | ForEach-Object {@{kind=$_;remaining=0}})}
@@ -51,8 +52,12 @@ try {
             'job-skipped' {$job='skipped'}
             'job-cancelled' {$job='cancelled'}
             'windows-missing' { '--- PASS: parent (0.01s)' | Set-Content "$root/windows/ssh/test.log" }
+            'zip-missing' { $controller.zip_exit_code=$null }
+            'zip-failed' { $controller.zip_exit_code=1 }
+            'zip-not-removed' { $controller.zip_container_removed=$false }
         }
         Save $w 'windows/manifest.json'; Save $ws 'windows/ssh/manifest.json'
+        Save $controller 'windows/ssh/controller.json'
         Save $l 'linux/manifest.json'; Save $e 'linux/document-example.json'; Save $v 'linux/version-comparison.json'
         Save @{Hash=$hash} 'linux/product-hash.json'
         if ($mode -eq 'missing-artifact') { Remove-Item -LiteralPath "$root/linux/product-hash.json" }

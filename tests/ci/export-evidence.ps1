@@ -3,9 +3,9 @@ $ErrorActionPreference='Stop'
 # Explicit filenames only. Never upload a fixture directory, context or credentials.
 $files=if ($Kind -eq 'windows') {
     @('manifest.json','coverage.json','scenarios.csv','test-cases.csv','sha256.csv','test.log','vet.log','wrappers.log','build.log','module_binary.log','native-container.log',
-      'ssh/manifest.json','ssh/controller.json','ssh/controller.log','ssh/cli-test.log','ssh/command-test.log','ssh/test.log')
+      'ssh/manifest.json','ssh/controller.json','ssh/controller.log','ssh/zip-controller.log','ssh/cli-test.log','ssh/command-test.log','ssh/test.log')
 } else {
-    @('manifest.json','versions.json','version-comparison.json','test.jsonl','product.jsonl','product-hash.json','document-example.json','starts','hash.json','flood.json','wait.json','ssh-policy.json')
+    @('manifest.json','versions.json','version-comparison.json','test.jsonl','product.jsonl','product-hash.json','product-failure.json','document-example.json','starts','hash.json','flood.json','wait.json','ssh-policy.json')
 }
 foreach ($file in $files) {
     $from=Join-Path $InputDirectory $file

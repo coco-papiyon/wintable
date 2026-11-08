@@ -5,6 +5,8 @@
 Windows対象ジョブとLinux対象ジョブは同じartifactを取得し再buildしない。
 配布候補には埋込Windows/Python receiverを含むexe、README、docs、examplesを同梱し、
 ZIP展開後の全ファイルhashとexe helpを検査する。ランタイムの外部Pythonソース配布は不要。
+候補作成は既存の `scripts/distribution.ps1` を再利用し、依存脆弱性監査、MITライセンス、
+Goと全依存のライセンス・通知、配布ZIP検査を維持する。監査の失敗も公開を拒否する。
 
 ## runnerの用意
 
@@ -41,6 +43,8 @@ workflowのLinux呼出しに `-DockerContext <alias> -TunnelHost <same-alias>` �
 一意なPASS、版照合、有限期限、清掃成功を検査する。親PASSで子SKIPを補わない。
 失敗・取消・未実行・欠落artifact・null終了値・重複は公開不可。
 合格時だけ`validated-distribution`を生成する。GitHub Releaseへの自動投稿は行わない。
+Windowsでは同じ候補をZIP化し、既存の非管理者・日本語空白パス・Go/WSL/Pythonなしの
+導入検査も実行する。`zip-controller.log` の完了マーカー、終了0、コンテナ清掃が必須。
 公開者はこのworkflowの同一SHAの`publication-gate`合格とartifactを使う。
 branch protectionの必須チェックにも同名jobを設定する。実装時点で保護設定は未変更。
 
@@ -63,11 +67,13 @@ Windowsはmanifestのimage/container名をDocker inspectで照合してその実
 ## ローカル再現
 
 ```powershell
-./build.ps1
 ./tests/ci/package.ps1 # dist/packageは新規ディレクトリ
+Copy-Item dist/package/wintable.exe dist/wintable.exe
 ./tests/ci/test-gate.ps1
 ./tests/validation/test-summary.ps1
 # Windows containersモード
+Compress-Archive -Path dist/package/* -DestinationPath dist/windows-candidate.zip
+$env:WINTABLE_DISTRIBUTION_ZIP="$pwd/dist/windows-candidate.zip"
 ./tests/validation/run.ps1 -DistributionDirectory "$pwd/dist/package" -OutputDirectory .cache/ci/windows
 # 専用Linux containers環境で、同じcheckoutと配布物を使う
 ./tests/linux-ssh/run.ps1 -DockerContext desktop-linux -ProductTestScript ./tests/linux-ssh/product.ps1 -OutputDirectory .cache/ci/linux

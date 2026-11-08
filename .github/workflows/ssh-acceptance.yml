@@ -30,11 +30,17 @@ jobs:
           go-version: '1.27.3'
           cache: false
       - run: |
-          ./build.ps1
           ./tests/ci/package.ps1
           ./tests/ci/check-package.ps1 -Directory dist/package -SourceSHA '${{ github.sha }}'
           ./tests/ci/test-gate.ps1
           ./tests/validation/test-summary.ps1
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: candidate-audit
+          path: dist/package-audit/audit.json
+          if-no-files-found: warn
+          retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: candidate
@@ -58,7 +64,11 @@ jobs:
         with:
           name: candidate
           path: dist/package
-      - run: ./tests/validation/run.ps1 -DistributionDirectory "$pwd/dist/package" -OutputDirectory "$pwd/.cache/ci/windows"
+      - run: |
+          New-Item .cache -ItemType Directory -Force | Out-Null
+          Compress-Archive -Path dist/package/* -DestinationPath .cache/windows-candidate.zip
+          $env:WINTABLE_DISTRIBUTION_ZIP="$pwd/.cache/windows-candidate.zip"
+          ./tests/validation/run.ps1 -DistributionDirectory "$pwd/dist/package" -OutputDirectory "$pwd/.cache/ci/windows"
       - if: always()
         run: ./tests/ci/export-evidence.ps1 -Kind windows -InputDirectory .cache/ci/windows -OutputDirectory .cache/upload
       - if: always()
