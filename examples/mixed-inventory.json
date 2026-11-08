@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "hosts": {
+    "win01": {
+      "address": "win01.example.test",
+      "known_hosts_file": "./known_hosts",
+      "port": 22,
+      "user": "automation",
+      "private_key_file": "./keys/automation",
+      "os": "windows",
+      "vars": {
+        "exe": "C:\\Windows\\System32\\whoami.exe"
+      }
+    },
+    "linux01": {
+      "address": "linux01.example.test",
+      "known_hosts_file": "./known_hosts",
+      "port": 22,
+      "user": "automation",
+      "private_key_file": "./keys/automation",
+      "os": "linux",
+      "vars": {
+        "exe": "/usr/bin/whoami"
+      }
+    }
+  }
+}

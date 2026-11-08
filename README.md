@@ -1,6 +1,6 @@
 # wintable
 
-Windowsネイティブで動作するGo製の構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、commandモジュール、結果集計・描画を実装しています。file_contentの実行はIssue #10で実装します。
+Windowsネイティブで動作するGo製の構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、commandモジュール、結果集計・描画を実装しています。Windows file_contentとLinux commandも実装済みです。
 
 - [Windows版Ansible相当ツールの設計](docs/design/windows-ansible.md)
 - [検証計画と後続実装](docs/design/windows-ansible-validation.md)
@@ -26,7 +26,7 @@ $env:CGO_ENABLED = '0'
 
 helpは終了0、不正引数は終了2。入力ファイルも検証し、不正入力は接続前に終了2となります。[サンプル](examples/)を参照してください。commandとfile_contentのrunは実際にSSHへ接続します。file_contentはBOMなしUTF-8のバイト比較を行い、差分があるときだけ安全な置換を行います。詳細は[file_contentモジュール](docs/file-content-module.md)を参照してください。Ctrl+Cのcontextを伝播します。
 
-`--include-output` は既定falseです。有効にすると任意コマンドの出力に秘密が含まれ得ます。完全な自動マスキングは保証しません。commandの実機検証範囲と未確認事項は [commandモジュール](docs/command-module.md) を参照してください。Windows CI・ZIP配布は後続Issueです。
+`--include-output` は既定falseです。有効にすると任意コマンドの出力に秘密が含まれ得ます。完全な自動マスキングは保証しません。commandの実機検証範囲と未確認事項は [commandモジュール](docs/command-module.md) を参照してください。CIとZIP配布の条件は [CI手順](docs/ci.md)、保証範囲は [対応表](docs/support.md) を参照してください。
 
 結果集計・JSON／テキスト描画・終了判定は `internal/result` に実装済みです。
 `cli.RunResults` に結果を返すExecutorを注入すると、ホスト名／task_index順の単一JSON文書またはテキストをstdoutへ、定型診断をstderrへ出します。
@@ -46,7 +46,7 @@ SSH接続の設定・依存監査・検証範囲は [SSH transport](docs/ssh-tra
 
 関連: [モジュール一覧と設計](docs/design/modules.md)。
 
-Linux対象の追加設計: [ADR-0001: LinuxをSSH実行対象に追加する](docs/adr/0001-linux-target-support.md)。設計決定であり、現行CLIのLinux対応を示すものではありません。
+Linux対象の追加設計: [ADR-0001: LinuxをSSH実行対象に追加する](docs/adr/0001-linux-target-support.md)。実装と対応公開の状態は [対応表](docs/support.md) を参照してください。
 
 ## inventory OSとCLI互換性
 
@@ -63,6 +63,17 @@ hostの `os` はリテラル `windows` / `linux` のみ。省略は `windows`。
 
 inventory/tasksのversion=1、結果形式は維持する。Linux command backendを実装済み。
 対象はDebian 13 amd64、OpenSSH、POSIX互換/bin/sh、/usr/bin/python3のCPython 3.13系。
-Windows制御端末から使用する。対応公開・CIは#29、Linux file_contentは後続実装。
+Windows制御端末から使用する。Pythonは事前導入が必要で自動導入しない。Linux file_contentは未対応。CIでの対応公開は両OS・同一SHAの必須試験合格を条件とし、runner未登録の現状では未確認。
 実行契約と検証範囲は [Linux command](docs/linux-command.md) を参照。
 詳細は [backend境界](docs/backend-boundary.md) を参照。
+
+Linux例: `examples/linux-inventory.json` / `examples/linux-command.json`。
+混在例: `examples/mixed-inventory.json` / `examples/mixed-command.json`。
+接続情報を編集し、次のように実行します。
+
+```powershell
+./dist/wintable.exe run --inventory examples/linux-inventory.json --tasks examples/linux-command.json --format json
+```
+
+[対応表・制限](docs/support.md) / [CI・配布・試験手順](docs/ci.md)。
+混在単一runの実機E2Eは未確認。切断後の子孫停止は保証しません。

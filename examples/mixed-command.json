@@ -1,0 +1,14 @@
+{
+  "hosts": "all",
+  "tasks": [
+    {
+      "name": "接続ユーザーの確認",
+      "module": "command",
+      "args": {
+        "executable": "${exe}",
+        "argv": []
+      }
+    }
+  ],
+  "version": 1
+}

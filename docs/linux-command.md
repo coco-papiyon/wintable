@@ -3,7 +3,7 @@
 Windows製品CLIのhostに `"os":"linux"` を指定するとLinux command backendを使う。
 対象はDebian 13 amd64 / OpenSSH / POSIX互換 `/bin/sh` / `/usr/bin/python3` の
 CPython 3.13系。制御端末はWindows。Linux file_content、sudo/become、汎用shell、
-package/systemd、再起動は対象外。対応公開・CIはIssue #29で扱う。
+package/systemd、再起動は対象外。対応公開条件は [対応表](support.md) と [CI](ci.md) を参照。
 
 ```json
 {"name":"example","module":"command","args":{"executable":"/usr/bin/printf","argv":["%s\n","こんにちは"]}}
@@ -41,6 +41,7 @@ SSH/engineはWindowsと共通で、接続再利用、host内順序、forks、再
 go test ./...
 go vet ./...
 ./build.ps1
+./tests/ci/package.ps1 # 文書例を配布物から検証
 ./tests/linux-ssh/run.ps1 -DockerContext desktop-linux -ProductTestScript ./tests/linux-ssh/product.ps1
 ./tests/windows-ssh/run.ps1
 ```
@@ -52,3 +53,4 @@ argvはreceiverとは独立したPython probeでUTF-8長とhexを照合する。
 `TestLinuxOpenSSH` は独立probeによる送信中/EOF後timeout/cancel、通信断、再送0の試験。
 `TestLinuxDecoder` は合成応答、backend/engine/CLI単体は模擬を含む。
 通常go testのopt-in SSH skipを実SSH合格として扱わない。
+

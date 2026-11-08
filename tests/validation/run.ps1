@@ -2,6 +2,7 @@
 [CmdletBinding()]
 param(
     [string]$OutputDirectory,
+    [string]$DistributionDirectory,
     [string]$BaseImage = 'mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09'
 )
 $ErrorActionPreference = 'Stop'
@@ -38,7 +39,14 @@ try {
     Invoke-Check vet @('vet','./...')
     $env:GOOS='windows'; $env:GOARCH='amd64'; $env:CGO_ENABLED='0'
     Invoke-Check wrappers @('test','./internal/module','-run','^TestDistributionWrapper$','-count=1','-v')
-    Invoke-Check build @('build','-trimpath','-o',"$output/wintable.exe",'./cmd/wintable')
+    if ($DistributionDirectory) {
+        & "$repo/tests/ci/check-package.ps1" -Directory $DistributionDirectory -SourceSHA $manifest.source_sha
+        Copy-Item "$DistributionDirectory/wintable.exe" "$output/wintable.exe"
+        'Verified common distribution executable' | Set-Content "$output/build.log"
+        $manifest.checks += @{name='build';command='verify common distribution';exit_code=0;log='build.log'}
+    } else {
+        Invoke-Check build @('build','-trimpath','-o',"$output/wintable.exe",'./cmd/wintable')
+    }
     Invoke-Check module_binary @('test','-c','-o',"$output/module.test.exe",'./internal/module')
     $nativeName = 'wintable-native-' + [Guid]::NewGuid().ToString('N').Substring(0,12)
     $nativeArgs = @('run','--name',$nativeName,'--isolation','hyperv','--mount',"type=bind,source=$output,target=C:/validation,readonly",$BaseImage,'C:/validation/module.test.exe','-test.run=^TestFileContentWindows$','-test.v','-test.timeout=3m')
@@ -66,3 +74,4 @@ try {
 $final = Get-Content "$output/manifest.json" -Raw | ConvertFrom-Json
 if ($final.acceptance -eq 'passed') { exit 0 }
 exit 1
+

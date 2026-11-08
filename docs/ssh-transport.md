@@ -94,3 +94,5 @@ isolated target with cmd.exe as DefaultShell, preverified host keys and a fixed
 receiver wrapper; repeat bad authentication, unknown/changed keys, Japanese
 split input, oversized dual output, send interruption and cancellation. Do not
 use the unfinished product wrappers as evidence of successful module execution.
+
+Windows制御のOS別実SSH CI・同一バイナリの公開条件は [CI手順](ci.md) を参照。

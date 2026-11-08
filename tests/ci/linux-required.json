@@ -1,0 +1,31 @@
+{
+  "test.jsonl": [
+    "TestLinuxOpenSSH",
+    "TestLinuxOpenSSH/reject/unknown",
+    "TestLinuxOpenSSH/reject/changed",
+    "TestLinuxOpenSSH/reject/auth",
+    "TestLinuxOpenSSH/reject/root",
+    "TestLinuxOpenSSH/reject/password",
+    "TestLinuxOpenSSH/reuse_hash_flood",
+    "TestLinuxOpenSSH/deadline_no-read",
+    "TestLinuxOpenSSH/deadline_wait",
+    "TestLinuxOpenSSH/cancel",
+    "TestLinuxOpenSSH/disconnect"
+  ],
+  "product.jsonl": [
+    "TestLinuxCommandSSH",
+    "TestLinuxCommandSSH/raw-invalid",
+    "TestLinuxCommandSSH/raw-boundaries",
+    "TestLinuxCommandSSH/raw-EOF",
+    "TestLinuxCommandSSH/raw-runtime",
+    "TestLinuxCommandSSH/raw-E2BIG",
+    "TestLinuxCommandSSH/product-argv",
+    "TestLinuxCommandSSH/product-output",
+    "TestLinuxCommandSSH/product-exits",
+    "TestLinuxCommandSSH/receiver-interruption",
+    "TestLinuxCommandSSH/receiver-interruption/timeout",
+    "TestLinuxCommandSSH/receiver-interruption/cancel",
+    "TestLinuxCommandSSH/receiver-interruption/disconnect",
+    "TestLinuxCommandSSH/product-E2BIG-fixture"
+  ]
+}
