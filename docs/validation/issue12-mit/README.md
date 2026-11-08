@@ -16,3 +16,5 @@ pwsh -NoProfile -File tests/validation/run.ps1 -OutputDirectory dist/mit-release
 ```
 
 保存先は未作成ディレクトリとする。ログには対象環境の識別情報が含まれるため公開前に内容を確認する。全18passed、ZIP_CONTROLLER_PASS、ContainerUserのnon_admin=true、日本語パス、ZIP/実行exe/配布commitの対応、コンテナ削除を確認してから受け入れmanifestを作成し、verify-acceptance.ps1と実ログレビューを行う。
+
+証跡の生バイトは.gitattributesで改行変換を無効化して保持します。

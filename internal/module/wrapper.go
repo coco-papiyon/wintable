@@ -32,7 +32,9 @@ func fixedWrapper(source string) string {
 	z, _ := flate.NewWriter(&b, flate.BestCompression)
 	_, _ = z.Write([]byte(source))
 	_ = z.Close()
-	script := `$ErrorActionPreference=1;$ProgressPreference=0;try{$m=[IO.MemoryStream]::new([Convert]::FromBase64String('` + base64.StdEncoding.EncodeToString(b.Bytes()) + `'));$z=[IO.Compression.DeflateStream]::new($m,[IO.Compression.CompressionMode]::Decompress);Add-Type ([IO.StreamReader]::new($z).ReadToEnd());[Receiver]::Run()}catch{exit 1}`
+	// CompressionMode.Decompress is zero. Its numeric spelling keeps both fixed
+	// launch lines below the cmd limit without changing the receiver protocol.
+	script := `$ErrorActionPreference=1;$ProgressPreference=0;try{$m=[IO.MemoryStream]::new([Convert]::FromBase64String('` + base64.StdEncoding.EncodeToString(b.Bytes()) + `'));$z=[IO.Compression.DeflateStream]::new($m,0);Add-Type ([IO.StreamReader]::new($z).ReadToEnd());[Receiver]::Run()}catch{exit 1}`
 	units := utf16.Encode([]rune(script))
 	data := make([]byte, len(units)*2)
 	for i, u := range units {
