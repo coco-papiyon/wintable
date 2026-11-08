@@ -224,8 +224,16 @@ func LoadInventory(path string) (map[string]any, error) {
 	}
 	for i, k := range keys(hosts) {
 		p := fmt.Sprintf("$.hosts{member:%d}", i)
-		h := v.obj(hosts[k], p, "address", "port", "user", "private_key_file", "known_hosts_file", "vars")
+		h := v.obj(hosts[k], p, "address", "port", "user", "private_key_file", "known_hosts_file", "vars", "os")
 		v.optionalVars(h, p)
+		if x, ok := h["os"]; ok {
+			target := v.str(x, p+".os", false)
+			if target != "windows" && target != "linux" {
+				v.fail(p+".os", "expected windows or linux")
+			}
+		} else {
+			h["os"] = "windows"
+		}
 		for _, f := range []string{"address", "user", "private_key_file", "known_hosts_file"} {
 			s := v.str(h[f], p+"."+f, false)
 			if strings.ContainsFunc(s, unicode.IsControl) || strings.ContainsAny(s, "${}") {
@@ -277,17 +285,11 @@ func LoadTasks(path string) (map[string]any, error) {
 		switch module {
 		case "command":
 			g := v.obj(t["args"], p+".args", "executable", "argv")
-			s := v.str(g["executable"], p+".args.executable", false)
-			if !strings.Contains(s, "${") && !WindowsAbsolute(s) {
-				v.fail(p+".args.executable", "expected Windows drive absolute path")
-			}
+			v.str(g["executable"], p+".args.executable", false)
 			v.strings(g["argv"], p+".args.argv", true)
 		case "file_content":
 			g := v.obj(t["args"], p+".args", "path", "content")
-			s := v.str(g["path"], p+".args.path", false)
-			if !strings.Contains(s, "${") && !WindowsAbsolute(s) {
-				v.fail(p+".args.path", "expected Windows drive absolute path")
-			}
+			v.str(g["path"], p+".args.path", false)
 			v.str(g["content"], p+".args.content", true)
 		default:
 			v.fail(p+".module", "unknown module")

@@ -66,6 +66,9 @@ func Run(ctx context.Context, args []string, stdout, stderr io.Writer, execute E
 // RunWithWrappers is the integration entry for distribution-provided final
 // OpenSSH/cmd launch lines. All are checked before the executor can connect.
 func RunWithWrappers(ctx context.Context, args []string, stdout, stderr io.Writer, execute Executor, wrapperLines []string) (code int) {
+	return runWithBackends(ctx, args, stdout, stderr, execute, wrapperLines, nil)
+}
+func runWithBackends(ctx context.Context, args []string, stdout, stderr io.Writer, execute Executor, wrapperLines []string, backends module.Backends) (code int) {
 	tracked := &diagnosticWriter{Writer: stderr}
 	stderr = tracked
 	defer func() {
@@ -136,7 +139,11 @@ func RunWithWrappers(ctx context.Context, args []string, stdout, stderr io.Write
 			limitSet = true
 		}
 	})
-	o.Plan, err = engine.Build(bundle, o.Limit, limitSet, wrapperLines...)
+	if backends != nil {
+		o.Plan, err = engine.BuildWithBackends(bundle, o.Limit, limitSet, backends)
+	} else {
+		o.Plan, err = engine.Build(bundle, o.Limit, limitSet, wrapperLines...)
+	}
 	if err != nil {
 		fmt.Fprintln(stderr, err)
 		var size *module.SizeError
