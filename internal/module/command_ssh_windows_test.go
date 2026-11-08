@@ -45,6 +45,26 @@ func testWrapperSSHLaunchAndDisconnect(t *testing.T, file bool) {
 	if err = json.Unmarshal(raw, &cfg); err != nil || cfg.Container == "" {
 		t.Fatal("invalid disposable fixture")
 	}
+	docker := func(script string) []byte {
+		t.Helper()
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		out, e := exec.CommandContext(ctx, "docker", "exec", cfg.Container, "powershell.exe", "-NoProfile", "-Command", script).CombinedOutput()
+		if e != nil {
+			t.Fatalf("fixture observation: %v: %s", e, out)
+		}
+		return out
+	}
+	// Cancellation does not promise descendant termination. Exclude shells
+	// already present before this test, rather than attributing them to its exec.
+	var previous []uint32
+	if err = json.Unmarshal(bytes.TrimSpace(docker(`$ids=@(Get-CimInstance Win32_Process -Filter "Name='cmd.exe'" | Select-Object -ExpandProperty ProcessId);ConvertTo-Json -InputObject $ids -Compress`)), &previous); err != nil {
+		t.Fatal(err)
+	}
+	previousIDs := make([]string, len(previous))
+	for i, pid := range previous {
+		previousIDs[i] = strconv.FormatUint(uint64(pid), 10)
+	}
 	key, err := os.ReadFile(filepath.Join(fixture, "client"))
 	if err != nil {
 		t.Fatal(err)
@@ -92,19 +112,9 @@ func testWrapperSSHLaunchAndDisconnect(t *testing.T, file bool) {
 	if _, err = stdin.Write(input[:len(input)-1]); err != nil {
 		t.Fatal(err)
 	}
-	docker := func(script string) []byte {
-		t.Helper()
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
-		out, e := exec.CommandContext(ctx, "docker", "exec", cfg.Container, "powershell.exe", "-NoProfile", "-Command", script).CombinedOutput()
-		if e != nil {
-			t.Fatalf("fixture observation: %v: %s", e, out)
-		}
-		return out
-	}
 	// CIM observes the command line supplied to the running process, not sshd's
 	// truncated debug log or a reconstruction from the exec request.
-	out := docker(`$ErrorActionPreference='Stop';$p=$null;for($i=0;$i -lt 40;$i++){ $p=@(Get-CimInstance Win32_Process -Filter "Name='cmd.exe'" | Where-Object {$_.CommandLine.Contains('` + command[len(command)/2:len(command)/2+80] + `')});if($p.Count){break};Start-Sleep -Milliseconds 250 };if($p.Count -ne 1){throw 'expected one wrapper shell'};if(Test-Path '` + marker + `'){throw 'executed before EOF'};$p[0].CommandLine | ConvertTo-Json -Compress`)
+	out := docker(`$ErrorActionPreference='Stop';$before=@(` + strings.Join(previousIDs, ",") + `);$p=$null;for($i=0;$i -lt 40;$i++){ $p=@(Get-CimInstance Win32_Process -Filter "Name='cmd.exe'" | Where-Object {$before -notcontains $_.ProcessId -and $_.CommandLine.Contains('` + command[len(command)/2:len(command)/2+80] + `')});if($p.Count){break};Start-Sleep -Milliseconds 250 };if($p.Count -ne 1){throw 'expected one wrapper shell'};if(Test-Path '` + marker + `'){throw 'executed before EOF'};$p[0].CommandLine | ConvertTo-Json -Compress`)
 	var line string
 	if err = json.Unmarshal(bytes.TrimSpace(out), &line); err != nil {
 		t.Fatal(err)
