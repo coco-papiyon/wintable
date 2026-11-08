@@ -38,7 +38,7 @@ try {
     Invoke-Check wrappers @('test','./internal/module','-run','^TestDistributionWrapper$','-count=1','-v')
     Invoke-Check build @('build','-trimpath','-o',"$output/wintable.exe",'./cmd/wintable')
     $manifest.exe_sha256 = (Get-FileHash "$output/wintable.exe" -Algorithm SHA256).Hash
-    & "$repo/tests/windows-ssh/run.ps1" -BaseImage $BaseImage -OutputDirectory "$output/ssh"
+    & "$repo/tests/windows-ssh/run.ps1" -BaseImage $BaseImage -OutputDirectory "$output/ssh" -ValidationExecutable "$output/wintable.exe"
     $manifest.ssh_fixture = 'completed; see ssh/manifest.json for commands and exit codes'
 } catch {
     $manifest.failure = $_.Exception.Message
@@ -48,12 +48,7 @@ try {
     Pop-Location
     $manifest.finished_utc = [DateTime]::UtcNow.ToString('o')
     $manifest | ConvertTo-Json -Depth 10 | Set-Content "$output/manifest.json" -Encoding utf8NoBOM
-    # Aggregate tests do not prove every required real-container subcase.
-    1..18 | ForEach-Object { [pscustomobject]@{ scenario=('V-{0:00}' -f $_); status='unconfirmed'; evidence='manifest.json; ssh/manifest.json if present'; note='Review subcases against validation plan before acceptance' } } |
-        Export-Csv "$output/scenarios.csv" -NoTypeInformation -Encoding utf8NoBOM
-    Get-ChildItem $output -Recurse -File | Where-Object { $_.Name -ne 'sha256.csv' -and $_.Extension -ne '.exe' } |
-        ForEach-Object { [pscustomobject]@{ path=[IO.Path]::GetRelativePath($output,$_.FullName); sha256=(Get-FileHash $_.FullName -Algorithm SHA256).Hash } } |
-        Export-Csv "$output/sha256.csv" -NoTypeInformation -Encoding utf8NoBOM
+    & "$PSScriptRoot/summarize.ps1" -EvidenceDirectory $output
     Write-Host "Evidence: $output"
 }
 # Partial coverage must never produce an acceptance success exit code.
