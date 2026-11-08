@@ -1,0 +1,2 @@
+# Preserve collected evidence bytes so SHA-256 remains valid after checkout.
+* -text
