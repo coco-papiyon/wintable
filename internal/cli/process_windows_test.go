@@ -21,6 +21,9 @@ func TestWindowsCLIConsoleHelper(t *testing.T) {
 		return
 	}
 	kernel := syscall.NewLazyDLL("kernel32.dll")
+	// Test runners may retain a console association even with CREATE_NO_WINDOW.
+	// Detach this helper only before allocating its isolated console.
+	kernel.NewProc("FreeConsole").Call()
 	if ok, _, err := kernel.NewProc("AllocConsole").Call(); ok == 0 {
 		t.Fatal(err)
 	}
