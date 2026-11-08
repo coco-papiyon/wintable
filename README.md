@@ -59,8 +59,10 @@ hostの `os` はリテラル `windows` / `linux` のみ。省略は `windows`。
 | --- | --- | --- |
 | os省略 | Windows両module | Windows両module（従来と同じ） |
 | os: windows | 未知キーで終了2 | Windows両module |
-| os: linux | 未知キーで終了2 | 構造受理後、未登録能力として接続前に終了2 |
+| os: linux | 未知キーで終了2 | commandのみ。file_contentは接続前に終了2 |
 
-inventory/tasksのversion=1、結果形式は維持する。Linux実行対応はまだ公開しない。
-Linux commandの登録は#28、file_contentは別の後続実装となる。
+inventory/tasksのversion=1、結果形式は維持する。Linux command backendを実装済み。
+対象はDebian 13 amd64、OpenSSH、POSIX互換/bin/sh、/usr/bin/python3のCPython 3.13系。
+Windows制御端末から使用する。対応公開・CIは#29、Linux file_contentは後続実装。
+実行契約と検証範囲は [Linux command](docs/linux-command.md) を参照。
 詳細は [backend境界](docs/backend-boundary.md) を参照。

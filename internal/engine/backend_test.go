@@ -53,8 +53,8 @@ func TestMixedBackends(t *testing.T) {
 	if _, e = r.Execute(context.Background(), p, 1, time.Second, false); e == nil || connects != 0 {
 		t.Fatal("mismatched backend connected")
 	}
-	if p, e = Build(b, "", false); p != nil || e == nil {
-		t.Fatal("Linux fallback")
+	if p, e = Build(b, "", false); e != nil || p.Hosts[1].Tasks[0].Backend.Command != module.LinuxCommandWrapper() {
+		t.Fatal("Linux production backend", e)
 	}
 	hosts["z"].(map[string]any)["vars"] = map[string]any{"exe": "relative"}
 	if p, e = BuildWithBackends(b, "", false, registry); p != nil || e == nil {

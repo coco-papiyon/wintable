@@ -61,7 +61,7 @@ func ValidateLinuxWrapper(s string) error {
 	return nil
 }
 
-// PrepareLinuxCommand validates and serializes only; no Linux runtime is registered.
+// PrepareLinuxCommand validates and serializes the Linux command request.
 func PrepareLinuxCommand(host string, task int, kind string, args map[string]any) (Prepared, error) {
 	bad := func() (Prepared, error) {
 		return Prepared{}, fmt.Errorf("input_error: invalid expanded module arguments")

@@ -26,7 +26,7 @@ type Plan struct{ Hosts []HostPlan }
 // wrapperLines are final launch lines from the distribution provider, checked
 // before the caller may connect. Real wrappers are provided in I-07/I-08.
 func Build(b *config.Bundle, limit string, limitSet bool, wrapperLines ...string) (*Plan, error) {
-	return build(b, limit, limitSet, module.WindowsBackends(), wrapperLines...)
+	return build(b, limit, limitSet, module.DefaultBackends(), wrapperLines...)
 }
 func BuildWithBackends(b *config.Bundle, limit string, limitSet bool, backends module.Backends) (*Plan, error) {
 	return build(b, limit, limitSet, backends)
