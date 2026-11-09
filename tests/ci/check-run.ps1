@@ -1,3 +1,13 @@
+function Assert-WindowsFallbackCapability {
+    param($Capability,[string]$SourceSHA)
+    if ($Capability.source_sha -cne $SourceSHA -or $Capability.status -cne 'unavailable') {
+        throw 'Local Windows fallback requires matching capability evidence'
+    }
+    if ($Capability.container_removed -isnot [bool] -or $Capability.container_removed -ne $true) {
+        throw 'Local Windows fallback requires successful capability container cleanup'
+    }
+}
+
 function Get-AcceptancePlan {
     param($Run,[object[]]$Jobs,[string]$SourceSHA,[string]$Repository,[switch]$WindowsLocal)
     if ($Run.head_sha -cne $SourceSHA -or $Run.repository.full_name -cne $Repository -or

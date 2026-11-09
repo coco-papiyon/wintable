@@ -41,7 +41,7 @@ try {
     } else {
         Invoke-Gh @('run','download',$RunId,'--repo',$repository,'--name','hosted-windows-capabilities','--dir',"$output/capability") | Out-Null
         $capability=Get-Content "$output/capability/windows-capability.json" -Raw | ConvertFrom-Json
-        if ($capability.source_sha -cne $sha -or $capability.status -cne 'unavailable') { throw 'Local Windows fallback requires matching capability evidence' }
+        Assert-WindowsFallbackCapability -Capability $capability -SourceSHA $sha
         $env:DOCKER_CONTEXT=$WindowsDockerContext
         $env:WINTABLE_DISTRIBUTION_ZIP="$package.zip"
         & pwsh -NoProfile -File "$repo/tests/validation/run.ps1" -DistributionDirectory $package -OutputDirectory "$output/raw/windows"

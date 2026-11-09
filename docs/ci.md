@@ -71,7 +71,8 @@ artifactが失効した場合は、同じSHAのworkflow全体を再実行して�
 Windows用には既存のHyper-V/Windows containers環境とOpenSSH serverバイナリが必要。
 その後にLinux contextを使用する。同時稼働を前提にせず、必要なモード切替は既存環境で準備する。
 helperはDockerのグローバルcontextやモードを切り替えず、環境変数を復元する。
-CIの能力確認artifactが同じSHAで `unavailable` を記録していることを必須とする。
+CIの能力確認artifactが同じSHAで `unavailable` を記録し、`container_removed` が
+真偽値の `true` であることを必須とする。清掃失敗・清掃結果の欠落は代替実行でも拒否する。
 
 ## 必須検査と範囲
 

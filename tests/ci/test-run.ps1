@@ -1,5 +1,26 @@
 $ErrorActionPreference='Stop'
 . "$PSScriptRoot/check-run.ps1"
+foreach ($mode in 'valid','source','status','cleanup-false','cleanup-missing','cleanup-null','cleanup-string','cleanup-number') {
+    $capability=@{source_sha='source';status='unavailable';container_removed=$true}
+    switch ($mode) {
+        'source' { $capability.source_sha='other' }
+        'status' { $capability.status='available' }
+        'cleanup-false' { $capability.container_removed=$false }
+        'cleanup-missing' { $capability.Remove('container_removed') }
+        'cleanup-null' { $capability.container_removed=$null }
+        'cleanup-string' { $capability.container_removed='true' }
+        'cleanup-number' { $capability.container_removed=1 }
+    }
+    # Exercise the same JSON artifact decoding and guard used before local SSH tests.
+    $artifact=$capability | ConvertTo-Json | ConvertFrom-Json
+    $accepted=$false
+    try {
+        Assert-WindowsFallbackCapability -Capability $artifact -SourceSHA source
+        $accepted=$true
+    } catch { if ($mode -eq 'valid') { throw } }
+    if ($accepted -ne ($mode -eq 'valid')) { throw "Wrong capability verdict: $mode" }
+    Write-Host "PASS capability: $mode"
+}
 foreach ($mode in 'valid','source','repository','workflow','build','queued','test-failed','capability-without-opt-in','capability-fallback') {
     $run=@{head_sha='source';repository=@{full_name='owner/repo'};path='.github/workflows/ssh-acceptance.yml'}
     $build=@{name='build';conclusion='success'}
