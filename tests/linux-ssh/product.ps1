@@ -7,6 +7,10 @@ try {
     $env:WINTABLE_LINUX_SSH_FIXTURE=$FixtureDirectory
     $env:WINTABLE_PRODUCT_EXE=if ($DistributionDirectory) { Join-Path $DistributionDirectory 'wintable.exe' } else { Join-Path $repo 'dist/wintable.exe' }
     if (!(Test-Path $env:WINTABLE_PRODUCT_EXE)) { throw 'Build product before acceptance' }
+    if (!$DistributionDirectory) {
+        # file_content's CLI regression also exercises the checked-in examples.
+        Copy-Item -LiteralPath "$repo/examples" -Destination "$repo/dist" -Recurse -Force
+    }
     $events = & go test ./internal/module -run '^TestLinux(CommandSSH|FileContentSSH|FetchSSH)$' -count=1 -json
     $code=$LASTEXITCODE
     $events | Set-Content "$EvidenceDirectory/product.jsonl" -Encoding utf8NoBOM
