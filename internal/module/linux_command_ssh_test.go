@@ -54,7 +54,8 @@ func TestLinuxCommandSSH(t *testing.T) {
 		}
 		return p.JSON()
 	}
-	raw := func(line string, input []byte) result.TaskResult {
+	raw := func(t *testing.T, line string, input []byte) result.TaskResult {
+		t.Helper()
 		r, e := session.Run(ctx, transport.Request{Command: line, Stdin: input, StdoutLimit: transport.WrapperResponseLimit})
 		if e != nil {
 			t.Fatal(e)
@@ -67,7 +68,7 @@ func TestLinuxCommandSSH(t *testing.T) {
 		// Shape mutations below also cover requests whose original argv is nonempty.
 		bad = append(bad, strings.Replace(valid, `"argv":["/fixture/results/forbidden-child"]`, `"argv":null`, 1), strings.Replace(valid, `"executable":"/usr/bin/touch"`, `"executable":"relative"`, 1))
 		for i, s := range bad {
-			r := raw(LinuxCommandWrapper(), []byte(s))
+			r := raw(t, LinuxCommandWrapper(), []byte(s))
 			if r.Changed == nil || *r.Changed || r.ExitCode != nil {
 				t.Fatal(i, r)
 			}
@@ -90,7 +91,7 @@ func TestLinuxCommandSSH(t *testing.T) {
 		}
 		for _, n := range []int{32767, 32768, 32769} {
 			input, _ := json.Marshal(map[string]any{"module": "command", "args": map[string]any{"executable": "/bin/true", "argv": []string{strings.Repeat("x", n)}}})
-			r := raw(LinuxCommandWrapper(), input)
+			r := raw(t, LinuxCommandWrapper(), input)
 			if (r.ExitCode != nil) != (n <= 32768) {
 				t.Fatal("arg", n, r)
 			}
@@ -98,7 +99,7 @@ func TestLinuxCommandSSH(t *testing.T) {
 		for _, n := range []int{4095, 4096, 4097} {
 			a := make([]string, n)
 			input, _ := json.Marshal(map[string]any{"module": "command", "args": map[string]any{"executable": "/bin/true", "argv": a}})
-			r := raw(LinuxCommandWrapper(), input)
+			r := raw(t, LinuxCommandWrapper(), input)
 			if (r.ExitCode != nil) != (n <= 4096) {
 				t.Fatal("argv", n, r)
 			}
@@ -106,14 +107,14 @@ func TestLinuxCommandSSH(t *testing.T) {
 		for _, n := range []int{65535, 65536, 65537} {
 			a := []string{strings.Repeat("a", 32768), strings.Repeat("b", n-len("/bin/true")-3-32768)}
 			input, _ := json.Marshal(map[string]any{"module": "command", "args": map[string]any{"executable": "/bin/true", "argv": a}})
-			r := raw(LinuxCommandWrapper(), input)
+			r := raw(t, LinuxCommandWrapper(), input)
 			if (r.ExitCode != nil) != (n <= 65536) {
 				t.Fatal("total", n, r)
 			}
 		}
 		input := request("/bin/true", []any{})
 		for _, n := range []int{JSONLimit - 1, JSONLimit, JSONLimit + 1} {
-			r := raw(LinuxCommandWrapper(), append(append([]byte{}, input...), bytes.Repeat([]byte(" "), n-len(input))...))
+			r := raw(t, LinuxCommandWrapper(), append(append([]byte{}, input...), bytes.Repeat([]byte(" "), n-len(input))...))
 			if (r.ExitCode != nil) != (n <= JSONLimit) {
 				t.Fatal("request", n, r)
 			}
@@ -170,7 +171,7 @@ func TestLinuxCommandSSH(t *testing.T) {
 			t.Fatal("receiver executed before EOF")
 		case <-time.After(150 * time.Millisecond):
 		}
-		r := raw(LinuxCommandWrapper(), request("/usr/bin/test", []any{"!", "-e", "/fixture/results/eof-child"}))
+		r := raw(t, LinuxCommandWrapper(), request("/usr/bin/test", []any{"!", "-e", "/fixture/results/eof-child"}))
 		if r.ExitCode == nil || *r.ExitCode != 0 {
 			t.Fatal("pre-EOF child marker")
 		}
@@ -188,25 +189,28 @@ func TestLinuxCommandSSH(t *testing.T) {
 		if r.Changed == nil || !*r.Changed {
 			t.Fatal(r)
 		}
-		r = raw(LinuxCommandWrapper(), request("/usr/bin/test", []any{"-e", "/fixture/results/eof-child"}))
+		r = raw(t, LinuxCommandWrapper(), request("/usr/bin/test", []any{"-e", "/fixture/results/eof-child"}))
 		if r.ExitCode == nil || *r.ExitCode != 0 {
 			t.Fatal("post-EOF child marker")
 		}
 	})
 	t.Run("raw-runtime", func(t *testing.T) {
 		input := request("/usr/bin/touch", []any{"/fixture/results/forbidden-child"})
+		// These injected runtimes reject before reading. Drain the synthetic
+		// request in the test shim so an early peer close cannot race stdin EOF
+		// and turn a receiver validation test into a transport interruption.
 		for _, prefix := range []string{"import sys;sys.platform='other'\n", "import sys;sys.version_info=(3,12)\n", "import platform;platform.python_implementation=lambda:'Other'\n"} {
-			line := "/usr/bin/python3 -I -c '" + strings.ReplaceAll(prefix+linuxCommandSource, "'", "'\"'\"'") + "'"
-			r := raw(line, input)
+			line := "/usr/bin/python3 -I -c '" + strings.ReplaceAll(prefix+"__import__('sys').stdin.buffer.read()\n"+linuxCommandSource, "'", "'\"'\"'") + "'"
+			r := raw(t, line, input)
 			if r.Changed == nil || *r.Changed {
 				t.Fatal(r)
 			}
 		}
-		r := raw("/missing/runtime -I -c 'pass'", input)
+		r := raw(t, "/bin/cat >/dev/null; /missing/runtime -I -c 'pass'", input)
 		if r.Changed != nil {
 			t.Fatal("runtime absence", r)
 		}
-		r = raw(LinuxCommandWrapper(), request("/usr/bin/test", []any{"!", "-e", "/fixture/results/forbidden-child"}))
+		r = raw(t, LinuxCommandWrapper(), request("/usr/bin/test", []any{"!", "-e", "/fixture/results/forbidden-child"}))
 		if r.ExitCode == nil || *r.ExitCode != 0 {
 			t.Fatal("child started")
 		}
@@ -216,11 +220,11 @@ func TestLinuxCommandSSH(t *testing.T) {
 		line := "/usr/bin/python3 -I -c '" + strings.ReplaceAll(prefix+linuxCommandSource, "'", "'\"'\"'") + "'"
 		// Linux's 128KiB ARG_MAX floor with a 512KiB stack is exceeded by
 		// inherited environment plus this otherwise valid 32KiB argument.
-		r := raw("ulimit -s 512; "+line, request("/bin/true", []any{strings.Repeat("a", 32768)}))
+		r := raw(t, "ulimit -s 512; "+line, request("/bin/true", []any{strings.Repeat("a", 32768)}))
 		if r.Changed == nil || *r.Changed || r.ExitCode != nil {
 			t.Fatal(r)
 		}
-		r = raw(LinuxCommandWrapper(), request("/bin/cat", []any{"/fixture/results/e2big-errno"}))
+		r = raw(t, LinuxCommandWrapper(), request("/bin/cat", []any{"/fixture/results/e2big-errno"}))
 		if r.StdoutBase64 == nil || *r.StdoutBase64 != base64.StdEncoding.EncodeToString([]byte("7")) {
 			t.Fatal("E2BIG errno not observed")
 		}

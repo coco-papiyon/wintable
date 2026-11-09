@@ -4,6 +4,11 @@
 
 ## 候補の生成
 
+Linux commandを含む版の公開には、上記の過去のWindows合格だけでは足りません。
+[標準runnerと必要時のローカル実SSH](ci.md)で同じSHA・共通配布exeのWindows/Linux必須ケースと
+`gate.ps1` が合格し、実行場所が記録されていることも確認します。検証対象のZIPと公開ZIPのハッシュを
+一致させ、合格後の再梱包は行いません。[対応範囲と未確認事項](support.md)も確認してください。
+
 PowerShell 7、git、固定Go 1.27.3、ネットワーク接続を備えたWindows amd64で、クリーンな対象commitをcheckoutします。Goの選択はGOTOOLCHAIN=go1.27.3で固定し、test/vet・固定ラッパー検査・CGO無効ビルド・govulncheck v1.9.0を実行します。
 
 ```powershell

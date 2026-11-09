@@ -1,0 +1,101 @@
+name: Standard runner SSH candidate
+on:
+  push:
+    branches: [main, 'feature/issue_#29']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ssh-acceptance-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  GOTOOLCHAIN: go1.27.3
+  GOOS: windows
+  GOARCH: amd64
+  CGO_ENABLED: '0'
+defaults:
+  run:
+    shell: pwsh
+jobs:
+  build:
+    if: github.event.repository.private == false
+    runs-on: windows-2022
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - run: |
+          ./tests/ci/package.ps1
+          ./tests/ci/check-package.ps1 -Directory dist/package -SourceSHA '${{ github.sha }}'
+          ./tests/ci/test-gate.ps1
+          ./tests/ci/test-run.ps1
+          ./tests/validation/test-summary.ps1
+          New-Item dist/shared -ItemType Directory | Out-Null
+          Copy-Item dist/package dist/shared/package -Recurse
+          Copy-Item dist/package.zip dist/shared/package.zip
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: candidate-audit
+          path: dist/package-audit/audit.json
+          if-no-files-found: warn
+          retention-days: 3
+          overwrite: true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: candidate
+          path: dist/shared/
+          if-no-files-found: error
+          retention-days: 3
+          overwrite: true
+  windows:
+    needs: build
+    runs-on: windows-2022
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
+        with:
+          go-version: '1.27.3'
+          cache: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: candidate
+          path: dist
+      - name: Windows container capability
+        timeout-minutes: 5
+        run: ./tests/ci/hosted-windows.ps1 -OutputFile .cache/ci/windows-capability.json
+      - name: Windows real SSH acceptance
+        run: |
+          $env:WINTABLE_DISTRIBUTION_ZIP="$pwd/dist/package.zip"
+          ./tests/validation/run.ps1 -DistributionDirectory "$pwd/dist/package" -Isolation process -OutputDirectory "$pwd/.cache/ci/windows"
+      - if: always()
+        run: ./tests/ci/export-evidence.ps1 -Kind windows -InputDirectory .cache/ci/windows -OutputDirectory .cache/upload
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: windows-evidence
+          path: .cache/upload/
+          if-no-files-found: error
+          retention-days: 3
+          overwrite: true
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: hosted-windows-capabilities
+          path: .cache/ci/windows-capability.json
+          if-no-files-found: error
+          retention-days: 3
+          overwrite: true
+      - name: Remaining acceptance
+        run: |
+          'Windows real SSH passed. Complete Linux acceptance on an existing Windows PC with tests/ci/complete-local.ps1; this candidate is not yet a validated distribution.' >> $env:GITHUB_STEP_SUMMARY
