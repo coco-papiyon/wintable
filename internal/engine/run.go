@@ -29,7 +29,7 @@ type Runtime struct {
 // Execute consumes an entirely validated plan. It never retries or reserializes
 // payloads. Slots remain occupied until session cleanup has completed.
 func (r Runtime) Execute(ctx context.Context, p *Plan, forks int, timeout time.Duration, output bool) ([]result.TaskResult, error) {
-	if p == nil || forks < 1 || forks > 64 || timeout <= 0 || r.Connector == nil {
+	if p == nil || forks < 1 || forks > 64 || timeout <= 0 {
 		return nil, result.PublicError("internal_error")
 	}
 	hosts := append([]HostPlan(nil), p.Hosts...)
@@ -39,6 +39,9 @@ func (r Runtime) Execute(ctx context.Context, p *Plan, forks int, timeout time.D
 			return nil, result.PublicError("internal_error")
 		}
 		for _, t := range h.Tasks {
+			if (!t.Local && r.Connector == nil) || (t.Local && (t.Module != "command" || t.Backend == nil)) {
+				return nil, result.PublicError("internal_error")
+			}
 			if t.Module == "fetch" {
 				capability, ok := r.Connector.(transport.StreamingConnector)
 				if !ok || !capability.SupportsStream() || t.Backend == nil || t.Payload.FetchDestination == "" {
@@ -46,7 +49,14 @@ func (r Runtime) Execute(ctx context.Context, p *Plan, forks int, timeout time.D
 				}
 			}
 			if t.Backend != nil {
-				if t.Backend.Target != (module.Key{OS: h.OS, Module: t.Module}) || t.Backend.Check() != nil {
+				targetOS := h.OS
+				if t.Local {
+					targetOS = "windows"
+					if t.Module != "command" {
+						return nil, result.PublicError("internal_error")
+					}
+				}
+				if t.Backend.Target != (module.Key{OS: targetOS, Module: t.Module}) || t.Backend.Check() != nil {
 					return nil, result.PublicError("internal_error")
 				}
 			} else if (h.OS != "" && h.OS != "windows") || (r.Decode == nil && r.DecodeResult == nil) || module.ValidateWrapper(r.Wrappers[t.Module]) != nil {
@@ -123,53 +133,58 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 	if len(h.Tasks) == 0 {
 		return nil, nil
 	}
-	connectCtx, cancel := context.WithTimeout(ctx, ConnectionTimeout)
-	s, err := r.Connector.Connect(connectCtx, h.Connection)
-	expired := connectCtx.Err() != nil || errors.Is(err, context.DeadlineExceeded)
-	cancel()
+	var s transport.Session
 	closeSession := func() {}
-	if s != nil {
-		var once sync.Once
-		var closeErr error
-		closeSession = func() { once.Do(func() { closeErr = s.Close() }) }
-		done := make(chan struct{})
-		watched := make(chan struct{})
-		go func() {
-			defer close(watched)
-			select {
-			case <-ctx.Done():
-				closeSession()
-			case <-done:
-			}
-		}()
-		defer func() {
-			close(done)
-			closeSession()
-			<-watched
-			if closeErr != nil {
-				failure = result.PublicError("internal_error")
-			}
-		}()
-	}
-	if ctx.Err() != nil {
-		return unstarted(h, 0, result.Cancelled, "cancelled"), nil
-	}
-	if err != nil || expired || s == nil {
-		code := "connection_failed"
-		if expired {
-			code = "deadline_exceeded"
-		}
-		rows = unstarted(h, 0, result.Skipped, "")
-		rows[0].Status = result.Unreachable
-		rows[0].Error = transportError(err, code)
-		if expired {
-			rows[0].Error = result.PublicError(code)
-		}
-		return rows, nil
-	}
 	for i, t := range h.Tasks {
 		if ctx.Err() != nil {
 			return append(rows, unstarted(h, i, result.Cancelled, "cancelled")...), nil
+		}
+		if !t.Local && s == nil {
+			connectCtx, cancel := context.WithTimeout(ctx, ConnectionTimeout)
+			var err error
+			s, err = r.Connector.Connect(connectCtx, h.Connection)
+			expired := connectCtx.Err() != nil || errors.Is(err, context.DeadlineExceeded)
+			cancel()
+
+			if s != nil {
+				var once sync.Once
+				var closeErr error
+				closeSession = func() { once.Do(func() { closeErr = s.Close() }) }
+				done := make(chan struct{})
+				watched := make(chan struct{})
+				go func() {
+					defer close(watched)
+					select {
+					case <-ctx.Done():
+						closeSession()
+					case <-done:
+					}
+				}()
+				defer func() {
+					close(done)
+					closeSession()
+					<-watched
+					if closeErr != nil {
+						failure = result.PublicError("internal_error")
+					}
+				}()
+			}
+			if ctx.Err() != nil {
+				return append(rows, unstarted(h, i, result.Cancelled, "cancelled")...), nil
+			}
+			if err != nil || expired || s == nil {
+				code := "connection_failed"
+				if expired {
+					code = "deadline_exceeded"
+				}
+				tail := unstarted(h, i, result.Skipped, "")
+				tail[0].Status = result.Unreachable
+				tail[0].Error = transportError(err, code)
+				if expired {
+					tail[0].Error = result.PublicError(code)
+				}
+				return append(rows, tail...), nil
+			}
 		}
 		var request transport.Request
 		if t.Backend != nil {
@@ -192,7 +207,10 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 		var response transport.Response
 		var runErr error
 		var fetched *result.TaskResult
-		if t.Module == "fetch" {
+		if t.Local {
+			local := module.RunLocalCommand(taskCtx, t.Payload, output)
+			fetched = &local
+		} else if t.Module == "fetch" {
 			local := module.RunFetch(taskCtx, t.Payload, s, request.Command)
 			fetched = &local
 		} else {
@@ -241,13 +259,17 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 		}
 		if fetched != nil {
 			row.Status, row.Changed, row.Error = fetched.Status, fetched.Changed, fetched.Error
-			row.ExitCode = nil
+			row.ExitCode = fetched.ExitCode
+			row.StdoutBase64, row.StderrBase64 = fetched.StdoutBase64, fetched.StderrBase64
+			row.StdoutTruncated, row.StderrTruncated = fetched.StdoutTruncated, fetched.StderrTruncated
 			if ctx.Err() != nil {
 				row.Status = result.Cancelled
 				row.Error = result.PublicError("cancelled")
+				row.Changed, row.ExitCode = nil, nil
 			} else if deadline {
 				row.Status = result.Failed
 				row.Error = result.PublicError("deadline_exceeded")
+				row.Changed, row.ExitCode = nil, nil
 			}
 		}
 		if output && r.DecodeResult == nil && t.Backend == nil {

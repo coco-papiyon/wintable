@@ -37,3 +37,7 @@ L07の公開条件には、属性保持/拒否・0600・ACL/xattr拒否・同期
 属性/競合試験のSKIPや準備失敗は対応確認に数えない。
 
 fetchは最大1GiB、Windows制御端末のNTFS保存限定です。第三者による検査後の保存先差し替えは上書きを許容します。確定前の失敗はchanged=false、確定後の失敗は既知のtrueを保持します。パス・リンク・ACL・依存条件は[fetch](fetch-module.md)を参照してください。
+
+## ローカルcommand委譲
+
+`delegate_to: "localhost"` を指定したcommandはWindows制御端末上で実行します。`become` は省略または `false` のみで昇格しません。元ホストごとに変数展開・実行し、結果も元ホストに所属します。全taskが委譲ならSSH接続属性・鍵・known_hostsは不要です。絶対exeとargv、出力上限、期限・中断時の子孫清掃などは[ローカルcommandの仕様](local-command.md)を参照してください。

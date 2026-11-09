@@ -7,11 +7,13 @@ import (
 	"github.com/coco-papiyon/wintable/internal/inventory"
 	"github.com/coco-papiyon/wintable/internal/module"
 	"github.com/coco-papiyon/wintable/internal/transport"
+	"runtime"
 	"strings"
 )
 
 type TaskPlan struct {
 	Name, Module string
+	Local        bool
 	Payload      module.Prepared
 	Backend      *module.Backend
 }
@@ -55,7 +57,8 @@ func build(b *config.Bundle, limit string, limitSet bool, backends module.Backen
 			return nil, fmt.Errorf("input_error: invalid target OS")
 		}
 		port, _ := connection["port"].(json.Number).Int64()
-		hp.Connection = transport.Host{Name: h, Address: connection["address"].(string), User: connection["user"].(string), PrivateKeyFile: connection["private_key_file"].(string), KnownHostsFile: connection["known_hosts_file"].(string), Port: uint16(port)}
+		str := func(k string) string { v, _ := connection[k].(string); return v }
+		hp.Connection = transport.Host{Name: h, Address: str("address"), User: str("user"), PrivateKeyFile: str("private_key_file"), KnownHostsFile: str("known_hosts_file"), Port: uint16(port)}
 		vars := inventory.Variables(b.Inventory, h, b.Vars)
 		for i, x := range b.Tasks["tasks"].([]any) {
 			t := x.(map[string]any)
@@ -81,11 +84,19 @@ func build(b *config.Bundle, limit string, limitSet bool, backends module.Backen
 				}
 			}
 			kind := t["module"].(string)
-			backend, ok := backends[module.Key{OS: hp.OS, Module: kind}]
+			local := t["delegate_to"] == "localhost"
+			targetOS := hp.OS
+			if local {
+				if runtime.GOOS != "windows" || kind != "command" {
+					return nil, fmt.Errorf("input_error: localhost command requires Windows controller")
+				}
+				targetOS = "windows"
+			}
+			backend, ok := backends[module.Key{OS: targetOS, Module: kind}]
 			if !ok {
 				return nil, fmt.Errorf("input_error: unsupported OS/module combination")
 			}
-			backend.Target = module.Key{OS: hp.OS, Module: kind}
+			backend.Target = module.Key{OS: targetOS, Module: kind}
 			if e := backend.Check(); e != nil {
 				return nil, e
 			}
@@ -102,7 +113,7 @@ func build(b *config.Bundle, limit string, limitSet bool, backends module.Backen
 				}
 				fetchPaths = append(fetchPaths, path)
 			}
-			hp.Tasks = append(hp.Tasks, TaskPlan{t["name"].(string), t["module"].(string), payload, &backend})
+			hp.Tasks = append(hp.Tasks, TaskPlan{Name: t["name"].(string), Module: kind, Local: local, Payload: payload, Backend: &backend})
 		}
 		p.Hosts = append(p.Hosts, hp)
 	}

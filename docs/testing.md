@@ -93,3 +93,7 @@ product.ps1は文書例を含み、配布manifestを要求する場合がある�
 ### 結果の記録
 
 対象SHA、全Go試験、Linux実SSHのコマンド・結果と未確認範囲を報告する。配布時のみの項目は「配布物作成時に実施」と記載し、通常実装の不合格理由にしない。必要な全Go試験またはLinux実SSHが未確認なら実装確認完了にしない。通常確認合格を配布可・両OS全受入合格と表現しない。同一SHAの成功証跡は範囲を確認して再利用し、失敗・追加変更・未解決懸念がなければ反復しない。
+
+## ローカル委譲commandの試験
+
+全Go試験には `TestDelegationSchema`、`TestLocalCommandWindows`、`TestDelegateCLIWindows` を含みます。Windows実プロセスでCRT引数・32,766 UTF-16上限・EOF・大量出力・起動失敗・期限切れ・中断と子孫清掃を確認し、CLIで元hostごとの実行、変数展開、全件事前検査、SSH混在順序とskipを確認します。Linux実SSHでは既存のcommand/file_content/fetchへの回帰を確認します。

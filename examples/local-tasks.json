@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "hosts": "all",
+  "tasks": [
+    {
+      "name": "制御端末のホスト名",
+      "module": "command",
+      "delegate_to": "localhost",
+      "become": false,
+      "args": {
+        "executable": "C:\\Windows\\System32\\hostname.exe",
+        "argv": []
+      }
+    }
+  ]
+}

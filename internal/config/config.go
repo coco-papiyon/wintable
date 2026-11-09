@@ -190,7 +190,8 @@ func (v *validator) version(m map[string]any) {
 func WindowsAbsolute(s string) bool {
 	return len(s) >= 3 && ((s[0] >= 'A' && s[0] <= 'Z') || (s[0] >= 'a' && s[0] <= 'z')) && s[1] == ':' && s[2] == '\\' && !strings.ContainsAny(s[3:], "<>:\"|?*/") && !strings.ContainsFunc(s, unicode.IsControl)
 }
-func LoadInventory(path string) (map[string]any, error) {
+func LoadInventory(path string) (map[string]any, error) { return loadInventory(path, true) }
+func loadInventory(path string, requireConnection bool) (map[string]any, error) {
 	m, e := read("inventory", path)
 	if e != nil {
 		return nil, e
@@ -235,6 +236,9 @@ func LoadInventory(path string) (map[string]any, error) {
 			h["os"] = "windows"
 		}
 		for _, f := range []string{"address", "user", "private_key_file", "known_hosts_file"} {
+			if _, ok := h[f]; !ok && !requireConnection {
+				continue
+			}
 			s := v.str(h[f], p+"."+f, false)
 			if strings.ContainsFunc(s, unicode.IsControl) || strings.ContainsAny(s, "${}") {
 				v.fail(p+"."+f, "invalid connection value")
@@ -279,9 +283,19 @@ func LoadTasks(path string) (map[string]any, error) {
 	}
 	for i, x := range a {
 		p := fmt.Sprintf("$.tasks[%d]", i)
-		t := v.obj(x, p, "name", "module", "args")
+		t := v.obj(x, p, "name", "module", "args", "delegate_to", "become")
 		v.str(t["name"], p+".name", false)
 		module := v.str(t["module"], p+".module", false)
+		if x, ok := t["delegate_to"]; ok {
+			if v.str(x, p+".delegate_to", false) != "localhost" || module != "command" {
+				v.fail(p+".delegate_to", "expected localhost for command only")
+			}
+		}
+		if x, ok := t["become"]; ok {
+			if b, ok := x.(bool); !ok || b {
+				v.fail(p+".become", "only false is supported")
+			}
+		}
 		switch module {
 		case "command":
 			g := v.obj(t["args"], p+".args", "executable", "argv")
@@ -313,11 +327,17 @@ func LoadVars(path string) (map[string]any, error) {
 func Load(inventory, tasks, vars string) (*Bundle, error) {
 	b := &Bundle{Vars: map[string]any{}}
 	var e error
-	b.Inventory, e = LoadInventory(inventory)
+	b.Tasks, e = LoadTasks(tasks)
 	if e != nil {
 		return nil, e
 	}
-	b.Tasks, e = LoadTasks(tasks)
+	requireConnection := false
+	for _, x := range b.Tasks["tasks"].([]any) {
+		if x.(map[string]any)["delegate_to"] != "localhost" {
+			requireConnection = true
+		}
+	}
+	b.Inventory, e = loadInventory(inventory, requireConnection)
 	if e != nil {
 		return nil, e
 	}

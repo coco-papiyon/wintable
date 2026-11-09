@@ -52,3 +52,7 @@ Windows対象のcommandはCRT規則でargvを解釈する絶対パス.exe専用�
 ## リモートファイルの取得
 
 fetchのsrcは対象OSの絶対パス、destはWindows制御端末の保存ルートです。[fetch利用例・保存名・上書き仕様](fetch-module.md)と[タスク例](../examples/fetch.json)を参照してください。inventoryの各host.vars.fetch_srcを設定して実行します。
+
+## ローカルcommand委譲
+
+`delegate_to: "localhost"` を指定したcommandはWindows制御端末上で実行します。`become` は省略または `false` のみで昇格しません。元ホストごとに変数展開・実行し、結果も元ホストに所属します。全taskが委譲ならSSH接続属性・鍵・known_hostsは不要です。絶対exeとargv、出力上限、期限・中断時の子孫清掃などは[ローカルcommandの仕様](local-command.md)を参照してください。
