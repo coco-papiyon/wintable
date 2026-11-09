@@ -96,3 +96,7 @@ split input, oversized dual output, send interruption and cancellation. Do not
 use the unfinished product wrappers as evidence of successful module execution.
 
 Windows制御のOS別実SSH CI・同一バイナリの公開条件は [CI手順](ci.md) を参照。
+
+## fetch専用stream
+
+StreamSession.Streamは通常のRun/captureとは別の受信経路です。stdoutを有界フレームconsumerへ直接渡し、stderrは記録せずdrainします。既存のSSH認証・鍵検証・接続を再利用し、消費失敗・期限・cancel時に接続を解放します。EOFと正常終了後にのみローカル確定します。再送しません。[fetch契約](fetch-module.md)を参照してください。

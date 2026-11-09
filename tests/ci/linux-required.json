@@ -48,6 +48,12 @@
     "TestLinuxFileContentSSH/API-cases/commit-cleanup-fsync",
     "TestLinuxFileContentSSH/API-cases/ancestor-rename",
     "TestLinuxFileContentSSH/API-cases/temp-substitution",
-    "TestLinuxFileContentSSH/distribution-example"
+    "TestLinuxFileContentSSH/distribution-example",
+    "TestLinuxFetchSSH",
+    "TestLinuxFetchSSH/empty",
+    "TestLinuxFetchSSH/text",
+    "TestLinuxFetchSSH/binary-over-1MiB",
+    "TestLinuxFetchSSH/failure-preserves-existing",
+    "TestLinuxFetchSSH/product-parallel-hosts"
   ]
 }

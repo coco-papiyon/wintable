@@ -8,7 +8,7 @@ function Reject([scriptblock]$Action) {
 }
 try {
     $stage = New-Item -ItemType Directory "$temp/stage"
-    foreach ($name in @('wintable.exe','README.md','LICENSE','audit.json','docs/usage.md','docs/release.md','docs/design/modules.md','docs/design/modules/command-module.md','docs/design/modules/file-content-module.md','docs/design/windows-ansible.md','docs/design/windows-ansible-validation.md','docs/adr/0001-linux-target-support.md','docs/linux-command.md','docs/linux-file-content.md','examples/linux-inventory.json','examples/linux-file-content.json','examples/linux-file-content-diff.json','examples/inventory.json','examples/tasks.json','licenses/index.json','licenses/Go-LICENSE')) {
+    foreach ($name in @('wintable.exe','README.md','LICENSE','audit.json','docs/usage.md','docs/fetch-module.md','docs/release.md','docs/design/modules.md','docs/design/modules/command-module.md','docs/design/modules/file-content-module.md','docs/design/windows-ansible.md','docs/design/windows-ansible-validation.md','docs/adr/0001-linux-target-support.md','docs/linux-command.md','docs/linux-file-content.md','examples/fetch.json','examples/linux-inventory.json','examples/linux-file-content.json','examples/linux-file-content-diff.json','examples/inventory.json','examples/tasks.json','licenses/index.json','licenses/Go-LICENSE')) {
         $path = Join-Path $stage $name
         New-Item -ItemType Directory (Split-Path $path) -Force | Out-Null
         Set-Content $path 'synthetic gate test; not a distribution'

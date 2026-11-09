@@ -1,8 +1,9 @@
 # wintable
 
-Windowsを制御端末として使うGo製構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、結果集計・描画に加え、Windows/Linux対象向け`command`と`file_content`を実装しています。対象OS・runtime・実証範囲は[対応表](docs/support.md)を参照してください。
+Windowsを制御端末として使うGo製構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、結果集計・描画に加え、Windows/Linux対象向け`command`と`file_content`、Windows制御端末への`fetch`を実装しています。対象OS・runtime・実証範囲は[対応表](docs/support.md)を参照してください。
 
 - [ZIPの導入・SSH準備・利用手順](docs/usage.md)
+- [fetchによるリモートファイル取得・保存先・上書き方針](docs/fetch-module.md)
 - [Windows CI・監査・ZIP作成と公開条件](docs/release.md)
 
 Windows/Linuxの実SSH受入と配布候補生成の手順があります。過去の実行証跡は各検証記録にSHA・環境・範囲を記載しています。証跡は記録されたcommitに対するもので、現在のHEADや将来のZIPの合格を示すものではありません。公開条件は[配布条件](docs/release.md)を参照してください。本体は[MITライセンス](LICENSE)です。Go・依存ライブラリのライセンスと通知も配布物に保持します。
@@ -85,3 +86,5 @@ Linux例: `examples/linux-inventory.json` / `examples/linux-command.json`。
 
 [対応表・制限](docs/support.md) / [CI・配布・試験手順](docs/ci.md)。
 混在単一runの実機E2Eは未確認。切断後の子孫停止は保証しません。
+
+fetchの通信失敗時は、ローカル確定前ならchanged=false、確定後ならtrueを保持します。取得内容は --include-output でも結果へ出しません。詳細は[fetch](docs/fetch-module.md)を参照してください。

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "hosts": "all",
+  "tasks": [
+    {
+      "name": "リモートファイルを取得",
+      "module": "fetch",
+      "args": { "src": "${fetch_src}", "dest": "collected" }
+    }
+  ]
+}

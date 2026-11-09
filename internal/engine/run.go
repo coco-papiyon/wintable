@@ -39,6 +39,12 @@ func (r Runtime) Execute(ctx context.Context, p *Plan, forks int, timeout time.D
 			return nil, result.PublicError("internal_error")
 		}
 		for _, t := range h.Tasks {
+			if t.Module == "fetch" {
+				capability, ok := r.Connector.(transport.StreamingConnector)
+				if !ok || !capability.SupportsStream() || t.Backend == nil || t.Payload.FetchDestination == "" {
+					return nil, result.PublicError("internal_error")
+				}
+			}
 			if t.Backend != nil {
 				if t.Backend.Target != (module.Key{OS: h.OS, Module: t.Module}) || t.Backend.Check() != nil {
 					return nil, result.PublicError("internal_error")
@@ -183,7 +189,15 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 		}()
 
 		start := time.Now()
-		response, runErr := s.Run(taskCtx, request)
+		var response transport.Response
+		var runErr error
+		var fetched *result.TaskResult
+		if t.Module == "fetch" {
+			local := module.RunFetch(taskCtx, t.Payload, s, request.Command)
+			fetched = &local
+		} else {
+			response, runErr = s.Run(taskCtx, request)
+		}
 		close(done)
 		<-watched
 		deadline := taskCtx.Err() != nil || errors.Is(runErr, context.DeadlineExceeded)
@@ -223,6 +237,17 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 			}
 			if row.Error != nil {
 				row.Error = result.PublicError(row.Error.Code)
+			}
+		}
+		if fetched != nil {
+			row.Status, row.Changed, row.Error = fetched.Status, fetched.Changed, fetched.Error
+			row.ExitCode = nil
+			if ctx.Err() != nil {
+				row.Status = result.Cancelled
+				row.Error = result.PublicError("cancelled")
+			} else if deadline {
+				row.Status = result.Failed
+				row.Error = result.PublicError("deadline_exceeded")
 			}
 		}
 		if output && r.DecodeResult == nil && t.Backend == nil {

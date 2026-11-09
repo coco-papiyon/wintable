@@ -21,3 +21,7 @@ SSH、順序、forks、timeout/cancel、結果描画は共用する。
 新規backendはRuntime.Backendsへ登録し、同じ登録をpreflightで使用する。
 旧Prepared.RequestもWindows専用。backend実行は選択済みBackend.Requestを使う。
 [互換表](../README.md#inventory-osとcli互換性)、[ADR-0001](adr/0001-linux-target-support.md)を参照。
+
+## fetch backend
+
+両OSのfetchはsrcだけをstdinへ直列化し、絶対化したローカル保存先をPrepared.FetchDestinationへ保持します。全件の保存先衝突と既存のリンク祖先をBuildで検査します。Runtimeは接続前にStreamingConnector能力を検査し、RunFetchが専用Stream・整合性検証・NTFS保存を所有します。通常Decodeへバイナリを渡しません。Windows固定bootstrapはASCIIの-Commandで配布コードを展開し、タスク値は一切連結しません。上限は従来の8,000 UTF-16単位を維持します。[仕様](fetch-module.md)。

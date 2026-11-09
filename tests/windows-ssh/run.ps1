@@ -4,7 +4,7 @@ param(
     [string]$BaseImage = 'mcr.microsoft.com/windows/servercore:ltsc2022',
     [ValidateSet('hyperv','process')][string]$Isolation = 'hyperv',
     [string]$OpenSSHDirectory = "$env:WINDIR\System32\OpenSSH",
-    [string]$ModuleTestPattern = '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows)$',
+    [string]$ModuleTestPattern = '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows|FetchSSH)$',
     [string]$OutputDirectory,
     [string]$ValidationExecutable
 )
@@ -46,10 +46,10 @@ $oldFixture = $env:WINTABLE_SSH_FIXTURE
 $oldExecutable = $env:WINTABLE_VALIDATION_EXE
 $regularModulePattern = $ModuleTestPattern
 $interruptionPattern = $null
-if ($ModuleTestPattern -ceq '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows)$') {
+if ($ModuleTestPattern -ceq '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows|FetchSSH)$') {
     # A cut connection need not terminate its remote descendants. Complete
     # ordinary receiver/size observations before leaving such processes behind.
-    $regularModulePattern = '^Test(CommandWindows|FileContentSSH|FileContentLinkSwapWindows)$'
+    $regularModulePattern = '^Test(CommandWindows|FileContentSSH|FileContentLinkSwapWindows|FetchSSH)$'
     $interruptionPattern = '^Test(Command|FileContent)SSHLaunchAndDisconnect$'
 }
 $created = $false
@@ -65,6 +65,8 @@ try {
     Get-ChildItem $OpenSSHDirectory -File | Where-Object { $_.Extension -in '.exe','.dll' -or $_.Name -in 'LICENSE.txt','NOTICE.txt','moduli','sshd_config_default' } | Copy-Item -Destination "$context/OpenSSH"
     Copy-Item "$PSScriptRoot/Dockerfile", "$PSScriptRoot/init.ps1", "$PSScriptRoot/start.ps1", "$PSScriptRoot/receiver.ps1" $context
     Copy-Item "$repo/tests/command/CRTReceiver.cs" $context
+    & go test -c ./internal/fetch -o "$context/fetch.test.exe"
+    if ($LASTEXITCODE) { throw 'fetch native test build failed' }
     $manifest = @{
         source_sha = (git rev-parse HEAD)
         source_status = @(git status --short)
@@ -108,6 +110,9 @@ try {
     "${address} $($pub[0]) $($pub[1])" | Set-Content "$output/known_hosts" -Encoding utf8NoBOM
     @{ Address=$address; Port=22; User='wintablessh'; Container=$name } | ConvertTo-Json | Set-Content "$output/fixture.json" -Encoding utf8NoBOM
     $env:WINTABLE_SSH_FIXTURE = $output
+    # Native control-side file APIs, including privileged symlink interleaving.
+    Invoke-Docker exec -e WINTABLE_FETCH_REQUIRE_SYMLINK=1 -w C:/fixture $name C:/fixture/fetch.test.exe '-test.v' | Tee-Object "$output/fetch-native.log"
+    $manifest.fetch_native = 'passed'
     if ($ValidationExecutable) {
         $env:WINTABLE_VALIDATION_EXE = [IO.Path]::GetFullPath($ValidationExecutable)
         & "$repo/tests/validation/clean-controller.ps1" -Executable $ValidationExecutable -FixtureDirectory $output -BaseImage $BaseImage -Isolation $Isolation

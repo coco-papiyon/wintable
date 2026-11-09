@@ -8,6 +8,7 @@
 - [モジュール一覧とWindows/Linux実装状況](design/modules.md)
 - [Windows command](design/modules/command-module.md)
 - [Windows file_content](design/modules/file-content-module.md)
+- [fetch](fetch-module.md)
 - [Linux command](linux-command.md)
 - [Linux file_content](linux-file-content.md)
 - [SSH transport](ssh-transport.md)

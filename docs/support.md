@@ -3,11 +3,11 @@
 制御端末は Windows 11 / Windows Server 2022以降の amd64 のみ。
 Linux制御端末、ARM64、第二Linuxディストリビューションは保証対象外。
 
-| SSH対象 | command | file_content | 実証範囲 |
-| --- | --- | --- | --- |
-| Windows amd64 | 実装済み | 実装済み | Server Core 2022コンテナ。Windows 11 / フルServer実機は未確認 |
-| Debian 13 amd64 / OpenSSH / POSIX互換 `/bin/sh` / CPython 3.13 | 実装済み | 実装済み（祖先・属性制限あり） | 固定Debian imageで個別実SSH。CI対応公開は下記条件付き |
-| その他のOS/arch/runtime | 保証対象外 | 保証対象外 | 未確認 |
+| SSH対象 | command | file_content | fetch | 実証範囲 |
+| --- | --- | --- | --- | --- |
+| Windows amd64 | 実装済み | 実装済み | 実装（NTFS制御側） | Server Core 2022コンテナ。Windows 11 / フルServer実機は未確認 |
+| Debian 13 amd64 / OpenSSH / POSIX互換 `/bin/sh` / CPython 3.13 | 実装済み | 実装済み（祖先・属性制限あり） | 実装（NTFS制御側） | 固定Debian imageで個別実SSH。CI対応公開は下記条件付き |
+| その他のOS/arch/runtime | 保証対象外 | 保証対象外 | 保証対象外 | 未確認 |
 
 Linux対象には管理者が **事前に** `/usr/bin/python3` のCPython 3.13系、
 OpenSSHと通常の実行ユーザーを用意する。CLIはPythonの自動導入・更新を行わない。
@@ -35,3 +35,5 @@ L07の公開条件には、属性保持/拒否・0600・ACL/xattr拒否・同期
 配布サンプルの新規→同値→差分を含める。詳細は
 [Linux file_contentの保証境界と手順](linux-file-content.md)を参照。
 属性/競合試験のSKIPや準備失敗は対応確認に数えない。
+
+fetchは最大1GiB、Windows制御端末のNTFS保存限定です。第三者による検査後の保存先差し替えは上書きを許容します。確定前の失敗はchanged=false、確定後の失敗は既知のtrueを保持します。パス・リンク・ACL・依存条件は[fetch](fetch-module.md)を参照してください。

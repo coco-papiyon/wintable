@@ -22,7 +22,7 @@ try {
         $seen[$row.path] = $true
         if ($row.sha256 -notmatch '^[a-fA-F0-9]{64}$' -or (Get-FileHash -LiteralPath (Join-Path $temp $row.path) -Algorithm SHA256).Hash -ne $row.sha256) { throw "File hash mismatch: $($row.path)" }
     }
-    foreach ($required in @('wintable.exe','README.md','LICENSE','build.json','audit.json','docs/usage.md','docs/release.md','docs/design/modules.md','docs/design/modules/command-module.md','docs/design/modules/file-content-module.md','docs/design/windows-ansible.md','docs/design/windows-ansible-validation.md','docs/adr/0001-linux-target-support.md','docs/linux-command.md','docs/linux-file-content.md','examples/linux-inventory.json','examples/linux-file-content.json','examples/linux-file-content-diff.json','examples/inventory.json','examples/tasks.json','licenses/index.json','licenses/Go-LICENSE')) {
+    foreach ($required in @('wintable.exe','README.md','LICENSE','build.json','audit.json','docs/usage.md','docs/fetch-module.md','docs/release.md','docs/design/modules.md','docs/design/modules/command-module.md','docs/design/modules/file-content-module.md','docs/design/windows-ansible.md','docs/design/windows-ansible-validation.md','docs/adr/0001-linux-target-support.md','docs/linux-command.md','docs/linux-file-content.md','examples/fetch.json','examples/linux-inventory.json','examples/linux-file-content.json','examples/linux-file-content-diff.json','examples/inventory.json','examples/tasks.json','licenses/index.json','licenses/Go-LICENSE')) {
         if (-not $seen.ContainsKey($required)) { throw "Missing required file: $required" }
     }
     $licenses = @(Get-Content "$temp/licenses/index.json" -Raw | ConvertFrom-Json)
