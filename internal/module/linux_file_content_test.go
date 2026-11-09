@@ -43,8 +43,8 @@ func TestLinuxFileContentSSH(t *testing.T) {
 		t.Skip("requires Linux SSH fixture")
 	}
 	var cfg struct {
-		Address, User string
-		Port          uint16
+		Address, User, Container, DockerContext string
+		Port                                    uint16
 	}
 	b, e := os.ReadFile(filepath.Join(dir, "fixture.json"))
 	if e != nil {
@@ -61,6 +61,27 @@ func TestLinuxFileContentSSH(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer session.Close()
+	t.Run("commit-disconnect", func(t *testing.T) { testFileCommitDisconnect(t, ctx, host, session) })
+	// Root is used only to provision ownership impossible for the SSH runner.
+	if !strings.HasPrefix(cfg.Container, "wintable-linux-") || cfg.DockerContext == "" {
+		t.Fatal("unsafe fixture")
+	}
+	setup := exec.CommandContext(ctx, "docker", "--context", cfg.DockerContext, "exec", "-i", cfg.Container, "/usr/bin/python3", "-I", "-")
+	setup.Stdin = strings.NewReader(`import os
+p='/home/runner/foreign-file'
+with open(p,'wb') as f: f.write(b'foreign')
+os.chown(p,0,0)
+os.chmod(p,0o644)
+for sg in (0,1):
+ for acl in (0,1):
+  p=f'/home/runner/attrs-{sg}-{acl}'
+  os.mkdir(p)
+  os.chown(p,1000,0)
+  os.chmod(p,0o2700 if sg else 0o700)
+`)
+	if out, err := setup.CombinedOutput(); err != nil {
+		t.Fatalf("fixture setup: %v %s", err, out)
+	}
 	t.Run("raw-boundaries", func(t *testing.T) {
 		for _, n := range []int{ContentLimit - 1, ContentLimit, ContentLimit + 1} {
 			b, _ := json.Marshal(map[string]any{"module": "file_content", "args": map[string]any{"path": "/missing-parent/file", "content": strings.Repeat("x", n)}})
@@ -102,6 +123,7 @@ func TestLinuxFileContentSSH(t *testing.T) {
 		if e != nil || r.ExitCode == nil || *r.ExitCode != 0 || !strings.Contains(string(r.Stdout), "cases passed") {
 			t.Fatalf("%v %+v %s", e, r, r.Stderr)
 		}
+		t.Log(string(r.Stdout))
 	})
 	t.Run("product-bytes", func(t *testing.T) {
 		temp := t.TempDir()

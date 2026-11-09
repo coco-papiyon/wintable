@@ -30,6 +30,10 @@ changed=falseはok、trueはchanged。確定APIを呼ぶ直前に状態を不明
 
 `tests/linux-ssh/file-content.ps1` は固定Debian fixture、実SSH、通常runnerを使用する。`product-bytes` はWindows製品exe経路と独立hash/mode/UID probe。`API-cases` は製品receiver関数を実SSH先で読み込み、テストだけのAPI差替えで競合/障害の同期点を作る。製品には注入入口を含めない。モックの成功を全実機競合の証明とはしない。
 
+属性の追加受入試験は、rootで用意したroot所有・0644の既存ファイルを通常runnerから更新し、fchown不能による確定前拒否、元内容・UID/GID/mode/mtime/inode不変、自身のtemp清掃を照合する。setgid有無×default ACL有無の4組合せを実SSHで試し、ACL付き親の拒否、ACLなし親の新規実効UID/GID・0600を確認する（setgid親のGIDはrunnerの実効GIDと異なるroot、umaskは077）。
+
+`commit-disconnect` は同じreceiverソースにテスト限定の同期点を置く。確定前はtempのファイルfsync直後（started=false）、確定後は実際のreplace直後で待機し、独立SSH probeで元内容/完全な新内容を照合してから実SSH接続を閉じる。結果null、receiver完走後の完全な内容・確定呼出し1回・残存tempなしを検証する。テストではSIGHUPを無視してreceiverを完走させるため、強制終了時の即時清掃を証明する試験ではない。製品の固定起動行に同期点やsignal変更は入れない。
+
 未確認: 全filesystem、実機電源断、悪意のroot/同一UIDへの完全防御、強制kill時の即時temp回収、全device種別、混在単一run実機E2E。強制切断後の残存はfixtureコンテナ破棄で回収する。対応公開は既存CI集約条件と別途保存する実証記録に従う。
 
 実行例: examples/linux-file-content.json。実SSH検証は tests/linux-ssh/run.ps1 に -ProductTestScript tests/linux-ssh/file-content.ps1 を指定する。既存Linux command試験も同時に実行し、skipを失敗として扱う。

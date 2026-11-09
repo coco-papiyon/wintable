@@ -22,6 +22,36 @@ def cases(source):
         assert value == wanted, (value, wanted)
     yes, no = {"changed": True}, {"changed": False}
     false, unknown = {"error": "write_failed"}, {"error": "execution_failed"}
+    foreign = '/home/runner/foreign-file'
+    before = os.stat(foreign)
+    expect(update(foreign, b'replacement'), false)
+    after = os.stat(foreign)
+    assert read(foreign) == b'foreign'
+    assert (before.st_uid, before.st_gid, before.st_mode, before.st_mtime_ns, before.st_ino) == (after.st_uid, after.st_gid, after.st_mode, after.st_mtime_ns, after.st_ino)
+    assert not [x for x in os.listdir('/home/runner') if x.startswith('.wintable-')]
+    print('foreign UID retention denied before commit; original unchanged; temp cleaned')
+    import struct
+    acl = struct.pack('<I', 2) + b''.join(struct.pack('<HHI', *x) for x in [(1,7,0xffffffff),(2,0,12345),(4,0,0xffffffff),(16,0,0xffffffff),(32,0,0xffffffff)])
+    for sg in (0,1):
+        for default in (0,1):
+            directory = f'/home/runner/attrs-{sg}-{default}'
+            if default:
+                os.setxattr(directory, 'system.posix_acl_default', acl)
+            old = os.umask(0o077)
+            try:
+                dest = directory + '/new'
+                expect(update(dest, b'new'), false if default else yes)
+                if default:
+                    assert not os.path.exists(dest)
+                    assert os.getxattr(directory, 'system.posix_acl_default') == acl
+                else:
+                    s = os.stat(dest)
+                    assert read(dest) == b'new'
+                    assert (s.st_uid, s.st_gid, stat.S_IMODE(s.st_mode)) == (os.geteuid(), os.getegid(), 0o600)
+                assert not [x for x in os.listdir(directory) if x.startswith('.wintable-')]
+                print(f'setgid={sg} defaultACL={default}: verified attributes/rejection and cleanup')
+            finally:
+                os.umask(old)
     for data in (b"", "日本語😀\r\n\0\n".encode(), b"x" * 1048576):
         expect(update(p, data), yes)
         s = os.stat(p)

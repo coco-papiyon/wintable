@@ -8,7 +8,7 @@ try {
  $events | Set-Content "$EvidenceDirectory/file-content.jsonl" -Encoding utf8NoBOM
  $parsed=@($events|ForEach-Object {$_|ConvertFrom-Json})
  if ($code -or @($parsed|Where-Object Action -eq skip).Count) {throw 'Linux acceptance failed or skipped'}
- foreach($test in @('TestLinuxFileContentSSH/API-cases','TestLinuxFileContentSSH/product-bytes','TestLinuxCommandSSH')) {
+ foreach($test in @('TestLinuxFileContentSSH/API-cases','TestLinuxFileContentSSH/commit-disconnect/before','TestLinuxFileContentSSH/commit-disconnect/after','TestLinuxFileContentSSH/product-bytes','TestLinuxCommandSSH')) {
   if (!@($parsed|Where-Object {$_.Action -eq 'pass' -and $_.Test -eq $test}).Count) {throw "Missing case $test"}
  }
  Get-FileHash $env:WINTABLE_PRODUCT_EXE | ConvertTo-Json | Set-Content "$EvidenceDirectory/file-content-product-hash.json"
