@@ -40,15 +40,39 @@ Only final evidence is retained here.
 
 ## Limits and remaining verification
 
+The two acceptance gaps below were resolved by revision 2; see
+[revision 2 evidence](revision2/manifest.json) and [case log](revision2/file-content.jsonl).
+Clean tested source: `0c2f895` (tests/design only; production source unchanged).
+Real SSH run completed without skips and with successful resource/key cleanup.
+
+- Root-owned 0644 file: ordinary SSH runner cannot retain foreign UID; update
+  returns write_failed (failed/false), preserving bytes, UID/GID/mode, inode and
+  mtime, and removing its temp.
+- setgid off/on × default ACL off/on: all four combinations tested with umask
+  077 and parent GID root, different from runner's effective GID. Default ACL
+  parents reject before temp/commit and preserve the ACL; other parents create
+  full contents with runner effective UID/GID and 0600, including setgid parents.
+- Commit-timed SSH disconnect before commit (temp fsync, started=false) and
+  immediately after actual replace: independent probe confirms old/new bytes
+  at the handshake. Real connection closure yields failed/null. After release,
+  receiver completes exactly one commit, full new bytes and no remaining own
+  temps. Exact receiver source with test-only os API interposition is used;
+  SIGHUP is ignored only in this test to allow finally to complete. This does
+  not prove immediate cleanup after forced process termination, or add test
+  hooks to the production launcher.
+
+Revision 2 also passes go test ./..., go vet ./..., build.ps1 and Linux command
+real-SSH regression. Windows real-SSH evidence below remains applicable because
+revision 2 changes only tests, evidence and documentation, with no production
+code changes; it was not rerun for this revision.
+
 See [design and trust boundary](../../linux-file-content.md). Only the pinned
 Debian container filesystem is exercised. Physical power loss, all device types,
-real foreign-UID ownership retention failure, default ACL/setgid combinations,
-and file-specific commit-timed SSH disconnect are unverified. Generic Linux
-command disconnect/timeout/cancel regressions pass, but do not prove file commit
-phase timing. Forced receiver kill may leave a temp; fixture destruction reclaims
+and arbitrary ownership/ACL/filesystem configurations beyond the concrete cases
+above remain unverified. Forced receiver kill may leave a temp; fixture destruction reclaims
 it. Hostile root/same-UID namespace mutation after final validation is outside the
-trust contract. A full L07 completion/publication claim is withheld for these
-remaining cases; implementing the backend is not a new CI publication approval.
+trust contract. Evidence supports the documented fixture/trust scope, not a
+universal filesystem or hostile-root guarantee or a new CI publication approval.
 
 ## Windows real SSH regression
 
