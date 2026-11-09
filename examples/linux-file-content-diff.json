@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hosts": "all",
+  "tasks": [
+    {
+      "name": "write UTF-8 configuration",
+      "module": "file_content",
+      "args": {
+        "path": "/home/runner/config.txt",
+        "content": "日本語: updated\n"
+      }
+    }
+  ]
+}

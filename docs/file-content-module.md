@@ -51,3 +51,6 @@ SSHの証跡は`.cache/windows-ssh/1e0ecd98f80c/`です。実cmd起動行は`wra
 ## Linux
 
 Linuxは別のPython receiverを使用します。[Linuxの詳細設計と制約](linux-file-content.md)を参照してください。上記のWindowsハンドル・DACL方式はLinuxには適用しません。
+
+Linuxの配布サンプルと期待結果（新規→同値→差分）、0600、既存属性保持・拒否条件、
+CASなし、変更不明時の復旧手順は[Linux file_content](linux-file-content.md#配布exeで新規同値差分を確認する)を参照。

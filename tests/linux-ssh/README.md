@@ -174,3 +174,12 @@ It must invoke the built **Windows product exe**, persist sanitized expectations
 and observations itself, fail on missing/skipped cases, and exit nonzero on
 failure. It shares the common run deadline and finally cleanup; the runner does
 not persist its arbitrary output. Never copy credential files into evidence.
+
+## L07を含む公開検証
+
+`product.ps1`は配布exeによるcommandとfile_contentを同一fixtureで実行する。
+`tests/ci/linux-required.json`の全サブケースが必須で、属性/競合のskipは成功に含めない。
+`file-content.ps1`を単独実行する場合も`-DistributionDirectory`に展開済み配布物を指定する。
+配布サンプル新規→同値→差分はその同梱JSONを使用する。
+API-cases/commit-disconnectはテスト限定注入、product-bytes/distribution-exampleは無改変製品経路。
+清掃・許可リスト証跡回収・600秒の全体期限は既存run.ps1を共用する。

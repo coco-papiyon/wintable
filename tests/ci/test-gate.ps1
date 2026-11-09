@@ -8,13 +8,13 @@ try {
     $hash=(Get-FileHash "$root/package/wintable.exe").Hash
     'synthetic ZIP bytes' | Set-Content "$root/package.zip"
     $zipHash=(Get-FileHash "$root/package.zip").Hash
-    $paths=@('wintable.exe','README.md','LICENSE','audit.json','build.json','SHA256.json','licenses/index.json','licenses/Go-LICENSE','docs/usage.md','docs/release.md','docs/file-content-module.md','docs/linux-command.md','docs/support.md','docs/ci.md','examples/linux-inventory.json','examples/linux-command.json','examples/mixed-inventory.json','examples/mixed-command.json')
+    $paths=@('wintable.exe','README.md','LICENSE','audit.json','build.json','SHA256.json','licenses/index.json','licenses/Go-LICENSE','docs/usage.md','docs/release.md','docs/file-content-module.md','docs/linux-file-content.md','docs/linux-command.md','docs/support.md','docs/ci.md','examples/linux-inventory.json','examples/linux-file-content.json','examples/linux-file-content-diff.json','examples/linux-command.json','examples/mixed-inventory.json','examples/mixed-command.json')
     foreach ($path in $paths | Select-Object -Skip 1) {
         New-Item (Split-Path "$root/package/$path") -ItemType Directory -Force | Out-Null
         'synthetic' | Set-Content "$root/package/$path"
     }
     Save @{source_sha='source';go='go version go1.27.3 windows/amd64';files=@($paths | ForEach-Object {@{path=$_;sha256=(Get-FileHash "$root/package/$_").Hash}})} 'package/distribution.json'
-    foreach ($mode in 'valid','valid-hybrid','missing-provenance','skip','missing','duplicate','null-exit','wrong-source','wrong-binary','versions','cleanup','deadline','job-failed','job-skipped','job-cancelled','missing-artifact','windows-missing','zip-missing','zip-failed','zip-not-removed','zip-wrong-hash') {
+    foreach ($mode in 'l07-attribute-skip','l07-race-missing','l07-duplicate','l07-empty','example-missing','valid','valid-hybrid','missing-provenance','skip','missing','duplicate','null-exit','wrong-source','wrong-binary','versions','cleanup','deadline','job-failed','job-skipped','job-cancelled','missing-artifact','windows-missing','zip-missing','zip-failed','zip-not-removed','zip-wrong-hash') {
         $wc=Get-Content "$PSScriptRoot/../validation/coverage.json" -Raw | ConvertFrom-Json
         foreach ($file in @($wc | ForEach-Object {$_.checks.PSObject.Properties.Name}) | Sort-Object -Unique) {
             $names=@($wc | ForEach-Object {$_.checks.PSObject.Properties | Where-Object Name -ceq $file | ForEach-Object Value}) | Sort-Object -Unique
@@ -41,6 +41,12 @@ try {
         }
         $job='success'
         switch ($mode) {
+            'l07-attribute-skip' { '{"Action":"skip","Test":"TestLinuxFileContentSSH/API-cases/foreign-owner"}' | Add-Content "$root/linux/product.jsonl" }
+            'l07-race-missing' { Get-Content "$root/linux/product.jsonl" | Where-Object {$_ -notmatch 'API-cases/ancestor-rename'} | Set-Content "$root/linux/changed"; Move-Item "$root/linux/changed" "$root/linux/product.jsonl" -Force }
+            'l07-duplicate' { '{"Action":"pass","Test":"TestLinuxFileContentSSH/API-cases/new-destination-race"}' | Add-Content "$root/linux/product.jsonl" }
+            'l07-empty' { '' | Set-Content "$root/linux/product.jsonl" }
+            'example-missing' { Get-Content "$root/linux/product.jsonl" | Where-Object {$_ -notmatch 'distribution-example'} | Set-Content "$root/linux/changed"; Move-Item "$root/linux/changed" "$root/linux/product.jsonl" -Force }
+
             'skip' { '{"Action":"skip","Test":"TestLinuxCommandSSH/product-output"}' | Add-Content "$root/linux/product.jsonl" }
             'missing' { Get-Content "$root/linux/product.jsonl" | Where-Object {$_ -notmatch 'product-output'} | Set-Content "$root/linux/changed"; Move-Item "$root/linux/changed" "$root/linux/product.jsonl" -Force }
             'duplicate' { '{"Action":"pass","Test":"TestLinuxCommandSSH/product-output"}' | Add-Content "$root/linux/product.jsonl" }

@@ -1,7 +1,7 @@
 param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$EvidenceDirectory,[string]$DistributionDirectory)
 $ErrorActionPreference='Stop'
 $env:WINTABLE_LINUX_SSH_FIXTURE=$FixtureDirectory
-$env:WINTABLE_PRODUCT_EXE=(Resolve-Path "$PSScriptRoot/../../dist/wintable.exe").Path
+$env:WINTABLE_PRODUCT_EXE=if ($DistributionDirectory) { (Resolve-Path "$DistributionDirectory/wintable.exe").Path } else { (Resolve-Path "$PSScriptRoot/../../dist/wintable.exe").Path }
 try {
  $events = & go test ./internal/module -run '^TestLinux(FileContentSSH|CommandSSH)$' -count=1 -json
  $code=$LASTEXITCODE
@@ -11,6 +11,7 @@ try {
  foreach($test in @('TestLinuxFileContentSSH/API-cases','TestLinuxFileContentSSH/commit-disconnect/before','TestLinuxFileContentSSH/commit-disconnect/after','TestLinuxFileContentSSH/product-bytes','TestLinuxCommandSSH')) {
   if (!@($parsed|Where-Object {$_.Action -eq 'pass' -and $_.Test -eq $test}).Count) {throw "Missing case $test"}
  }
+ & "$PSScriptRoot/check-file-content.ps1" -Events $parsed
  Get-FileHash $env:WINTABLE_PRODUCT_EXE | ConvertTo-Json | Set-Content "$EvidenceDirectory/file-content-product-hash.json"
 } finally {
  Remove-Item Env:WINTABLE_LINUX_SSH_FIXTURE -ErrorAction SilentlyContinue

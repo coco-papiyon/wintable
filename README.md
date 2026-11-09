@@ -1,6 +1,6 @@
 # wintable
 
-Windowsネイティブで動作するGo製の構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、commandモジュール、結果集計・描画を実装しています。Windows file_contentとLinux commandも実装済みです。
+Windowsネイティブで動作するGo製の構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、commandモジュール、結果集計・描画を実装しています。Windows/Linuxのcommand・file_contentを実装済みです。
 
 - [ZIPの導入・SSH準備・利用手順](docs/usage.md)
 - [Windows CI・監査・ZIP作成と公開条件](docs/release.md)

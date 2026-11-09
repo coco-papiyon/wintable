@@ -55,6 +55,6 @@ foreach ($file in $coverage.PSObject.Properties) {
         if (@($events | Where-Object { $_.Test -ceq $name -and $_.Action -ceq 'pass' }).Count -ne 1) { throw "Missing/duplicate case: $name" }
     }
 }
-@{source_sha=$SourceSHA;exe_sha256=$hash;zip_sha256=(Get-FileHash "$DistributionDirectory.zip").Hash;status='passed';mixed_real_ssh='unconfirmed';windows='V-01..V-18';linux='L01..L06 (layered)';windows_execution=$WindowsExecution;linux_execution=$LinuxExecution;workflow_run_id=$WorkflowRunId} |
+@{source_sha=$SourceSHA;exe_sha256=$hash;zip_sha256=(Get-FileHash "$DistributionDirectory.zip").Hash;status='passed';mixed_real_ssh='unconfirmed';windows='V-01..V-18';linux='L01..L07 (layered)';windows_execution=$WindowsExecution;linux_execution=$LinuxExecution;workflow_run_id=$WorkflowRunId} |
     ConvertTo-Json | Set-Content "$EvidenceDirectory/publication.json" -Encoding utf8NoBOM
 
