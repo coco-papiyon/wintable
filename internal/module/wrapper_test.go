@@ -3,6 +3,11 @@ package module
 import "testing"
 
 func TestDistributionWrapper(t *testing.T) {
+	for _, target := range []string{"windows", "linux"} {
+		if e := FetchBackend(target).Check(); e != nil {
+			t.Fatal(e)
+		}
+	}
 	if err := ValidateLinuxWrapper(LinuxFileContentWrapper()); err != nil {
 		t.Fatal(err)
 	}

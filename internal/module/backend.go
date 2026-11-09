@@ -115,5 +115,5 @@ func Serialize(host string, task int, kind string, args map[string]any) (Prepare
 	if len(data) > JSONLimit {
 		return Prepared{}, &SizeError{Host: host, Task: task, Limit: JSONLimit, Actual: len(data)}
 	}
-	return Prepared{data}, nil
+	return Prepared{data: data}, nil
 }

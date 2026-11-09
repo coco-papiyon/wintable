@@ -8,13 +8,13 @@ try {
     $hash=(Get-FileHash "$root/package/wintable.exe").Hash
     'synthetic ZIP bytes' | Set-Content "$root/package.zip"
     $zipHash=(Get-FileHash "$root/package.zip").Hash
-    $paths=@('wintable.exe','README.md','LICENSE','audit.json','build.json','SHA256.json','licenses/index.json','licenses/Go-LICENSE','docs/usage.md','docs/release.md','docs/file-content-module.md','docs/linux-file-content.md','docs/linux-command.md','docs/support.md','docs/ci.md','examples/linux-inventory.json','examples/linux-file-content.json','examples/linux-file-content-diff.json','examples/linux-command.json','examples/mixed-inventory.json','examples/mixed-command.json')
+    $paths=@('wintable.exe','README.md','LICENSE','audit.json','build.json','SHA256.json','licenses/index.json','licenses/Go-LICENSE','docs/usage.md','docs/fetch-module.md','examples/fetch.json','docs/release.md','docs/file-content-module.md','docs/linux-file-content.md','docs/linux-command.md','docs/support.md','docs/ci.md','examples/linux-inventory.json','examples/linux-file-content.json','examples/linux-file-content-diff.json','examples/linux-command.json','examples/mixed-inventory.json','examples/mixed-command.json')
     foreach ($path in $paths | Select-Object -Skip 1) {
         New-Item (Split-Path "$root/package/$path") -ItemType Directory -Force | Out-Null
         'synthetic' | Set-Content "$root/package/$path"
     }
     Save @{source_sha='source';go='go version go1.27.3 windows/amd64';files=@($paths | ForEach-Object {@{path=$_;sha256=(Get-FileHash "$root/package/$_").Hash}})} 'package/distribution.json'
-    foreach ($mode in 'l07-attribute-skip','l07-race-missing','l07-duplicate','l07-empty','example-missing','valid','valid-hybrid','missing-provenance','skip','missing','duplicate','null-exit','wrong-source','wrong-binary','versions','cleanup','deadline','job-failed','job-skipped','job-cancelled','missing-artifact','windows-missing','zip-missing','zip-failed','zip-not-removed','zip-wrong-hash') {
+    foreach ($mode in 'fetch-linux-missing','fetch-windows-missing','fetch-native-skip','l07-attribute-skip','l07-race-missing','l07-duplicate','l07-empty','example-missing','valid','valid-hybrid','missing-provenance','skip','missing','duplicate','null-exit','wrong-source','wrong-binary','versions','cleanup','deadline','job-failed','job-skipped','job-cancelled','missing-artifact','windows-missing','zip-missing','zip-failed','zip-not-removed','zip-wrong-hash') {
         $wc=Get-Content "$PSScriptRoot/../validation/coverage.json" -Raw | ConvertFrom-Json
         foreach ($file in @($wc | ForEach-Object {$_.checks.PSObject.Properties.Name}) | Sort-Object -Unique) {
             $names=@($wc | ForEach-Object {$_.checks.PSObject.Properties | Where-Object Name -ceq $file | ForEach-Object Value}) | Sort-Object -Unique
@@ -41,6 +41,9 @@ try {
         }
         $job='success'
         switch ($mode) {
+            'fetch-linux-missing' { Get-Content "$root/linux/product.jsonl" | Where-Object {$_ -notmatch 'TestLinuxFetchSSH'} | Set-Content "$root/linux/changed"; Move-Item "$root/linux/changed" "$root/linux/product.jsonl" -Force }
+            'fetch-windows-missing' { Get-Content "$root/windows/ssh/command-test.log" | Where-Object {$_ -notmatch 'TestFetchSSH'} | Set-Content "$root/windows/ssh/changed"; Move-Item "$root/windows/ssh/changed" "$root/windows/ssh/command-test.log" -Force }
+            'fetch-native-skip' { '--- SKIP: TestStoreCommitFailuresAndRace/symlink-swap (0.01s)' | Add-Content "$root/windows/ssh/fetch-native.log" }
             'l07-attribute-skip' { '{"Action":"skip","Test":"TestLinuxFileContentSSH/API-cases/foreign-owner"}' | Add-Content "$root/linux/product.jsonl" }
             'l07-race-missing' { Get-Content "$root/linux/product.jsonl" | Where-Object {$_ -notmatch 'API-cases/ancestor-rename'} | Set-Content "$root/linux/changed"; Move-Item "$root/linux/changed" "$root/linux/product.jsonl" -Force }
             'l07-duplicate' { '{"Action":"pass","Test":"TestLinuxFileContentSSH/API-cases/new-destination-race"}' | Add-Content "$root/linux/product.jsonl" }

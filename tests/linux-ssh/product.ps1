@@ -7,7 +7,11 @@ try {
     $env:WINTABLE_LINUX_SSH_FIXTURE=$FixtureDirectory
     $env:WINTABLE_PRODUCT_EXE=if ($DistributionDirectory) { Join-Path $DistributionDirectory 'wintable.exe' } else { Join-Path $repo 'dist/wintable.exe' }
     if (!(Test-Path $env:WINTABLE_PRODUCT_EXE)) { throw 'Build product before acceptance' }
-    $events = & go test ./internal/module -run '^TestLinux(CommandSSH|FileContentSSH)$' -count=1 -json
+    if (!$DistributionDirectory) {
+        # file_content's CLI regression also exercises the checked-in examples.
+        Copy-Item -LiteralPath "$repo/examples" -Destination "$repo/dist" -Recurse -Force
+    }
+    $events = & go test ./internal/module -run '^TestLinux(CommandSSH|FileContentSSH|FetchSSH)$' -count=1 -json
     $code=$LASTEXITCODE
     $events | Set-Content "$EvidenceDirectory/product.jsonl" -Encoding utf8NoBOM
     $parsed=@($events | ForEach-Object { $_ | ConvertFrom-Json })
@@ -17,8 +21,15 @@ try {
         if (@($parsed | Where-Object { $_.Action -eq 'pass' -and $_.Test -ceq "TestLinuxCommandSSH/$case" }).Count -ne 1) { throw "Missing/duplicate product case: $case" }
     }
     & "$PSScriptRoot/check-file-content.ps1" -Events $parsed
-    $stage='document-example'
-    & "$PSScriptRoot/document-example.ps1" -FixtureDirectory $FixtureDirectory -EvidenceDirectory $EvidenceDirectory -DistributionDirectory $DistributionDirectory
+    foreach ($case in @('TestLinuxFetchSSH','TestLinuxFetchSSH/empty','TestLinuxFetchSSH/text','TestLinuxFetchSSH/binary-over-1MiB','TestLinuxFetchSSH/failure-preserves-existing','TestLinuxFetchSSH/product-parallel-hosts')) {
+        if (@($parsed | Where-Object { $_.Action -eq 'pass' -and $_.Test -ceq $case }).Count -ne 1) { throw "Missing/duplicate fetch case: $case" }
+    }
+    # Normal implementation checks use the standalone dist/wintable.exe.
+    # Packaged documentation examples remain mandatory for distribution checks.
+    if ($DistributionDirectory) {
+        $stage='document-example'
+        & "$PSScriptRoot/document-example.ps1" -FixtureDirectory $FixtureDirectory -EvidenceDirectory $EvidenceDirectory -DistributionDirectory $DistributionDirectory
+    }
     Get-FileHash $env:WINTABLE_PRODUCT_EXE | Select-Object Algorithm,Hash | ConvertTo-Json | Set-Content "$EvidenceDirectory/product-hash.json"
 } catch {
     # Persist only location metadata, never exception text or command output.
