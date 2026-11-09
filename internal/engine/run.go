@@ -265,11 +265,15 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 			if ctx.Err() != nil {
 				row.Status = result.Cancelled
 				row.Error = result.PublicError("cancelled")
-				row.Changed, row.ExitCode = nil, nil
+				if t.Local {
+					row.Changed, row.ExitCode = nil, nil
+				}
 			} else if deadline {
 				row.Status = result.Failed
 				row.Error = result.PublicError("deadline_exceeded")
-				row.Changed, row.ExitCode = nil, nil
+				if t.Local {
+					row.Changed, row.ExitCode = nil, nil
+				}
 			}
 		}
 		if output && r.DecodeResult == nil && t.Backend == nil {
