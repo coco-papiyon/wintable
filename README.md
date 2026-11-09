@@ -88,3 +88,7 @@ Linux例: `examples/linux-inventory.json` / `examples/linux-command.json`。
 混在単一runの実機E2Eは未確認。切断後の子孫停止は保証しません。
 
 fetchの通信失敗時は、ローカル確定前ならchanged=false、確定後ならtrueを保持します。取得内容は --include-output でも結果へ出しません。詳細は[fetch](docs/fetch-module.md)を参照してください。
+
+## ローカルcommand委譲
+
+`delegate_to: "localhost"` を指定したcommandはWindows制御端末上で実行します。`become` は省略または `false` のみで昇格しません。元ホストごとに変数展開・実行し、結果も元ホストに所属します。全taskが委譲ならSSH接続属性・鍵・known_hostsは不要です。絶対exeとargv、出力上限、期限・中断時の子孫清掃などは[ローカルcommandの仕様](docs/local-command.md)を参照してください。

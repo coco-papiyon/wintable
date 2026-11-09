@@ -99,7 +99,7 @@ func fixture(t *testing.T, n int) (*Plan, Runtime) {
 	p := &Plan{}
 	for i := n - 1; i >= 0; i-- {
 		name := fmt.Sprintf("h%03d", i)
-		p.Hosts = append(p.Hosts, HostPlan{Name: name, Connection: transport.Host{Name: name}, Tasks: []TaskPlan{{"same", "command", payload, nil}, {"same", "command", payload, nil}, {"same", "command", payload, nil}}})
+		p.Hosts = append(p.Hosts, HostPlan{Name: name, Connection: transport.Host{Name: name}, Tasks: []TaskPlan{{Name: "same", Module: "command", Payload: payload}, {Name: "same", Module: "command", Payload: payload}, {Name: "same", Module: "command", Payload: payload}}})
 	}
 	return p, Runtime{Wrappers: map[string]string{"command": "fixed"}, Decode: func(_ TaskPlan, r transport.Response) (result.Status, *bool, *result.Error) {
 		b := true

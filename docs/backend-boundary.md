@@ -25,3 +25,7 @@ SSH、順序、forks、timeout/cancel、結果描画は共用する。
 ## fetch backend
 
 両OSのfetchはsrcだけをstdinへ直列化し、絶対化したローカル保存先をPrepared.FetchDestinationへ保持します。全件の保存先衝突と既存のリンク祖先をBuildで検査します。Runtimeは接続前にStreamingConnector能力を検査し、RunFetchが専用Stream・整合性検証・NTFS保存を所有します。通常Decodeへバイナリを渡しません。Windows固定bootstrapはASCIIの-Commandで配布コードを展開し、タスク値は一切連結しません。上限は従来の8,000 UTF-16単位を維持します。[仕様](fetch-module.md)。
+
+## ローカルcommand委譲
+
+`delegate_to: "localhost"` を指定したcommandはWindows制御端末上で実行します。`become` は省略または `false` のみで昇格しません。元ホストごとに変数展開・実行し、結果も元ホストに所属します。全taskが委譲ならSSH接続属性・鍵・known_hostsは不要です。絶対exeとargv、出力上限、期限・中断時の子孫清掃などは[ローカルcommandの仕様](local-command.md)を参照してください。

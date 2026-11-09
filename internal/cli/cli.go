@@ -48,13 +48,17 @@ Scope: Windows 11 / Windows Server 2022 or later, amd64 control and target;
 SSH public-key authentication, mandatory known_hosts, cmd.exe default shell,
 PowerShell 5.1+, independent JSON v1; command, file_content and fetch modules.
 Debian 13 amd64 targets require OpenSSH, POSIX /bin/sh and CPython 3.13.
-Unsupported: Ansible YAML/Jinja/collections, roles/handlers/facts/become/vault,
+Unsupported: Ansible YAML/Jinja/collections, roles/handlers/facts/privilege escalation/vault,
 dynamic inventory, check mode, retries, rollback, WinRM and arm64.
 Output bodies may contain secrets from arbitrary commands. Automatic masking
 is not guaranteed; enable --include-output only when appropriate.
 
 Input files are strictly validated before execution. No connections are made yet.
 Fetch saves binary files on the Windows controller; see docs/fetch-module.md.
+Local command: task delegate_to="localhost" runs on the Windows controller.
+become accepts false only; no elevation. Absolute .exe + argv required.
+Delegation runs once per original host; local-only tasks need no SSH credentials.
+See docs/local-command.md and examples/local-{inventory,tasks}.json.
 Internal errors exit 3.
 Exit codes: 0 success/help, 1 target failure, 2 input, 3 internal, 130 cancelled.
 `

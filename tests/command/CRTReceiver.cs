@@ -13,6 +13,18 @@ public class CRTReceiver {
   if(__wgetmainargs(out count,out args,out env,0,ref startup)!=0)return 99;
   string[] values=new string[count-1];
   for(int i=1;i<count;i++)values[i-1]=Marshal.PtrToStringUni(Marshal.ReadIntPtr(args,i*IntPtr.Size));
+  if(values.Length>0 && values[0]=="--stdin-eof")return Console.OpenStandardInput().ReadByte()==-1?0:97;
+  if(values.Length>0 && values[0]=="--bytes") {
+   int n=Int32.Parse(values[1]);byte[] data=new byte[n];
+   var task=Task.Factory.StartNew(()=>Console.OpenStandardError().Write(data,0,n));
+   Console.OpenStandardOutput().Write(data,0,n);task.Wait();return 0;
+  }
+  if(values.Length>0 && (values[0]=="--tree" || values[0]=="--orphan")) {
+   var child=System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName,"--wait \""+values[1]+".started\""){UseShellExecute=false,CreateNoWindow=true});
+   File.WriteAllText(values[1],child.Id.ToString());
+   if(values[0]=="--tree")System.Threading.Thread.Sleep(60000);
+   return 0;
+  }
   if(values.Length>0 && values[0]=="--marker") { File.WriteAllText(values[1],"executed");return 0; }
   if(values.Length>0 && values[0]=="--wait") { File.AppendAllText(values[1],"started\n");System.Threading.Thread.Sleep(60000);return 0; }
   if(values.Length>0 && values[0]=="--assert-absent")return File.Exists(values[1])?98:0;

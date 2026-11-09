@@ -44,3 +44,7 @@ Windows 11のローカルcmd/PowerShell/CRT試験は成功しましたが、Wind
 関連: [モジュール一覧と設計](../modules.md)。
 
 Linux対象の契約・例・対応範囲は [Linux command](../../linux-command.md)、[対応表](../../support.md) を参照。
+
+## ローカルcommand委譲
+
+`delegate_to: "localhost"` を指定したcommandはWindows制御端末上で実行します。`become` は省略または `false` のみで昇格しません。元ホストごとに変数展開・実行し、結果も元ホストに所属します。全taskが委譲ならSSH接続属性・鍵・known_hostsは不要です。絶対exeとargv、出力上限、期限・中断時の子孫清掃などは[ローカルcommandの仕様](../../local-command.md)を参照してください。

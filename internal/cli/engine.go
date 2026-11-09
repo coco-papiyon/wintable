@@ -44,7 +44,9 @@ func RunEngine(ctx context.Context, args []string, stdout, stderr io.Writer, r e
 		if legacy {
 			for hi := range o.Plan.Hosts {
 				for ti := range o.Plan.Hosts[hi].Tasks {
-					o.Plan.Hosts[hi].Tasks[ti].Backend = nil
+					if !o.Plan.Hosts[hi].Tasks[ti].Local {
+						o.Plan.Hosts[hi].Tasks[ti].Backend = nil
+					}
 				}
 			}
 		}
