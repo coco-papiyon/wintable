@@ -1,5 +1,7 @@
 # 標準runnerと必要時のローカル実SSH検証
 
+試験内容の一覧と、通常開発・関連変更時・配布前の試験選択は[試験一覧と実行方針](testing.md)を参照。エージェントの通常試験は変更範囲に応じて選択するが、本書のCI・公開ゲートの必須条件は維持する。
+
 追加のVM契約・larger runner・常設self-hosted runnerを使わない。
 公開リポジトリのGitHub標準runnerによる実行を使用する。
 [GitHubの料金条件](https://docs.github.com/en/actions/concepts/billing-and-usage)に従い、
