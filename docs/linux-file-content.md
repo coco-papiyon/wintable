@@ -31,3 +31,5 @@ changed=falseはok、trueはchanged。確定APIを呼ぶ直前に状態を不明
 `tests/linux-ssh/file-content.ps1` は固定Debian fixture、実SSH、通常runnerを使用する。`product-bytes` はWindows製品exe経路と独立hash/mode/UID probe。`API-cases` は製品receiver関数を実SSH先で読み込み、テストだけのAPI差替えで競合/障害の同期点を作る。製品には注入入口を含めない。モックの成功を全実機競合の証明とはしない。
 
 未確認: 全filesystem、実機電源断、悪意のroot/同一UIDへの完全防御、強制kill時の即時temp回収、全device種別、混在単一run実機E2E。強制切断後の残存はfixtureコンテナ破棄で回収する。対応公開は既存CI集約条件と別途保存する実証記録に従う。
+
+実行例: examples/linux-file-content.json。実SSH検証は tests/linux-ssh/run.ps1 に -ProductTestScript tests/linux-ssh/file-content.ps1 を指定する。既存Linux command試験も同時に実行し、skipを失敗として扱う。

@@ -1,0 +1,73 @@
+=== RUN   TestCommandWindows
+    command_windows_test.go:41: CRT parser: msvcrt.dll __wgetmainargs; local exe=C:\Users\cocoo\AppData\Local\Temp\TestCommandWindows2662400660\001\日本語 空白.exe
+=== RUN   TestCommandWindows/cmd
+=== RUN   TestCommandWindows/cmd/wrapper_launch_boundaries
+    command_windows_test.go:139: real wrapper launch accepted: 7999 UTF-16 units mode=cmd
+    command_windows_test.go:139: real wrapper launch accepted: 8000 UTF-16 units mode=cmd
+=== RUN   TestCommandWindows/cmd/CRT_roundtrip
+=== RUN   TestCommandWindows/cmd/nonzero_and_bytes
+=== RUN   TestCommandWindows/cmd/receiver_boundaries
+    command_windows_test.go:223: receiver JSON boundary: 2097151 bytes
+    command_windows_test.go:223: receiver JSON boundary: 2097152 bytes
+    command_windows_test.go:223: receiver JSON boundary: 2097153 bytes
+=== RUN   TestCommandWindows/cmd/invalid_before_execution
+=== RUN   TestCommandWindows/cmd/EOF_required
+=== NAME  TestCommandWindows/cmd
+    command_windows_test.go:296: launch units=7185 mode=cmd
+=== RUN   TestCommandWindows/ssh
+=== RUN   TestCommandWindows/ssh/wrapper_launch_boundaries
+    command_windows_test.go:139: real wrapper launch accepted: 7999 UTF-16 units mode=ssh
+    command_windows_test.go:139: real wrapper launch accepted: 8000 UTF-16 units mode=ssh
+=== RUN   TestCommandWindows/ssh/CRT_roundtrip
+=== RUN   TestCommandWindows/ssh/nonzero_and_bytes
+=== RUN   TestCommandWindows/ssh/receiver_boundaries
+    command_windows_test.go:223: receiver JSON boundary: 2097151 bytes
+    command_windows_test.go:223: receiver JSON boundary: 2097152 bytes
+    command_windows_test.go:223: receiver JSON boundary: 2097153 bytes
+=== RUN   TestCommandWindows/ssh/invalid_before_execution
+=== NAME  TestCommandWindows/ssh
+    command_windows_test.go:296: launch units=7185 mode=ssh
+--- PASS: TestCommandWindows (75.70s)
+    --- PASS: TestCommandWindows/cmd (24.22s)
+        --- PASS: TestCommandWindows/cmd/wrapper_launch_boundaries (1.36s)
+        --- PASS: TestCommandWindows/cmd/CRT_roundtrip (0.69s)
+        --- PASS: TestCommandWindows/cmd/nonzero_and_bytes (4.25s)
+        --- PASS: TestCommandWindows/cmd/receiver_boundaries (8.03s)
+        --- PASS: TestCommandWindows/cmd/invalid_before_execution (7.81s)
+        --- PASS: TestCommandWindows/cmd/EOF_required (2.08s)
+    --- PASS: TestCommandWindows/ssh (50.91s)
+        --- PASS: TestCommandWindows/ssh/wrapper_launch_boundaries (4.49s)
+        --- PASS: TestCommandWindows/ssh/CRT_roundtrip (1.78s)
+        --- PASS: TestCommandWindows/ssh/nonzero_and_bytes (9.71s)
+        --- PASS: TestCommandWindows/ssh/receiver_boundaries (11.45s)
+        --- PASS: TestCommandWindows/ssh/invalid_before_execution (23.38s)
+=== RUN   TestFileContentLinkSwapWindows
+=== RUN   TestFileContentLinkSwapWindows/expected
+    file_content_race_windows_test.go:68: synchronized file-to-symlink swap rejected; referent unchanged; no temporary files
+=== RUN   TestFileContentLinkSwapWindows/different
+    file_content_race_windows_test.go:68: synchronized file-to-symlink swap rejected; referent unchanged; no temporary files
+--- PASS: TestFileContentLinkSwapWindows (7.89s)
+    --- PASS: TestFileContentLinkSwapWindows/expected (4.12s)
+    --- PASS: TestFileContentLinkSwapWindows/different (3.76s)
+=== RUN   TestFileContentSSH
+    file_content_ssh_windows_test.go:56: failed receiver stdout={"error":"invalid_request"} stderr=
+    file_content_ssh_windows_test.go:56: failed receiver stdout={"error":"write_failed"} stderr=
+    file_content_ssh_windows_test.go:121: ACL deny: failed without target or temporary file; deny ACE removed in deferred cleanup
+    file_content_ssh_windows_test.go:126: SSH/cmd file_content: bytes, 10KiB stdin, idempotence, replacement ACL, invalid JSON passed; launch model=7997 UTF-16; target=5.1.20348.5773
+        
+        Microsoft Windows [Version 10.0.20348.5773]
+--- PASS: TestFileContentSSH (16.70s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/module	101.763s
+=== RUN   TestCommandSSHLaunchAndDisconnect
+    command_ssh_windows_test.go:126: observed shell UTF-16 units=7185, model=7185
+    command_ssh_windows_test.go:171: seven-byte SSH writes and explicit EOF: valid request executed; pending request still has no side effect
+    command_ssh_windows_test.go:187: partial JSON disconnect: returned within 10 seconds; no child side effect before/after disconnect
+--- PASS: TestCommandSSHLaunchAndDisconnect (10.81s)
+=== RUN   TestFileContentSSHLaunchAndDisconnect
+    command_ssh_windows_test.go:126: observed shell UTF-16 units=7997, model=7997
+    command_ssh_windows_test.go:171: seven-byte SSH writes and explicit EOF: valid request executed; pending request still has no side effect
+    command_ssh_windows_test.go:187: partial JSON disconnect: returned within 10 seconds; no child side effect before/after disconnect
+--- PASS: TestFileContentSSHLaunchAndDisconnect (9.76s)
+PASS
+ok  	github.com/coco-papiyon/wintable/internal/module	22.118s
