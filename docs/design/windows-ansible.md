@@ -1,5 +1,7 @@
 # Windows上で動作するGo製構成管理CLIの設計
 
+> 本書はWindows向け初期設計とIssue単位の履歴を含みます。本文中の「未実装」「将来」は当時の記録です。現行のWindows/Linux実装状況は[モジュール一覧](modules.md)、[対応表](../support.md)、OS別の現行module仕様を参照してください。
+
 対象: [Issue #1](https://github.com/coco-papiyon/wintable/issues/1)  
 資料確認日: 2026-11-07
 
@@ -251,8 +253,8 @@ transport/moduleは既知の原因をこのコードへ分類し、下位のerro
 Ctrl+Cで新規処理を止め接続を解放します。切断で対象プロセス停止は保証できません。変更不明時は対象状態を確認してから手動で再実行してください。
 `cli.RunEngine` が全件事前検証から結果描画まで接続します。SSHと実モジュールは後続Issueのため、本番mainは引き続き未実装終了3です。模擬V-04/06を実機SSH検証の合格とは扱いません。
 
-I-08実装では固定コードをDeflate/base64で配布し、起動形から表示用の-NoLogoを省略する。タスク値は引き続きstdinのみ。file_contentの起動長・競合処理と検証範囲は[モジュール資料](../file-content-module.md)を参照。
+I-08実装では固定コードをDeflate/base64で配布し、起動形から表示用の-NoLogoを省略する。タスク値は引き続きstdinのみ。当時のWindows file_contentの起動長・競合処理と検証範囲は[Windows module資料](modules/file-content-module.md)を参照する。現行のOS別対応は[モジュール一覧](modules.md)に記載する。
 
 関連: [モジュール一覧と設計](modules.md)。
 
-Linux対象の追加設計: [ADR-0001: LinuxをSSH実行対象に追加する](../adr/0001-linux-target-support.md)。設計決定であり、現行CLIのLinux対応を示すものではありません。
+Linux対象追加の設計判断: [ADR-0001](../adr/0001-linux-target-support.md)。現在のLinux対応範囲は[モジュール一覧](modules.md)と[対応表](../support.md)に記載しています。

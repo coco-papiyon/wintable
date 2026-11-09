@@ -1,6 +1,6 @@
 # commandモジュール（I-07）
 
-この文書はWindows backendの契約。Linux backendは [Linux command](linux-command.md) を参照。
+この文書はWindows backendの契約。Linux backendは [Linux command](../../linux-command.md) を参照。
 
 commandはCRT規則でargvを受け取るWindows絶対パスの.exeに限定します。cmd.exe、バッチ、.com/.ps1、独自引数解析exe、シェル構文は対応しません。コマンドは非冪等です。終了0はchanged=true、非0はfailed/changed=nullで子の終了値を返します。通信断・期限切れは変更不明で、自動再送しません。
 
@@ -26,11 +26,13 @@ stdout/stderrは別々のバイトストリームで並行回収し、各1MiBを
 
 ## 検証と未確認事項
 
+> 本節の実行記録は記載した日付・commit・環境に対する履歴です。最新の実装状況と実証範囲は[モジュール一覧](../modules.md)と[対応表](../../support.md)を参照してください。
+
 `go test ./...`、`go vet ./...`、`build.ps1`を使用します。WindowsではTestCommandWindowsが実cmd.exe・PowerShell 5.1を起動し、CRTReceiver.exeのmsvcrt.dll `__wgetmainargs`が実コマンドラインを解析します。CLR/Goのargv解析で代用しません。試験専用exeには、引数をUTF-16LE/base64行で返すモード、生バイト同時大量出力、終了値、実行検出マーカーがあります。
 
 Windows 11ローカルで確認した項目：日本語・空白パス、空引数、引用符、バックスラッシュ、非BMP、メタ文字・改行、9,000文字argvの往復、生出力各1MiBとtruncated、終了値、子起動行32,765/32,766/32,767、stdin 2MiB−1/同値/+1、7バイト分割送信、不正UTF-8/JSON/重複/型/未知キー/BOM/サロゲートの拒否、本文非露出、EOF前の実行禁止。モジュール・engineの回帰試験では外側/子終了値の区別と既定出力非公開も検証します。
 
-## 2026-11-08の修正とSSH検証
+## 2026-11-08の修正とSSH検証記録
 
 実OpenSSH 9.5.6.4経由では、従来の8,192バイト読取で9,000文字argvの受信が停止しました。4,096バイト読取でも再現しました。受信を既存transport fixtureと同じ7バイト単位に変更すると、長いargvと2MiB−1/同値/+1を含む製品ラッパーの全試験が成功しました。原因の内部機序は未確定であり、待機時間や追加の標準出力・標準エラーで回避していません。小さい断片をEOFまたは上限+1までバイト列として結合し、その後に厳密UTF-8/JSON検査する契約は同じです。
 
@@ -39,6 +41,6 @@ Windows 11ローカルで確認した項目：日本語・空白パス、空引�
 今回の製品試験証跡: `.cache/windows-ssh/4726fe503440/`。`command-test.log`は実cmdとSSH両モードで全サブテスト成功、`wrapper-launch.json`は実起動行、`manifest.json`はソースhash・OpenSSH版・コマンド・終了値・後片付けを保存します。ベースはServer Core LTSC 2022のdigest `sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09`、Hyper-V分離です。ホストのSSHサービス・設定は変更しません。
 
 Windows 11のローカルcmd/PowerShell/CRT試験は成功しましたが、Windows 11をSSH対象とする試験、およびフルServer 2022での試験は未確認です。Server Coreコンテナを両OSの実機合格へ読み替えません。Issue #9の受け入れ条件全体は、これらが未確認のため合格扱いにしません。独自引数解析exe等の互換範囲は本書冒頭のとおりです。
-関連: [モジュール一覧と設計](design/modules.md)。
+関連: [モジュール一覧と設計](../modules.md)。
 
-Linux対象の契約・例・対応範囲は [Linux command](linux-command.md)、[対応表](support.md) を参照。
+Linux対象の契約・例・対応範囲は [Linux command](../../linux-command.md)、[対応表](../../support.md) を参照。

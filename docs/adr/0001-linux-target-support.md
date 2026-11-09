@@ -1,15 +1,15 @@
 # ADR-0001: LinuxをSSH実行対象に追加する
 
-- 状態: 採用（command/file_content実装済み。対応公開は同一SHAのL01〜L07・Windows回帰・集約ゲート合格が条件）
+- 状態: 採用（Windows制御端末からLinux対象へのcommand/file_contentを実装済み。現在の公開条件は[対応表](../support.md)と[CI](../ci.md)を参照）
 - 日付: 2026-11-08
 - 要件: [Issue #23](https://github.com/coco-papiyon/wintable/issues/23)本文・実装計画と[検証指摘](https://github.com/coco-papiyon/wintable/issues/23#issuecomment-6715076392)。
-- 調査基準: main `fb1e92e02754def6b3d3c290c79573199282f843`（PR #21統合後）
+- 設計調査時の基準: main `fb1e92e02754def6b3d3c290c79573199282f843`（PR #21統合後）。このSHAはADR作成時点のもので、現行実装基準ではない。
 
 ## 背景と範囲
 
 Windows制御端末からLinuxへ、現行と同じ公開鍵SSH・known_hosts検証・全件事前検証で実行する。初期Linux moduleはcommandのみ。Linux制御端末、sudo/become、package、systemd、再起動、汎用shellは別Issueとする。本IssueはADR・分割案・試験設計を納品し、コード、fixture、CI、子Issueの起票は行わない。
 
-mainはWindowsのcommandとfile_contentを標準CLIに登録済み。file_contentは[PR #21](https://github.com/coco-papiyon/wintable/pull/21)で統合され、[Issue #10](https://github.com/coco-papiyon/wintable/issues/10)はCLOSED。[Issue #20](https://github.com/coco-papiyon/wintable/issues/20)のモジュール設計も統合済み。確認根拠は `internal/cli/engine.go` の両Wrappers/DecodeResult登録、`internal/module/file_content.cs` と[現行仕様](../file-content-module.md)。Windowsコンテナの受け入れ済み範囲と未確認範囲は現行仕様と#10の最終検証を参照し、全OS・全競合の保証とはしない。
+このADRはLinux対象追加の設計判断を記録する。現在のmainではWindows/Linux両方のcommandとfile_contentが標準CLIに登録済み。現在の状況は[モジュール一覧](../design/modules.md)、Windows file_contentの契約は[仕様書](../design/modules/file-content-module.md)、Linux file_contentの契約は[こちら](../linux-file-content.md)。個別の受入範囲・未確認事項はそれぞれの仕様および[対応表](../support.md)を参照し、全OS・全競合の保証と混同しない。
 
 ## 決定1: 対象環境と依存
 

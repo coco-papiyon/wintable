@@ -8,7 +8,7 @@ try {
     $hash=(Get-FileHash "$root/package/wintable.exe").Hash
     'synthetic ZIP bytes' | Set-Content "$root/package.zip"
     $zipHash=(Get-FileHash "$root/package.zip").Hash
-    $paths=@('wintable.exe','README.md','LICENSE','audit.json','build.json','SHA256.json','licenses/index.json','licenses/Go-LICENSE','docs/usage.md','docs/release.md','docs/file-content-module.md','docs/linux-file-content.md','docs/linux-command.md','docs/support.md','docs/ci.md','examples/linux-inventory.json','examples/linux-file-content.json','examples/linux-file-content-diff.json','examples/linux-command.json','examples/mixed-inventory.json','examples/mixed-command.json')
+    $paths=@('wintable.exe','README.md','LICENSE','audit.json','build.json','SHA256.json','licenses/index.json','licenses/Go-LICENSE','docs/usage.md','docs/release.md','docs/design/modules.md','docs/design/modules/command-module.md','docs/design/modules/file-content-module.md','docs/design/windows-ansible.md','docs/design/windows-ansible-validation.md','docs/adr/0001-linux-target-support.md','docs/linux-file-content.md','docs/linux-command.md','docs/support.md','docs/ci.md','examples/linux-inventory.json','examples/linux-file-content.json','examples/linux-file-content-diff.json','examples/linux-command.json','examples/mixed-inventory.json','examples/mixed-command.json')
     foreach ($path in $paths | Select-Object -Skip 1) {
         New-Item (Split-Path "$root/package/$path") -ItemType Directory -Force | Out-Null
         'synthetic' | Set-Content "$root/package/$path"

@@ -21,7 +21,7 @@ changed=nullは対象状態不明を表す。再送は行わず、状態を確�
 
 混在inventoryは模擬backend/engineと個別Windows/Linux実SSHを分けて検証する。
 **混在単一runの実機E2Eは未確認**。両コンテナモードの同時稼働を前提にしない。
-L07の設計・制約・検証層は [Linux file_content](linux-file-content.md) を参照。実装済みとCI対応公開は区別する。
+モジュール別の現行実装と設計は[一覧](design/modules.md)を参照。L07の設計・制約・検証層は [Linux file_content](linux-file-content.md) を参照。実装済みとCI対応公開は区別する。
 
 対応公開の条件は、同じSHA・同じ製品exeの両OS必須試験と集約ゲートの合格。
 標準GitHub Windows runnerの実測を先に行い、Linux実SSHは既存Windows PCで必要時に実行する。

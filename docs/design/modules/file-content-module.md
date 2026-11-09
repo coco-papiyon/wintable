@@ -22,6 +22,8 @@ contentはBOMを付加しない厳密UTF-8へ符号化します。LF/CRLF、末�
 
 ## 起動と検証
 
+> 本節の実行記録は記載した日付・commit・環境に対する履歴です。最新の実装状況と実証範囲は[モジュール一覧](../modules.md)と[対応表](../../support.md)を参照してください。
+
 タスク値はUTF-8 JSON stdinだけへ入ります。固定C#は配布時のDeflate/base64からPowerShell 5.1のAdd-Typeで読み込みます。実行時のスクリプトファイルや外部コンパイラは不要です。
 
 起動長の式は`UTF16Len(WrapperLaunchLine(FileContentWrapper()))`で、OpenSSHのcmd接頭辞と引用符を含みます。file_contentは**7,997**、commandは**7,185**単位です。8,000超過はビルド時とCLI接続前に拒否します。固定コード変更時は必ず再測定します。
@@ -48,9 +50,8 @@ SSHの証跡は`.cache/windows-ssh/1e0ecd98f80c/`です。実cmd起動行は`wra
 
 最終SSH回帰は終了0でした。command/file_contentの製品モジュール4試験が成功（Goパッケージ128.686秒）、続くtransport全7サブテストも成功（34.59秒）しました。manifestで専用コンテナ・専用イメージの削除を確認し、試験用秘密鍵も削除されています。
 
-## Linux
+## 関連するLinux実装
 
-Linuxは別のPython receiverを使用します。[Linuxの詳細設計と制約](linux-file-content.md)を参照してください。上記のWindowsハンドル・DACL方式はLinuxには適用しません。
+Linuxは別のPython receiverとPOSIX APIを使用します。BOMなしUTF-8のcontent-only契約は共通ですが、path検査、祖先の信頼条件、属性保持、原子的確定方法はWindowsと異なります。Linux固有の設計、制限、実SSH検証、配布サンプルは[Linux file_content](../../linux-file-content.md)を参照してください。上記のWindowsハンドル・DACL方式はLinuxには適用しません。
 
-Linuxの配布サンプルと期待結果（新規→同値→差分）、0600、既存属性保持・拒否条件、
-CASなし、変更不明時の復旧手順は[Linux file_content](linux-file-content.md#配布exeで新規同値差分を確認する)を参照。
+関連: [モジュール一覧と設計](../modules.md)。

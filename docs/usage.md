@@ -1,6 +1,6 @@
 # Windows版の導入と利用
 
-この手順と同梱サンプルはWindows amd64の制御側・対象側向けです。Linux command backendの対象環境・準備・制限は[Linux command](linux-command.md)を参照してください。対象はcmd.exe既定のOpenSSH ServerとPowerShell 5.1以上が必要です。制御側のZIP展開と実行にGo、WSL、Python、管理者権限は不要です。対象側のSSH Server導入・サービス設定には管理者権限が必要な場合があります。検証環境は固定Server Core LTSC 2022コンテナです。Windows 11/フルServerの全シナリオ合格は主張しません。
+この導入手順と標準サンプルはWindows amd64制御端末・Windows対象向けです。Linux対象にはhostの`os: "linux"`とLinux形式のmodule引数を指定します。Linuxの対象環境・準備・制限は[Linux command](linux-command.md)、[Linux file_content](linux-file-content.md)、[対応表](support.md)を参照してください。Windows対象はcmd.exe既定のOpenSSH ServerとPowerShell 5.1以上が必要です。制御側のZIP展開と実行にGo、WSL、Python、管理者権限は不要です。対象側のSSH Server導入・サービス設定には管理者権限が必要な場合があります。Windows実証環境は固定Server Core LTSC 2022コンテナです。Windows 11/フルServerの全シナリオ合格は主張しません。
 
 ## 導入・更新
 
@@ -44,7 +44,7 @@ Get-Content .\result.json -Raw | ConvertFrom-Json
 
 ## 制限と障害後の確認
 
-Windows対象のcommandはCRT規則でargvを解釈する絶対パス.exe専用です。シェル構文、cmd.exe、.bat/.com/.ps1、独自引数解析exe、対話入力、PTY、パスワード・agent認証、権限昇格は非対応です。file_contentは既存親フォルダー下の通常ファイル向けで、reparse point等を拒否します。詳細は同梱の[command](command-module.md)、[file_content](file-content-module.md)を参照してください。
+Windows対象のcommandはCRT規則でargvを解釈する絶対パス.exe専用です。シェル構文、cmd.exe、.bat/.com/.ps1、独自引数解析exe、対話入力、PTY、パスワード・agent認証、権限昇格は非対応です。Windows file_contentは既存親フォルダー下の通常ファイル向けで、reparse point等を拒否します。OS別契約は[モジュール一覧](design/modules.md)、[Windows command](design/modules/command-module.md)、[Windows file_content](design/modules/file-content-module.md)、[Linux command](linux-command.md)、[Linux file_content](linux-file-content.md)を参照してください。
 
 接続期限10秒、タスク期限は既定60秒（`--timeout`で指定）です。失敗ホストの後続タスクはskipped、他ホストは続行します。自動再試行はしません。タイムアウト・切断・Ctrl+CでSSHを閉じても対象プロセスの停止は保証できません。changed=nullなら対象のプロセス、出力ファイル、サービス状態等を別接続で調査し、処理がまだ動いていないか確認してから手動再実行してください。commandの二重実行は副作用を生む場合があります。
 

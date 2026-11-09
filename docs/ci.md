@@ -1,6 +1,6 @@
 # 標準runnerと必要時のローカル実SSH検証
 
-試験内容の一覧と、通常開発・関連変更時・配布前の試験選択は[試験一覧と実行方針](testing.md)を参照。エージェントの通常試験は変更範囲に応じて選択するが、本書のCI・公開ゲートの必須条件は維持する。
+試験内容と段階別の確認範囲は[試験一覧と実行方針](testing.md)を参照。通常実装は全Go試験とLinux実SSH（transport・対象製品モジュール）まで確認する。両OS実SSH・複数CLIの並列取得・監査・ZIP検査は配布物作成時に実施する。通常実装の確認のために配布作成・証跡集約helperを呼ばない。本書の既存workflow起動条件・公開ゲートは維持し、自動CIで行われる監査等を手動で重ねない。
 
 追加のVM契約・larger runner・常設self-hosted runnerを使わない。
 公開リポジトリのGitHub標準runnerによる実行を使用する。
@@ -84,7 +84,7 @@ CIの能力確認artifactが同じSHAで `unavailable` を記録し、`container
 | L02 | 固定独立probeの2MiB/EOF/両stream/鍵拒否/期限・中断/再送なし |
 | L03〜L04 | Windows製品exeのargv/出力/終了値、raw receiverの不正入力・runtime・E2BIG、文書例 |
 | L05〜L06 | 模擬混在、個別実SSH、合成境界、固定起動長。層別に記録 |
-| L07 | file_contentの製品バイト境界・配布サンプル新規→同値→差分、実SSH上のAPI属性/競合/障害注入、確定前後の同期切断。全サブケース必須 |
+| L07 | Linux file_contentの製品バイト境界・配布サンプル新規→同値→差分、実SSH上のAPI属性/競合/障害注入、確定前後の同期切断。全サブケース必須 |
 | Windows V-01〜V-18 | 既存coverage/summarizeとZIP導入。期待値を緩めない |
 
 混在単一runの実機E2E、専用remote Docker/tunnelは未確認。

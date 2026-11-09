@@ -2,15 +2,27 @@
 
 ## 基準と読み方
 
-[Issue #20](https://github.com/coco-papiyon/wintable/issues/20)の設計成果物。確認日は2026-11-08、基準mainは `307b8329359c60ffba47a18b2fe883e3212f72e9`。入力スキーマや実行コードは変更しない。
+[Issue #20](https://github.com/coco-papiyon/wintable/issues/20)を起点にした設計・対応状況資料。確認日2026-11-10、基準mainは `4e26bf4c0eb6a194ff164e34eaf9863aa4856ad8`。以下はこのcommitのコード・仕様・対応表を照合した状態であり、入力スキーマや実行コードを規定する文書ではない。
 
-- **実行対応済み**: 標準CLIに固定ラッパーと応答解釈が登録されている。全OSの実機検証済みという意味ではない。
+- **実装済み**: 当該OSのbackend・固定receiver・応答解釈が標準CLIに登録されている。実機検証範囲は別記し、全環境での動作保証とは区別する。
 - **入力検証のみ**: スキーマと送信準備はあるが標準CLI実行経路に未登録。
 - **実装中**: 別ブランチに実装がありmain未取り込み。
 - **候補**: 今後の設計案。P1（基本構成）、P2（運用拡張）、P3（基盤拡張後）は優先度案で、実装確約ではない。
 - **保留／対象外**: 追加調査が必要／Windows向け初期範囲から除外。
 
-現行仕様の正本は[全体設計](windows-ansible.md)、[command詳細](../command-module.md)、検証範囲の正本は[検証計画](windows-ansible-validation.md)。本書は対応状況と将来設計の入口とする。
+現行仕様の正本は[全体設計](windows-ansible.md)、[Windows command](modules/command-module.md)、[Windows file_content](modules/file-content-module.md)、[Linux command](../linux-command.md)、[Linux file_content](../linux-file-content.md)。検証範囲は[検証計画](windows-ansible-validation.md)と[対応表](../support.md)を参照する。本書は対応状況と将来設計の入口とする。
+
+## 現在の実装状況（Windows・Linux）
+
+制御端末はWindows 11 / Windows Server 2022以降のamd64。SSH対象として実装しているOSとmoduleの組合せは次のとおり。
+
+| 対象OS | `command` | `file_content` | receiver・主な制約 | 実証範囲 |
+| --- | --- | --- | --- | --- |
+| Windows amd64 | 実装済み | 実装済み | PowerShell 5.1の固定C# receiver。`command`は`.exe`を直接起動しCRT引用。`file_content`はBOMなしUTF-8テキスト専用、内容1MiB。Windowsパス・reparse point・DACL等の固有契約あり | Windowsローカル実プロセスとServer Core 2022の実SSH/コンテナ試験。Windows 11対象機・フルServer 2022の個別実SSHは未確認 |
+| Linux amd64 | 実装済み | 実装済み | Debian 13 / OpenSSH / POSIX互換`/bin/sh` / `/usr/bin/python3` CPython 3.13系。固定Python receiver。`command`はshell=Falseの絶対パス起動。`file_content`はBOMなしUTF-8テキスト専用、祖先所有権・ACL/xattr等の制約あり | Windows制御端末から固定Debian imageへ個別実SSH。製品exeの試験あり。第二ディストリビューション・ARM64・混在単一runの実SSHは未確認 |
+| その他 | 対象外 | 対象外 | 対応する固定backendなし | 未確認・保証対象外 |
+
+標準CLIはhostの`os`（省略時`windows`）とmoduleの組合せを接続前に検査する。Linux対応はWindows backendの互換実装ではなく、OSごとに異なるreceiver・引数規則・ファイル安全性を持つ。公開条件・実証ケース・未確認範囲は[対応表](../support.md)、[CI](../ci.md)、各OS仕様を参照する。実装登録済みという状態だけで両OS・全環境の受入合格を意味しない。
 
 ## Ansibleの代表用途一覧
 
@@ -54,20 +66,29 @@ Linuxで代表的な [ansible.builtin.command](https://docs.ansible.com/projects
 
 JSON v1は未知キー・重複キー・型違いを拒否する。対象ホスト選択、文字列変数展開、展開後の全ホスト・全タスクの引数とサイズ検証を最初の接続前に済ませる。変数はdefaults→所属group→host→vars-fileの順で上書きし、所属groupはグループ名の辞書順で適用し、同一キーは後のgroupで上書きする。`${name}`の一回置換で、再帰展開や式評価はしない（詳細は全体設計）。
 
-タスク値をコードへ埋め込まず、固定ラッパーへBOMなしUTF-8 JSON stdinとして一度だけ直列化して送る。EOF後に実行する。全JSONは2MiB以下、固定起動行はOpenSSH/cmdの接頭辞込み8,000 UTF-16単位以下。両上限は同値を許可する。対象はWindows 11 / Server 2022以降amd64、PowerShell 5.1以上、公開鍵SSHとknown_hosts必須、既定cmd構成。become、check mode、handlers、Ansible playbookは現行非対応。
+タスク値をコードへ埋め込まず、固定receiverへBOMなしUTF-8 JSON stdinとして一度だけ送る。EOF後に実行する。要求JSONは2MiB以下。Windows固定起動行はOpenSSH/cmd接頭辞込み8,000 UTF-16単位以下、Linux固定起動行は8KiB以下のUTF-8。両OSとも公開鍵SSHとknown_hosts必須。Windows receiverはPowerShell 5.1以上・cmd既定構成。Linux対象runtimeは後述の限定環境を参照。become、check mode、handlers、Ansible playbookは現行非対応。
 
 接続10秒、タスクtimeoutは接続後に独立。各ホストは定義順、ホスト間はforksで並列。ホスト失敗後は後続skipped、他ホストは続行する。自動再送しない。未開始はchanged=false、実行中の通信断・期限切れはfailed/null、キャンセルは実行中cancelled/null・未開始cancelled/false。切断後の対象プロセス停止は保証しない。
 
 結果はホスト名・task_index順。changedはtrue（変更あり）、false（変更なし）、null（不明）。CLI終了値の優先順位は130（キャンセル）→3（内部・出力障害）→2（入力不正）→1（タスク失敗等）→0。子プロセスの終了値とは別である。任意コマンド出力は既定非公開、`--include-output`時にstdout/stderr各先頭1MiBをbase64化し、超過をtruncatedで示す。
 
-## command：実行対応済み
+## command：Windows・Linuxで実装済み
+
+共通入力は`executable:string`と`argv:string[]`。shell経由でコード文字列を組み立てない。出力は既定で秘匿し、`--include-output`時もstdout/stderr各先頭1MiBを保持する。非0終了・通信不明時の結果契約と実測範囲はOSごとに異なるため、OS仕様を併読する。
+
+| OS | 起動・入力契約 | 実装固有の制限 |
+| --- | --- | --- |
+| Windows | ドライブ絶対パスの`.exe`をPowerShell receiverから直接起動。CRT規則でargvを引用 | UNC/device・制御文字・`cmd.exe`拒否。子起動行32,766 UTF-16単位まで。バッチ、`.com`、`.ps1`、シェル構文は対象外 |
+| Linux | POSIX絶対パスをCPython receiverから`Popen`配列・`shell=False`で起動 | PATH探索なし。各引数32KiB、NUL込み合計64KiB、argv 4096個、固定起動行8KiBまで。対象はDebian 13 amd64 / CPython 3.13系 |
+
+接続再利用・ホスト内タスク順・forks・失敗後の後続skip・自動再送なしは共通。中断後に子孫プロセスが停止する保証はない。
 
 | 引数 | 型・必須・既定 | 契約 |
 | --- | --- | --- |
 | executable | string、必須、既定なし | ドライブ絶対パスの.exe。UNC/device、制御文字、cmd.exeを拒否 |
 | argv | string配列、必須、既定なし | 空配列・空要素可、NUL不可。CRT規則で引用 |
 
-`ProcessStartInfo`のUseShellExecute=falseで直接起動。シェル演算子は文字列であり、バッチ/.com/.ps1や独自引数解析exeは対応外。作業ディレクトリ指定・子stdin入力はなく子stdinは閉じる。非冪等で、正常起動して終了0ならstatus=changed / changed=true、非0ならfailed/changed=nullで子exit_codeを返す。拒否・起動失敗・不正応答は失敗とし、詳細なnull判定とプロトコルはcommand詳細を正本とする。
+Windowsでは`ProcessStartInfo`のUseShellExecute=falseで直接起動。シェル演算子は文字列であり、バッチ/.com/.ps1や独自引数解析exeは対応外。作業ディレクトリ指定・子stdin入力はなく子stdinは閉じる。非冪等で、正常起動して終了0ならstatus=changed / changed=true、非0ならfailed/changed=nullで子exit_codeを返す。拒否・起動失敗・不正応答は失敗とし、詳細なnull判定とプロトコルはcommand詳細を正本とする。
 
 最終子起動行は32,766 UTF-16単位以下（終端NUL除外、非BMPは2単位）。stdout/stderrは各1MiB保持後も読み捨てて回収し、固定ラッパー応答には最大3MiBのtransport枠を使う。不正base64、外側stderr/非0、応答超過等はfailed/null。外側PowerShellと子の終了値を混同しない。
 
@@ -79,13 +100,15 @@ JSON v1は未知キー・重複キー・型違いを拒否する。対象ホス�
 
 成功はstatus=changed / changed=true / exit_code=0。失敗例として存在しない `C:\\missing.exe` は起動失敗、`cmd.exe`指定は接続前の入力不正、32,767単位の子起動行は接続前の上限超過。実機確認はWindows 11ローカルとServer Core 2022コンテナSSHまでで、Windows 11のSSH対象・フルServer 2022は未確認。詳細の試験項目・証跡はcommand詳細参照。
 
-## file_content：実行対応済み
+## file_content：Windows・Linuxで実装済み
 
-main `fb1e92e02754def6b3d3c290c79573199282f843` で再確認。標準CLIのWrappersとDecodeResultに登録済み。[Issue #10](https://github.com/coco-papiyon/wintable/issues/10)はPR #21で統合されCLOSED。採用済み契約・試験範囲の正本は[仕様書](../file-content-module.md)。Linuxも実装済み。[Linux file_content](../linux-file-content.md)にAPI・属性・祖先の信頼境界を記載する。
+標準CLIのbackendと応答解釈にWindows / Linux両方を登録済み。[Issue #10](https://github.com/coco-papiyon/wintable/issues/10)はPR #21で統合されCLOSED。Windows契約の正本は[Windows仕様書](modules/file-content-module.md)、Linux契約の正本は[Linux仕様書](../linux-file-content.md)。両OSでAPI・path安全性・属性保持が異なる。
 
 pathは必須stringのドライブ絶対パス、contentは必須string（空可）、既定値なし。contentのUTF-8は1MiB以下、JSON全体2MiB以下。BOMを付加せず、LF/CRLF・末尾改行を保持しバイト比較する。同値はok/false、未存在は空内容でも新規作成でchanged/true、差分置換はchanged/trueを返す。
 
 親ディレクトリは既存必須。対象・祖先のreparse point、通常ファイル以外、曖昧なWin32パスを拒否する。同一ディレクトリの排他的tempへ書込み・flush後、既存はFile.Replace、新規は上書きしないMoveで確定する。既存DACL保持、所有者管理なし。比較時点のCASは保証せず並行置換は最後の成功内容が残る。確定前の拒否はfailed/false、確定API以降の失敗・清掃失敗・通信断は変更不明null。自動再送なし。PR #21では同期した通常ファイル→symlink切替をコンテナで検証し、同値・異値とも拒否・リンク先不変・tempなしを確認済み。全外部競合・全ACLエラー経路、Windows 11 SSH・フルServerの個別確認は保証範囲外。
+
+LinuxではCPython 3.13標準APIの`dir_fd`・`O_NOFOLLOW`を用いて祖先と対象を検査し、既存のUID/GID/modeを保持する。新規は実効UID/GID・0600。ACL/xattr付き祖先、group/other書込み可能な祖先、link・非通常ファイル・複数hardlink等を拒否する。既存はfd相対replace、新規は上書きしないlinkで確定する。Linux固有の信頼前提、fsync・障害・競合境界、公開受入試験は[Linux仕様](../linux-file-content.md)を正本とする。Windowsのreparse point/DACL方式をLinuxにも適用するわけではない。
 
 現行Windowsでの実行例:
 
@@ -133,4 +156,4 @@ user/acl/template/powershell/shell/scheduled_task/updatesは採用未決定。�
 
 推奨順序は、file_contentの取り込みと安全置換の検証→P1のfile/service/registry/environment→読取結果基盤とfacts/stat/ping→転送・ハッシュ基盤とP2→再起動要求の結果契約→機能管理と再接続基盤。各段階でWindows 11 SSHとフルServer 2022の試験範囲を明示し、コンテナ試験だけで全環境合格としない。
 
-Linux command backendは [Linux command仕様](../linux-command.md) を参照。設計根拠は [ADR-0001](../adr/0001-linux-target-support.md)。Linux file_contentも実装済み。対応公開・CIはIssue #29/#31の[公開ゲート](../ci.md)に従う。
+Linux command backendは [Linux command仕様](../linux-command.md)、Linux file_contentは[Linux file_content仕様](../linux-file-content.md)を参照。設計根拠は [ADR-0001](../adr/0001-linux-target-support.md)。対応公開・CIは[公開ゲート](../ci.md)に従う。

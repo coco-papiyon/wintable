@@ -31,7 +31,13 @@ try {
     Invoke-Go -Arguments @('version','-m',"$stage/wintable.exe") | Set-Content "$stage/build-info.txt" -Encoding utf8
     Copy-Item examples "$stage/examples" -Recurse
     New-Item -ItemType Directory "$stage/docs" | Out-Null
-    Copy-Item docs/*.md "$stage/docs"
+    $rootDocs = Get-ChildItem docs -File -Filter '*.md' | Where-Object Name -ne 'README.md'
+    Copy-Item $rootDocs.FullName "$stage/docs"
+    New-Item -ItemType Directory "$stage/docs/design/modules" -Force | Out-Null
+    Copy-Item docs/design/*.md "$stage/docs/design"
+    Copy-Item docs/design/modules/*.md "$stage/docs/design/modules"
+    New-Item -ItemType Directory "$stage/docs/adr" -Force | Out-Null
+    Copy-Item docs/adr/0001-linux-target-support.md "$stage/docs/adr"
     @('# wintable Windows amd64', '', '導入・SSH準備・利用方法: [docs/usage.md](docs/usage.md)', '', '配布条件と検証範囲: [docs/release.md](docs/release.md)', '', 'このZIPは検証用候補です。公開可否はbuild.jsonと対応する受け入れ証跡で確認してください。') | Set-Content "$stage/README.md" -Encoding utf8
     $licenses = New-Item -ItemType Directory "$stage/licenses"
     $goroot = (& go env GOROOT).Trim()

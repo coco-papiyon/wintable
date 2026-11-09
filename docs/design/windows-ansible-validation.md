@@ -1,5 +1,7 @@
 # Windows版構成管理CLIの検証計画
 
+> 本書は初期I-01〜I-08の計画・履歴です。ここにある未実行・後続Issueの記述は当時の状態です。現行実装・検証範囲は[モジュール一覧](modules.md)、[対応表](../support.md)、[CI](../ci.md)を参照してください。
+
 対象: [Issue #1](https://github.com/coco-papiyon/wintable/issues/1)  
 仕様基準: [設計書](windows-ansible.md)のI-01決定表。Issue #1は設計成果物のレビューまでを対象とし、Issue #3ではCLI基盤の検証を行う。SSH・PowerShellの実装検証は未実行。
 
@@ -66,6 +68,6 @@ I-03ではV-02/03/15/17の単体検査、V-16の合成最終行検査を追加�
 
 I-05: internal/engine/run_test.go で模擬V-04/06（forks=1/3/64、順序、失敗停止、接続返却時キャンセル、期限切れ、Close一回、Close失敗）を検証。実SSH・実Ctrl+C・対象プロセス状態は後続Issueで実測する。
 
-I-08ではfile_contentの固定受信コード・冪等書込み・CLI接続を実装。ローカルcmd/PowerShellとServer Core 2022/OpenSSHの試験内容、起動行7,985単位、ACL比較時のOS由来AIフラグ、競合の保証範囲と未確認項目は[file_contentモジュール](../file-content-module.md)を参照。両対象OSのV-08/09/10/14/15/16/18全体の合格とはしない。
+I-08ではWindows file_contentの固定受信コード・冪等書込み・CLI接続を実装。ローカルcmd/PowerShellとServer Core 2022/OpenSSHの当時の試験内容、起動行、ACL比較時のOS由来AIフラグ、競合の保証範囲は[Windows file_content仕様](modules/file-content-module.md)を参照。現行Linux対応・検証状況は[Linux file_content仕様](../linux-file-content.md)と[対応表](../support.md)を参照する。
 
 関連: [モジュール一覧と設計](modules.md)。

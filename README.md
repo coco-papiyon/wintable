@@ -1,13 +1,16 @@
 # wintable
 
-Windowsネイティブで動作するGo製の構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、commandモジュール、結果集計・描画を実装しています。Windows/Linuxのcommand・file_contentを実装済みです。
+Windowsを制御端末として使うGo製構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、結果集計・描画に加え、Windows/Linux対象向け`command`と`file_content`を実装しています。対象OS・runtime・実証範囲は[対応表](docs/support.md)を参照してください。
 
 - [ZIPの導入・SSH準備・利用手順](docs/usage.md)
 - [Windows CI・監査・ZIP作成と公開条件](docs/release.md)
 
-Windows CIと配布候補生成を整備しています。[Issue #11の全必須検証は合格済み](https://github.com/coco-papiyon/wintable/issues/11#issuecomment-6717454311)です。本体は[MITライセンス](LICENSE)です。Go・依存ライブラリのライセンスと通知も配布物に保持します。[最終ZIPのV-13と配布commitの全18シナリオを確認済み](docs/validation/issue12-audit-fixed/README.md)です。公開前に実ログ・最新監査・ライセンスの人手レビューを行います。
+Windows/Linuxの実SSH受入と配布候補生成の手順があります。過去の実行証跡は各検証記録にSHA・環境・範囲を記載しています。証跡は記録されたcommitに対するもので、現在のHEADや将来のZIPの合格を示すものではありません。公開条件は[配布条件](docs/release.md)を参照してください。本体は[MITライセンス](LICENSE)です。Go・依存ライブラリのライセンスと通知も配布物に保持します。
 
 - [Windows版Ansible相当ツールの設計](docs/design/windows-ansible.md)
+- [モジュール一覧・Windows/Linux実装状況](docs/design/modules.md)
+- [ドキュメント索引](docs/README.md)
+- [試験内容と実行方針](docs/testing.md)
 - [検証計画と後続実装](docs/design/windows-ansible-validation.md)
 - [Windowsコンテナの証跡収集と未確認項目](docs/validation/windows-container.md)
 
@@ -29,9 +32,9 @@ $env:CGO_ENABLED = '0'
 .\dist\wintable.exe run --inventory inventory.json --tasks tasks.json
 ```
 
-helpは終了0、不正引数は終了2。入力ファイルも検証し、不正入力は接続前に終了2となります。[サンプル](examples/)を参照してください。commandとfile_contentのrunは実際にSSHへ接続します。file_contentはBOMなしUTF-8のバイト比較を行い、差分があるときだけ安全な置換を行います。詳細は[file_contentモジュール](docs/file-content-module.md)を参照してください。Ctrl+Cのcontextを伝播します。
+helpは終了0、不正引数は終了2。入力ファイルも検証し、不正入力は接続前に終了2となります。[サンプル](examples/)を参照してください。commandとfile_contentのrunは実際にSSHへ接続します。file_contentはBOMなしUTF-8のバイト比較を行い、差分があるときだけ安全な置換を行います。詳細は[モジュール一覧](docs/design/modules.md)からOS別仕様を参照してください。Ctrl+Cのcontextを伝播します。
 
-`--include-output` は既定falseです。有効にすると任意コマンドの出力に秘密が含まれ得ます。完全な自動マスキングは保証しません。commandの実機検証範囲と未確認事項は [commandモジュール](docs/command-module.md) を参照してください。CIとZIP配布の条件は [CI手順](docs/ci.md)、保証範囲は [対応表](docs/support.md) を参照してください。
+`--include-output` は既定falseです。有効にすると任意コマンドの出力に秘密が含まれ得ます。完全な自動マスキングは保証しません。commandの契約は[Windows仕様](docs/design/modules/command-module.md)と[Linux仕様](docs/linux-command.md)、CI・ZIP配布条件は[CI手順](docs/ci.md)、保証範囲は[対応表](docs/support.md)を参照してください。
 
 結果集計・JSON／テキスト描画・終了判定は `internal/result` に実装済みです。
 `cli.RunResults` に結果を返すExecutorを注入すると、ホスト名／task_index順の単一JSON文書またはテキストをstdoutへ、定型診断をstderrへ出します。
@@ -51,7 +54,7 @@ SSH接続の設定・依存監査・検証範囲は [SSH transport](docs/ssh-tra
 
 関連: [モジュール一覧と設計](docs/design/modules.md)。
 
-Linux対象の追加設計: [ADR-0001: LinuxをSSH実行対象に追加する](docs/adr/0001-linux-target-support.md)。実装と対応公開の状態は [対応表](docs/support.md) を参照してください。
+Linux対象の設計判断: [ADR-0001](docs/adr/0001-linux-target-support.md)。現行実装と対応公開の状態は[モジュール一覧](docs/design/modules.md)と[対応表](docs/support.md)を参照してください。
 
 ## inventory OSとCLI互換性
 

@@ -55,46 +55,41 @@ Go内の判定と、実プロセス・実SSHへの最大入力は負荷が異な
 
 最大値転送以外に、PowerShellの反復起動、EOF・期限・通信断待ち、コンテナ準備も時間を使う。main pushの通常CIと候補作成、候補作成と受入runnerで全Goテストが重複する。Windows SSH runner内のcommandはcmdとSSH双方で実行し、file_contentもローカル・コンテナ・SSHの複数層で実行する。
 
-## 今後のエージェントによる試験選択
+## エージェントによる試験範囲（2026-11-10改訂）
 
-これは手動・スキル実行時の選択方針。既存CI・公開ゲートの必須条件は変更しない。
+実装・修正・通常レビューの完了条件は **全Go試験通過とLinux実SSH合格** とする。実装のたびに配布物の全受入まで進めない。文書・スキルのみの変更は参照・差分・形式の確認でよい。
 
-| 区分 | 選択条件 | 範囲 |
+| 区分 | 必須範囲 | 完了後の扱い |
 | --- | --- | --- |
-| 通常 | 通常の実装・修正・レビュー | 変更したGoパッケージと利用側、小入力の正常・異常系、安価なGo境界、必要なvet / build |
-| 関連変更時 | 上限・引用・直列化・受信・出力・transport・ファイル確定等を変更、または該当要件を新設 | 対応する実プロセス最大値、実SSH、ACL・競合・切断等を追加 |
-| 配布前 | 配布物の作成・公開判定、全受入の明示依頼 | 既存の全境界・両OS実SSH・ZIP導入・監査・証跡ゲート |
+| 実装・修正・通常検証 | go test ./... -count=1 とLinux実SSH（transportおよび製品モジュール） | この範囲の結果を報告して終了 |
+| 配布物作成 | 全Go試験、両OS実SSH、複数CLIの並列取得試験、監査、license・ZIP内容・ハッシュ・導入・証跡ゲート | 同一SHA・配布exe・ZIPを対応付け、全必須結果を確認 |
+| 文書・スキルのみ | 差分、参照先、スキル形式 | 製品試験は不要 |
 
-文書・スキルだけの変更ではリンク・差分・スキル検証を行い、製品試験は起動しない。実装検証でIssueの必須要件に境界・実SSHがある場合はその要件を優先する。未実施は未確認として報告し、通常試験合格を全受入合格と表現しない。
+通常実装ではWindows実SSH、複数CLIによる並列取得の実機試験、govulncheck、ZIP生成・検査、配布受入集約を起動しない。新機能や共通コード変更であっても、自動的に配布検証へ拡大しない。Issueに配布向け受入条件があっても、通常実装段階では配布時確認として区別して報告する。ユーザーが今回の作業で明示的に全受入を指定した場合はその指定に従う。
 
-### 現行コードでの選択方法
+全Go試験に含まれる境界・最大値・模擬並列テストは実行する。-skipで全Go試験を省略しない。別途の最大値・障害注入は該当コード修正の確認に必要なものだけ実施し、Windows実SSHや配布一式の実施条件にはしない。現行の-shortは軽量化スイッチではない。
 
-testing.Short()による切替は未実装のため、-shortだけでは軽量化しない。-runで対象を選ぶ。Windows file_contentは正常・最大値・ACL・競合が単一関数に混在しているため、関連変更時は関数全体を実施する。Windows commandは一部サブテストを選べる。
+### 通常実装の実行方法
 
 ```powershell
-# 共通Go処理（必要なパッケージにさらに絞ってよい）
-go test ./internal/config ./internal/inventory ./internal/engine ./internal/result -count=1
-# CLI：使い捨てSSH fixtureを設定していない通常環境
-go test ./internal/cli -count=1
-# モジュールのGo検証：実プロセス・実SSHの親関数を除外
-go test ./internal/module -count=1 -skip '^(TestCommandWindows|TestFileContentWindows|TestFileContentLinkSwapWindows|TestCommandSSHLaunchAndDisconnect|TestFileContentSSHLaunchAndDisconnect|TestFileContentSSH|TestLinuxCommandSSH|TestLinuxFileContentSSH)$'
-# 小入力によるWindows command代表試験（fixture未設定）
-go test ./internal/module -count=1 -run '^TestCommandWindows$/^cmd$/^(CRT_roundtrip|invalid_before_execution)$'
-# ファイル受信・確定を変更した場合：現状は最大値等も含む
-go test ./internal/module -count=1 -run '^TestFileContentWindows$'
+# Windows fixtureが未設定の独立プロセスで実行（既存環境を無断変更しない）
+go test ./... -count=1
+# ZIP・監査を作成せずLinux製品試験に必要なexeだけビルド
+go build -o dist/wintable.exe ./cmd/wintable
+# transportに加え製品command / file_contentも確認する
+pwsh -NoProfile -File tests/linux-ssh/run.ps1 -DockerContext desktop-linux -ProductTestScript tests/linux-ssh/product.ps1
 ```
 
-実行前にfixture変数を確認する。通常試験のために既存fixture設定を無断上書きせず、独立したプロセス環境を使う。選別コマンドは将来のテスト追加時に見直す。現行CIを軽くするには、別途テスト分割とworkflow変更が必要。
+Linux runnerだけの起動ではtransportのみのため、製品試験スクリプトも指定する。新モジュールのLinux実SSHケースが既存product.ps1の対象に含まれない場合は、そのケースをLinux fixture上で実施する経路を追加・選択する。接続成功だけをLinux製品試験合格と扱わない。
 
-### 関連変更と追加試験の対応
+product.ps1は文書例を含み、配布manifestを要求する場合がある。未梱包exeで実行する際は現在の呼出し契約を確認し、必要ならLinux製品試験用の独立した経路を整備する。通常実装を通すためにdistribution.ps1 / package.ps1 / complete-local.ps1を呼び、監査・ZIP作成へ進めない。必要なLinux試験が実行できなければ未確認として報告する。
 
-| 変更 | 追加する試験 |
-| --- | --- |
-| 上限・UTF-8・JSON・変数展開 | 対応する前後境界、最終ホスト・最終タスクでの事前拒否。受信契約変更ならraw / 実SSHも |
-| command引用・起動コード | CRT、起動長、子引数限界。LinuxはE2BIG。該当OSの実SSH |
-| transport・出力取得 | EOF、両stream大量出力、drain、期限・cancel・disconnect、再送なし、鍵検証 |
-| file_content・共通receiver | content / JSON最大値、同値・差分、ACL・リンク・競合・清掃、確定前後の障害。影響OSの実SSH |
-| OS選択・backend・engine | OS事前検証、混在模擬、順序・失敗伝播。起動経路に影響すれば該当OSの実SSH |
-| 配布・workflow・証跡検査 | 変更したゲートの合成回帰。製品経路・公開要件変更なら対応する実受入 |
+### 配布物作成時
 
-同一SHAで既に成功した検証は根拠を確認して再利用し、同じ試験を反復しない。異なるSHAの結果は影響がないと説明できる範囲だけ補助根拠にする。失敗・追加変更・未解決懸念があれば関連範囲を再実行する。
+[scripts/distribution.ps1](../scripts/distribution.ps1)による監査・license・ZIP検査と、[CI手順](ci.md)の両OS実SSH・同一SHAの証跡集約を実施する。複数CLIを同時に起動する並列取得では保存先の衝突、内容一致、各プロセスの結果・終了値、一時ファイル清掃を確認する。Go内の模擬並列試験で代用しない。対象機能のケース・実行方法が未整備なら配布検証未完了と報告する。
+
+既存CIは実装時の手動確認とは別の自動実行であり、この文書変更ではworkflowの起動条件を変更しない。自動CIの監査等が起動しても、実装エージェントが同じ配布検証を手動で重ねる必要はない。配布物作成成功を公開操作の許可と扱わない。
+
+### 結果の記録
+
+対象SHA、全Go試験、Linux実SSHのコマンド・結果と未確認範囲を報告する。配布時のみの項目は「配布物作成時に実施」と記載し、通常実装の不合格理由にしない。必要な全Go試験またはLinux実SSHが未確認なら実装確認完了にしない。通常確認合格を配布可・両OS全受入合格と表現しない。同一SHAの成功証跡は範囲を確認して再利用し、失敗・追加変更・未解決懸念がなければ反復しない。

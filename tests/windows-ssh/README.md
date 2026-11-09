@@ -112,7 +112,7 @@ Windows 11ホスト上で動かしても対象ユーザーランドはServer Cor
 `.cache/windows-ssh/4726fe503440/`です。実cmdとSSHでCRT argv、子起動長、
 stdinサイズ、不正入力の実行抑止、非UTF-8生出力と各1MiB保持を確認しました。
 受信の小断片化により、長い要求で再現したstdinの停止を解消しています。
-詳細と未確認範囲は`docs/command-module.md`を参照してください。
+詳細と未確認範囲は`docs/design/modules/command-module.md`を参照してください。
 
 `wrapper-launch.json`はCIMで採取した実cmd起動行です（7,401はIssue #9時点の値）。file_contentは`wrapper-launch-file.json`へ保存します。現行の長さは各モジュールの資料を参照してください。
 7,999/8,000単位の実ラッパー起動と8,001のローカル拒否、UTF-8途中分割送信、
@@ -124,4 +124,4 @@ stdinサイズ、不正入力の実行抑止、非UTF-8生出力と各1MiB保持
 フルServer 2022の未確認は残り、両OS受け入れ全体の合格ではありません。
 
 file_contentだけの調査実行は "-ModuleTestPattern '^TestFileContentSSH'" を指定できます。既定はcommandとfile_contentの両方です。
-I-08の製品file_content試験とcommand回帰の最終証跡は`.cache/windows-ssh/1e0ecd98f80c/`。現行の実起動長はfile_content 7,985、command 7,185 UTF-16単位です。詳細・未確認範囲は`docs/file-content-module.md`を参照してください。
+I-08の製品file_content試験とcommand回帰の最終証跡は`.cache/windows-ssh/1e0ecd98f80c/`。その証跡の実起動長はfile_content 7,985、command 7,185 UTF-16単位です。詳細・未確認範囲は`docs/design/modules/file-content-module.md`を参照してください。
