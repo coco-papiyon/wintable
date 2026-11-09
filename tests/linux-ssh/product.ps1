@@ -20,8 +20,12 @@ try {
     foreach ($case in @('TestLinuxFetchSSH','TestLinuxFetchSSH/empty','TestLinuxFetchSSH/text','TestLinuxFetchSSH/binary-over-1MiB','TestLinuxFetchSSH/failure-preserves-existing','TestLinuxFetchSSH/product-parallel-hosts')) {
         if (@($parsed | Where-Object { $_.Action -eq 'pass' -and $_.Test -ceq $case }).Count -ne 1) { throw "Missing/duplicate fetch case: $case" }
     }
-    $stage='document-example'
-    & "$PSScriptRoot/document-example.ps1" -FixtureDirectory $FixtureDirectory -EvidenceDirectory $EvidenceDirectory -DistributionDirectory $DistributionDirectory
+    # Normal implementation checks use the standalone dist/wintable.exe.
+    # Packaged documentation examples remain mandatory for distribution checks.
+    if ($DistributionDirectory) {
+        $stage='document-example'
+        & "$PSScriptRoot/document-example.ps1" -FixtureDirectory $FixtureDirectory -EvidenceDirectory $EvidenceDirectory -DistributionDirectory $DistributionDirectory
+    }
     Get-FileHash $env:WINTABLE_PRODUCT_EXE | Select-Object Algorithm,Hash | ConvertTo-Json | Set-Content "$EvidenceDirectory/product-hash.json"
 } catch {
     # Persist only location metadata, never exception text or command output.

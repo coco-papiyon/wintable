@@ -231,12 +231,19 @@ func (s *Store) Commit(ctx context.Context, expected [32]byte) (bool, error) {
 	old, e := relative(s.parent, s.name, false, false, windows.GENERIC_READ, windows.FILE_SHARE_READ|windows.FILE_SHARE_DELETE, nil)
 	if e == nil {
 		f := os.NewFile(uintptr(old), "")
-		digest, n, readErr := hashFile(ctx, f)
+		info, readErr := f.Stat()
+		var digest [32]byte
+		var n int64
+		// Different sizes already prove a content change. In particular, the
+		// transfer limit must not prevent replacing an oversized local file.
+		if readErr == nil && info.Size() == size {
+			digest, n, readErr = hashFile(ctx, f)
+		}
 		closeErr := f.Close()
 		if readErr != nil || closeErr != nil {
 			return false, fmt.Errorf("comparison failed")
 		}
-		if n == size && digest == expected {
+		if info.Size() == size && n == size && digest == expected {
 			return false, nil
 		}
 	} else if !missing(e) {

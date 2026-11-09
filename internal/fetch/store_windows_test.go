@@ -145,6 +145,32 @@ func TestStoreLifecycle(t *testing.T) {
 		}
 	}
 }
+func TestStoreReplacesOversizedExisting(t *testing.T) {
+	path := filepath.Join(testDir(t), "file.bin")
+	f, e := os.Create(path)
+	if e != nil {
+		t.Fatal(e)
+	}
+	truncateErr := f.Truncate(MaxSize + 1)
+	closeErr := f.Close()
+	if truncateErr != nil || closeErr != nil {
+		t.Fatal(truncateErr, closeErr)
+	}
+	body := []byte("replacement")
+	s := openStore(t, path)
+	if _, e := s.Write(body); e != nil {
+		t.Fatal(e)
+	}
+	if changed, e := s.Commit(context.Background(), sha256.Sum256(body)); e != nil || !changed {
+		t.Fatalf("changed=%v error=%v", changed, e)
+	}
+	if e := s.Close(); e != nil {
+		t.Fatal(e)
+	}
+	assertContents(t, path, body)
+	assertClean(t, path)
+}
+
 func TestStorePreservesExistingOnFailure(t *testing.T) {
 	dir := testDir(t)
 	path := filepath.Join(dir, "file.bin")
