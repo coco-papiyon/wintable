@@ -1,0 +1,243 @@
+{
+  "schema": 1,
+  "run_id": "bd22ef1b3751419c8f12a7b90ddb7006",
+  "source_sha": "0c2f895276f94b30ca5581577a9877084d20567f",
+  "source_status": [
+    ""
+  ],
+  "started_utc": "2026-11-09T04:59:14.2564592Z",
+  "controller_os": "Microsoft Windows NT 10.0.26300.0",
+  "controller_arch": "X64",
+  "docker_context": "desktop-linux",
+  "container": "wintable-linux-bd22ef1b3751419c8f12a7b90ddb7006",
+  "network": "wintable-linux-bd22ef1b3751419c8f12a7b90ddb7006",
+  "image_tag": "wintable-linux-ssh:bd22ef1b3751419c8f12a7b90ddb7006",
+  "volumes": "unnecessary",
+  "status": "passed",
+  "fault": "none",
+  "cleanup": [
+    {
+      "remaining": 0,
+      "kind": "container"
+    },
+    {
+      "remaining": 0,
+      "kind": "network"
+    },
+    {
+      "remaining": 0,
+      "kind": "image"
+    },
+    {
+      "remaining": 0,
+      "kind": "credentials"
+    }
+  ],
+  "product": {
+    "exit_code": 0
+  },
+  "lock_sha256": "B68FD223F31737292998220B28CB8C9FEE1407CDBBF7057D7A968A04860C35C7",
+  "transport_test_sha256": "34D6E62D252320945178B14D359190EC9E93C51170A08E9A40A6E66087D3488E",
+  "fixture_hashes": [
+    {
+      "name": ".dockerignore",
+      "sha256": "374A8F95B6B1537E85749A5F3BF2419B951B127B1BC422B36234B8A4C1200E8E"
+    },
+    {
+      "name": ".gitattributes",
+      "sha256": "79C4E75A71CE4172319AC2D55449C11A4CEC6A5358A2A537B74164869122E51F"
+    },
+    {
+      "name": "Dockerfile",
+      "sha256": "1DEA6DA3F5355547218317077B4C700A7920F6C98E7B6253C40B4909332DFC57"
+    },
+    {
+      "name": "document-example.ps1",
+      "sha256": "1F4B6430BD0A0110EA89FFEDBF288013E3E02C8678267064BD427CF33AAACB1A"
+    },
+    {
+      "name": "file_content_cases.py",
+      "sha256": "95DE6B4404F38D326C1D1A0B0988995A69E15D45E2A6FCDDA2FE0F5710EBC04B"
+    },
+    {
+      "name": "file-content.ps1",
+      "sha256": "9CAECCEEE0ABE13708DB583006E4090D805C6A734E880B4DE655F06BC267C8A4"
+    },
+    {
+      "name": "fixture.lock.json",
+      "sha256": "B68FD223F31737292998220B28CB8C9FEE1407CDBBF7057D7A968A04860C35C7"
+    },
+    {
+      "name": "packages.install",
+      "sha256": "D857DD721E525EC3278E9A28589141B9D667244E19EB27E082E0964752DDDF8D"
+    },
+    {
+      "name": "probe.py",
+      "sha256": "2D60072C87159AF3357CE9413B8C37CFD0C60DD8F86456E5F6888B46629D0923"
+    },
+    {
+      "name": "product.ps1",
+      "sha256": "AE60A2012ACABE948575D71A2886A05A71A7226A45C769BB7F5E7ED7763BDE6E"
+    },
+    {
+      "name": "README.md",
+      "sha256": "84A88EBAA51B2C2752C76DC4AEF21706976A8C4A380EABEB7FD69735E4089B7F"
+    },
+    {
+      "name": "run.ps1",
+      "sha256": "2EF0A98784CDED2E511CF301E8905AEEFD2EAC122AD03C2553A6D35CA0AC23EA"
+    },
+    {
+      "name": "sshd_config",
+      "sha256": "0C427D81E1E8E4DC7BC933E70E1D7BDE343CFF2D029B3551AFDA128C53261896"
+    },
+    {
+      "name": "start.sh",
+      "sha256": "9C52B789F7E0F984229AE2B2D869A756440104E31A1AA78F254F70C6ABFE63E6"
+    },
+    {
+      "name": "verify.ps1",
+      "sha256": "516F06B0D60128452FB8A391D1EF34E67A8977603EA7FEA7D88F40BF9C2B853E"
+    },
+    {
+      "name": "versions.py",
+      "sha256": "6A3BA229433831389377B35733B5FF440E817253861FE4CC8538F76947F1F435"
+    }
+  ],
+  "docker": {
+    "Client": {
+      "Version": "29.9.2",
+      "ApiVersion": "1.56",
+      "DefaultAPIVersion": "1.56",
+      "GitCommit": "a82e528",
+      "GoVersion": "go1.26.10",
+      "Os": "windows",
+      "Arch": "amd64",
+      "BuildTime": "Tue Oct 20 19:44:07 2026",
+      "Context": "desktop-linux"
+    },
+    "Server": {
+      "Platform": {
+        "Name": "Docker Desktop 4.98.0 (245422)"
+      },
+      "Version": "29.9.2",
+      "ApiVersion": "1.56",
+      "MinAPIVersion": "1.40",
+      "Os": "linux",
+      "Arch": "amd64",
+      "Components": [
+        {
+          "Name": "Engine",
+          "Version": "29.9.2",
+          "Details": {
+            "ApiVersion": "1.56",
+            "Arch": "amd64",
+            "BuildTime": "Tue Oct 20 18:45:02 2026",
+            "Experimental": "false",
+            "GitCommit": "0367cbe",
+            "GoVersion": "go1.26.10",
+            "KernelVersion": "6.18.54.1-microsoft-standard-WSL2",
+            "MinAPIVersion": "1.40",
+            "Module": "github.com/moby/moby/v2",
+            "ModuleVersion": "v2.0.0+unknown",
+            "Os": "linux"
+          }
+        },
+        {
+          "Name": "containerd",
+          "Version": "v2.4.2",
+          "Details": {
+            "GitCommit": "b7a25261e029d68978bbf290df0a62fc819b3c51"
+          }
+        },
+        {
+          "Name": "runc",
+          "Version": "1.5.2",
+          "Details": {
+            "GitCommit": "v1.5.2-0-g29dd3dc2"
+          }
+        },
+        {
+          "Name": "docker-init",
+          "Version": "0.19.0",
+          "Details": {
+            "GitCommit": "de40ad0"
+          }
+        }
+      ],
+      "GitCommit": "0367cbe",
+      "GoVersion": "go1.26.10",
+      "KernelVersion": "6.18.54.1-microsoft-standard-WSL2",
+      "BuildTime": "2026-10-20T18:45:02.000000000+00:00"
+    }
+  },
+  "go": "go version go1.27.3 windows/amd64",
+  "image_id": "sha256:739b17f2c3f2529ea293b3340cb6f2191b61f1818990a71779fa8c5f6875522c",
+  "docker_port": 57154,
+  "test_exit_code": 0,
+  "cases": [
+    {
+      "Test": "TestLinuxOpenSSH/reject/unknown",
+      "Action": "pass",
+      "Elapsed": 0.03
+    },
+    {
+      "Test": "TestLinuxOpenSSH/reject/changed",
+      "Action": "pass",
+      "Elapsed": 0.03
+    },
+    {
+      "Test": "TestLinuxOpenSSH/reject/auth",
+      "Action": "pass",
+      "Elapsed": 0.04
+    },
+    {
+      "Test": "TestLinuxOpenSSH/reject/root",
+      "Action": "pass",
+      "Elapsed": 0.03
+    },
+    {
+      "Test": "TestLinuxOpenSSH/reject/password",
+      "Action": "pass",
+      "Elapsed": 0.02
+    },
+    {
+      "Test": "TestLinuxOpenSSH/reject",
+      "Action": "pass",
+      "Elapsed": 0.46
+    },
+    {
+      "Test": "TestLinuxOpenSSH/reuse_hash_flood",
+      "Action": "pass",
+      "Elapsed": 2.12
+    },
+    {
+      "Test": "TestLinuxOpenSSH/deadline_no-read",
+      "Action": "pass",
+      "Elapsed": 1.84
+    },
+    {
+      "Test": "TestLinuxOpenSSH/deadline_wait",
+      "Action": "pass",
+      "Elapsed": 1.83
+    },
+    {
+      "Test": "TestLinuxOpenSSH/cancel",
+      "Action": "pass",
+      "Elapsed": 1.42
+    },
+    {
+      "Test": "TestLinuxOpenSSH/disconnect",
+      "Action": "pass",
+      "Elapsed": 1.39
+    },
+    {
+      "Test": "TestLinuxOpenSSH",
+      "Action": "pass",
+      "Elapsed": 9.06
+    }
+  ],
+  "test_finished_utc": "2026-11-09T04:59:41.4305653Z",
+  "cleanup_ok": true,
+  "finished_utc": "2026-11-09T04:59:43.6263307Z"
+}

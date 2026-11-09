@@ -66,8 +66,8 @@ func TestLinuxFixedBackend(t *testing.T) {
 	if e := b.Check(); e != nil {
 		t.Fatal(e)
 	}
-	if _, ok := DefaultBackends()[Key{"linux", "file_content"}]; ok {
-		t.Fatal("unsupported backend")
+	if b, ok := DefaultBackends()[Key{"linux", "file_content"}]; !ok || b.Check() != nil {
+		t.Fatal("invalid file backend")
 	}
 	for _, value := range []string{"", "日本語😀\n'\" &|$PATH"} {
 		p, e := b.Prepare("h", 0, "command", map[string]any{"executable": "/bin/echo", "argv": []any{value}})

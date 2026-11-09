@@ -47,3 +47,7 @@ PR #21のF-001修正では、オープン直前に通常ファイルを実ファ
 SSHの証跡は`.cache/windows-ssh/1e0ecd98f80c/`です。実cmd起動行は`wrapper-launch-file.json`へ保存し、7,985単位で構築式と一致しました。Server Core 2022（10.0.20348.5773）、PowerShell 5.1.20348.5773、OpenSSH 9.5.6.4、Docker 29.9.2、Hyper-V分離、固定ベースdigestはmanifest.jsonに記録します。ローカル証跡と試験用資格情報はGitへ含めません。埋込C#ソースは`.gitattributes`で改行変換を無効にし、圧縮結果の再現性を保ちます。
 
 最終SSH回帰は終了0でした。command/file_contentの製品モジュール4試験が成功（Goパッケージ128.686秒）、続くtransport全7サブテストも成功（34.59秒）しました。manifestで専用コンテナ・専用イメージの削除を確認し、試験用秘密鍵も削除されています。
+
+## Linux
+
+Linuxは別のPython receiverを使用します。[Linuxの詳細設計と制約](linux-file-content.md)を参照してください。上記のWindowsハンドル・DACL方式はLinuxには適用しません。

@@ -148,3 +148,7 @@ Python導入と指定ログインシェルが追加前提になる。v1の意味
 | REQ-004 ADR | 背景、決定、却下/保留案、影響、未決事項、検証計画を本ファイルに保存 |
 
 本Issueの検証は要件対応・コードとの照合・リンク整合で行う。Linuxコードやコンテナ試験の合格を意味しない。関連: [全体設計](../design/windows-ansible.md)、[モジュール設計](../design/modules.md)、[README](../../README.md)。
+
+## Issue #30による決定5の詳細化
+
+Linux file_contentを独立backendとして追加する。採用API、root/SSHユーザーの信頼、祖先所有者・group/other書込み・ACL/xattrの拒否条件、最終照合後のrename競合の限界は[詳細設計](../linux-file-content.md)に記載する。Python標準APIで悪意のroot/同じUIDに対する名前空間固定は保証しない。command公開の条件は変更しない。

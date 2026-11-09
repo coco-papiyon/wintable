@@ -6,7 +6,7 @@ Linux制御端末、ARM64、第二Linuxディストリビューションは保�
 | SSH対象 | command | file_content | 実証範囲 |
 | --- | --- | --- | --- |
 | Windows amd64 | 実装済み | 実装済み | Server Core 2022コンテナ。Windows 11 / フルServer実機は未確認 |
-| Debian 13 amd64 / OpenSSH / POSIX互換 `/bin/sh` / CPython 3.13 | 実装済み | 未対応、全接続前に終了2 | 固定Debian imageで個別実SSH。CI対応公開は下記条件付き |
+| Debian 13 amd64 / OpenSSH / POSIX互換 `/bin/sh` / CPython 3.13 | 実装済み | 実装済み（祖先・属性制限あり） | 固定Debian imageで個別実SSH。CI対応公開は下記条件付き |
 | その他のOS/arch/runtime | 保証対象外 | 保証対象外 | 未確認 |
 
 Linux対象には管理者が **事前に** `/usr/bin/python3` のCPython 3.13系、
@@ -21,7 +21,7 @@ changed=nullは対象状態不明を表す。再送は行わず、状態を確�
 
 混在inventoryは模擬backend/engineと個別Windows/Linux実SSHを分けて検証する。
 **混在単一runの実機E2Eは未確認**。両コンテナモードの同時稼働を前提にしない。
-L07（Linux file_content）は後続範囲であり、接続前拒否だけを確認する。
+L07の設計・制約・検証層は [Linux file_content](linux-file-content.md) を参照。実装済みとCI対応公開は区別する。
 
 対応公開の条件は、同じSHA・同じ製品exeの両OS必須試験と集約ゲートの合格。
 標準GitHub Windows runnerの実測を先に行い、Linux実SSHは既存Windows PCで必要時に実行する。
