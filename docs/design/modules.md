@@ -81,7 +81,7 @@ JSON v1は未知キー・重複キー・型違いを拒否する。対象ホス�
 
 ## file_content：実行対応済み
 
-main `fb1e92e02754def6b3d3c290c79573199282f843` で再確認。標準CLIのWrappersとDecodeResultに登録済み。[Issue #10](https://github.com/coco-papiyon/wintable/issues/10)はPR #21で統合されCLOSED。採用済み契約・試験範囲の正本は[仕様書](../file-content-module.md)。Linuxは未実装で、[Linux対象ADR](../adr/0001-linux-target-support.md)の第二段階Dとする。
+main `fb1e92e02754def6b3d3c290c79573199282f843` で再確認。標準CLIのWrappersとDecodeResultに登録済み。[Issue #10](https://github.com/coco-papiyon/wintable/issues/10)はPR #21で統合されCLOSED。採用済み契約・試験範囲の正本は[仕様書](../file-content-module.md)。Linuxも実装済み。[Linux file_content](../linux-file-content.md)にAPI・属性・祖先の信頼境界を記載する。
 
 pathは必須stringのドライブ絶対パス、contentは必須string（空可）、既定値なし。contentのUTF-8は1MiB以下、JSON全体2MiB以下。BOMを付加せず、LF/CRLF・末尾改行を保持しバイト比較する。同値はok/false、未存在は空内容でも新規作成でchanged/true、差分置換はchanged/trueを返す。
 
@@ -133,4 +133,4 @@ user/acl/template/powershell/shell/scheduled_task/updatesは採用未決定。�
 
 推奨順序は、file_contentの取り込みと安全置換の検証→P1のfile/service/registry/environment→読取結果基盤とfacts/stat/ping→転送・ハッシュ基盤とP2→再起動要求の結果契約→機能管理と再接続基盤。各段階でWindows 11 SSHとフルServer 2022の試験範囲を明示し、コンテナ試験だけで全環境合格としない。
 
-Linux command backendは [Linux command仕様](../linux-command.md) を参照。設計根拠は [ADR-0001](../adr/0001-linux-target-support.md)。Linux file_contentは未実装。対応公開・CIはIssue #29で扱う。
+Linux command backendは [Linux command仕様](../linux-command.md) を参照。設計根拠は [ADR-0001](../adr/0001-linux-target-support.md)。Linux file_contentも実装済み。対応公開・CIはIssue #29/#31の[公開ゲート](../ci.md)に従う。

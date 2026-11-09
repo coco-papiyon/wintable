@@ -1,6 +1,6 @@
 # ADR-0001: LinuxをSSH実行対象に追加する
 
-- 状態: 採用（設計決定。Linux実行対応は未実装）
+- 状態: 採用（command/file_content実装済み。対応公開は同一SHAのL01〜L07・Windows回帰・集約ゲート合格が条件）
 - 日付: 2026-11-08
 - 要件: [Issue #23](https://github.com/coco-papiyon/wintable/issues/23)本文・実装計画と[検証指摘](https://github.com/coco-papiyon/wintable/issues/23#issuecomment-6715076392)。
 - 調査基準: main `fb1e92e02754def6b3d3c290c79573199282f843`（PR #21統合後）
@@ -111,7 +111,7 @@ fixtureはsshd foreground、パスワード/rootログイン無効、通常runne
 | L06 上限/回帰 | JSON2MiB・argv制限・各出力1MiB・応答3MiB境界、Windows単体/固定起動長/実SSH | 両stream超過でもdeadlockなし、Windows既存期待値一致。合成入力と実CLI入力を分けて記録 |
 | L07 file_content後続 | 新規→同値→差分、空/日本語/改行、symlink/祖先link、非通常、mode/UID/GID/ACL/xattr、権限、競合/清掃失敗、content1MiB/JSON2MiB境界 | 内容・属性・副作用を別probeで観測し決定5と一致。同値はmtime不変・tempなし、新規0600、既存属性保持、不対応属性は拒否。競合時リンク先不変・完全な内容、false/null、自身のtemp清掃を照合。未実証経路は未確認 |
 
-将来ランナー手順（現時点ではコマンド/fixture未実装）:
+設計時のランナー手順（現行の実行場所・配布手順・公開条件は[CI](../ci.md)を参照）:
 
 1. ソースSHAと固定GoでWindows製品をbuildし、`go test ./...`・`go vet ./...`とWindows起動長検査を実行する。
 2. lockからLinux imageをbuildし、digest/依存版を照合。専用資源と鍵生成、sshd開始、管理経路のhost鍵でknown_hostsを作る。
