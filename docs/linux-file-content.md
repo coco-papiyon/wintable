@@ -36,4 +36,36 @@ changed=falseはok、trueはchanged。確定APIを呼ぶ直前に状態を不明
 
 未確認: 全filesystem、実機電源断、悪意のroot/同一UIDへの完全防御、強制kill時の即時temp回収、全device種別、混在単一run実機E2E。強制切断後の残存はfixtureコンテナ破棄で回収する。対応公開は既存CI集約条件と別途保存する実証記録に従う。
 
-実行例: examples/linux-file-content.json。実SSH検証は tests/linux-ssh/run.ps1 に -ProductTestScript tests/linux-ssh/file-content.ps1 を指定する。既存Linux command試験も同時に実行し、skipを失敗として扱う。
+実行例と新規→同値→差分の手順は下記を参照。実SSH検証は tests/linux-ssh/run.ps1 に -ProductTestScript tests/linux-ssh/file-content.ps1 を指定する。既存Linux command試験も同時に実行し、skipを失敗として扱う。
+
+## 配布exeで新規→同値→差分を確認する
+
+ZIPを展開し、そのディレクトリをカレントにする。`examples/linux-inventory.json`の
+address/user/port、Windows上の秘密鍵・known_hostsパスを実環境へ変更する。
+対象の`/home/runner`は既存で、上記の祖先信頼条件を満たすこと。
+サンプルは`/home/runner/config.txt`へ書き込む。新規確認には未作成の専用pathを使い、
+両taskファイルのpathをそろえる。実ファイルを削除して新規状態を作らない。
+
+```powershell
+./wintable.exe run --inventory examples/linux-inventory.json --tasks examples/linux-file-content.json --format json
+./wintable.exe run --inventory examples/linux-inventory.json --tasks examples/linux-file-content.json --format json
+./wintable.exe run --inventory examples/linux-inventory.json --tasks examples/linux-file-content-diff.json --format json
+```
+
+期待結果はすべてCLI終了0、順に`changed/true`、`ok/false`、`changed/true`。
+新規はSSHユーザーの実効UID/GID・0600。同値ではmtimeも変わらない。
+初回内容はBOMなしUTF-8の「日本語」とLF、差分は「日本語: updated」とLF。
+既存の通常ファイルはUID/GID/modeを保持し、保持不能なら拒否する。所有者やmodeを
+指定する入力はない。ACL/xattr付き既存ファイル・親、symlinkや非通常ファイルは上記条件で拒否する。
+
+`failed/null`なら未変更と判断しない。自動再送はない。対象の実際のバイト列・
+UID/GID/mode、実行中receiverと自身の`.wintable-`一時ファイルを管理者が確認し、
+並行更新を整理してから手動で再実行する。他の実行のtempを一括削除しない。
+CASはなく、既存の通常ファイル同士では最後に成功した置換内容が残り得る。
+
+公開ゲートは同じSHA/配布exe/ZIPのWindows両moduleとLinux L01〜L07を要求する。
+`distribution-example`は展開済み配布物の両JSONを直接使用し、通常SSHユーザーで
+上記3段階、独立probeのhash・所有者・0600・同値mtime・残存tempを照合する。
+属性/競合のAPI試験は製品receiverを実SSH先でテスト限定に差し替える層であり、
+無改変製品exe経路と区別する。属性準備不能やskipも公開不可。
+実行場所と同一SHAでの公開判定は[CI手順](ci.md)に従う。

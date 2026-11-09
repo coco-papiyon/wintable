@@ -61,6 +61,75 @@ func TestLinuxFileContentSSH(t *testing.T) {
 		t.Fatal(e)
 	}
 	defer session.Close()
+	t.Run("distribution-example", func(t *testing.T) {
+		packageDir := filepath.Dir(os.Getenv("WINTABLE_PRODUCT_EXE"))
+		temp := t.TempDir()
+		inventory, err := os.ReadFile(filepath.Join(packageDir, "examples", "linux-inventory.json"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var inv map[string]any
+		if err = json.Unmarshal(inventory, &inv); err != nil {
+			t.Fatal(err)
+		}
+		h := inv["hosts"].(map[string]any)["linux01"].(map[string]any)
+		h["address"], h["port"], h["user"] = cfg.Address, cfg.Port, cfg.User
+		h["private_key_file"], h["known_hosts_file"] = host.PrivateKeyFile, host.KnownHostsFile
+		inventory, _ = json.Marshal(inv)
+		ip := filepath.Join(temp, "inventory.json")
+		if err = os.WriteFile(ip, inventory, 0600); err != nil {
+			t.Fatal(err)
+		}
+		var previous string
+		for i, name := range []string{"linux-file-content.json", "linux-file-content.json", "linux-file-content-diff.json"} {
+			tp := filepath.Join(packageDir, "examples", name)
+			data, err := os.ReadFile(tp)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var task struct {
+				Tasks []struct {
+					Args struct{ Path, Content string }
+				}
+			}
+			if err = json.Unmarshal(data, &task); err != nil || len(task.Tasks) != 1 {
+				t.Fatal("invalid distribution example", err)
+			}
+			out, err := exec.CommandContext(ctx, os.Getenv("WINTABLE_PRODUCT_EXE"), "run", "--inventory", ip, "--tasks", tp, "--format", "json").CombinedOutput()
+			if err != nil {
+				t.Fatalf("example exit: %v %s", err, out)
+			}
+			var report result.Report
+			if err = json.Unmarshal(out, &report); err != nil || len(report.Hosts) != 1 || len(report.Hosts[0].Tasks) != 1 {
+				t.Fatal("example result", err)
+			}
+			row := report.Hosts[0].Tasks[0]
+			wantStatus := "changed"
+			if i == 1 {
+				wantStatus = "ok"
+			}
+			if row.Changed == nil || *row.Changed != (i != 1) || string(row.Status) != wantStatus {
+				t.Fatal(row)
+			}
+			args := task.Tasks[0].Args
+			probe := fmt.Sprintf(`import os,stat,hashlib,json
+p=%q
+s=os.stat(p)
+assert hashlib.sha256(open(p,'rb').read()).hexdigest()==%q
+assert (s.st_uid,s.st_gid,stat.S_IMODE(s.st_mode))==(os.geteuid(),os.getegid(),0o600)
+assert not [x for x in os.listdir(os.path.dirname(p)) if x.startswith('.wintable-')]
+print(json.dumps([s.st_uid,s.st_gid,stat.S_IMODE(s.st_mode),s.st_mtime_ns]))
+`, args.Path, fmt.Sprintf("%x", sha256.Sum256([]byte(args.Content))))
+			r, err := session.Run(ctx, transport.Request{Command: "/usr/bin/python3 -I -", Stdin: []byte(probe), StdoutLimit: 4096})
+			if err != nil || r.ExitCode == nil || *r.ExitCode != 0 {
+				t.Fatalf("example probe: %v %s", err, r.Stderr)
+			}
+			if i == 1 && string(r.Stdout) != previous {
+				t.Fatal("same-content example modified attributes/mtime")
+			}
+			previous = string(r.Stdout)
+		}
+	})
 	t.Run("commit-disconnect", func(t *testing.T) { testFileCommitDisconnect(t, ctx, host, session) })
 	// Root is used only to provision ownership impossible for the SSH runner.
 	if !strings.HasPrefix(cfg.Container, "wintable-linux-") || cfg.DockerContext == "" {
@@ -122,6 +191,13 @@ for sg in (0,1):
 		r, e := session.Run(ctx, transport.Request{Command: "/usr/bin/python3 -I -", Stdin: []byte(script), StdoutLimit: transport.WrapperResponseLimit})
 		if e != nil || r.ExitCode == nil || *r.ExitCode != 0 || !strings.Contains(string(r.Stdout), "cases passed") {
 			t.Fatalf("%v %+v %s", e, r, r.Stderr)
+		}
+		for _, name := range []string{"foreign-owner", "setgid-0-acl-0", "setgid-0-acl-1", "setgid-1-acl-0", "setgid-1-acl-1", "bytes-equal", "mode-retention", "type-ancestor-rejections", "acl-xattr-permissions", "target-link-swap", "new-destination-race", "commit-cleanup-fsync", "ancestor-rename", "temp-substitution"} {
+			t.Run(name, func(t *testing.T) {
+				if strings.Count(string(r.Stdout), "PASS "+name+"\n") != 1 {
+					t.Fatal("missing/duplicate API assertion group", name)
+				}
+			})
 		}
 		t.Log(string(r.Stdout))
 	})

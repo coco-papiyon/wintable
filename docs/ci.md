@@ -43,7 +43,7 @@ PCをGitHub runnerとして登録したり、常駐サービスを入れたり�
 
 helperは実際のActions APIでrepository/workflow/head SHAと両job結果を検査し、
 同じrunのcandidateとWindows証跡を取得する。ローカルでexeを再buildしない。
-固定Debian image/CPython 3.13.5の実SSHと配布exeの日本語文書例を実行し、
+固定Debian image/CPython 3.13.5のcommand/file_content実SSHと配布exeの日本語文書例を実行し、
 `tests/ci/gate.ps1` で両OS証跡・同一SHA・exe/ZIPハッシュ・全必須ケース・清掃を照合する。
 旧SHA、汚れた作業ツリー、別workflow、欠落artifact、実テスト失敗、skip/欠落/重複は拒否する。
 artifactが失効した場合は、同じSHAのworkflow全体を再実行してから新しい結果を使う。
@@ -78,14 +78,21 @@ CIの能力確認artifactが同じSHAで `unavailable` を記録し、`container
 
 | 基準 | 検証 |
 | --- | --- |
-| L01 | TestHostOS / TestOSSchemaBoundaries / TestOSPreflightNoConnections。Linux file_contentは全ホスト接続前拒否 |
+| L01 | TestHostOS / TestOSSchemaBoundaries / TestOSPreflightNoConnections。未知OS/module等は全ホスト接続前拒否。Linux file_contentは有効 |
 | L02 | 固定独立probeの2MiB/EOF/両stream/鍵拒否/期限・中断/再送なし |
 | L03〜L04 | Windows製品exeのargv/出力/終了値、raw receiverの不正入力・runtime・E2BIG、文書例 |
 | L05〜L06 | 模擬混在、個別実SSH、合成境界、固定起動長。層別に記録 |
+| L07 | file_contentの製品バイト境界・配布サンプル新規→同値→差分、実SSH上のAPI属性/競合/障害注入、確定前後の同期切断。全サブケース必須 |
 | Windows V-01〜V-18 | 既存coverage/summarizeとZIP導入。期待値を緩めない |
 
 混在単一runの実機E2E、専用remote Docker/tunnelは未確認。
-Windows制御・Debian 13 amd64/CPython 3.13のみ。Linux file_contentは未対応。
+Windows制御・Debian 13 amd64/CPython 3.13のみ。Linux file_contentはL07を公開ゲートで必須化する。
 切断後の子孫停止は保証しない。対応範囲は [support.md](support.md) を参照。
 Linuxはready60秒、試験600秒、清掃90秒。Windows jobは35分、能力確認は5分。
 強制中断時はfixture READMEの実行ID別回収手順を使い、共有Docker資源のpruneは行わない。
+
+L07も公開ゲートの必須条件である。配布物の
+[Linux file_content手順](linux-file-content.md#配布exeで新規同値差分を確認する)を実行する。
+属性・競合・障害注入の子ケースは`tests/ci/linux-required.json`で個別に要求し、
+親PASSでも子SKIP・欠落・重複・空ログを許容しない。通常製品exe経路とテスト限定API注入の
+保証範囲を区別し、任意filesystem・敵対的root/同一UIDの操作への保証へ拡張しない。

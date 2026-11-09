@@ -1,7 +1,7 @@
 name: Standard runner SSH candidate
 on:
   push:
-    branches: [main, 'feature/issue_#29']
+    branches: [main, 'feature/issue_#29', 'feature/issue_#31']
   workflow_dispatch:
 permissions:
   contents: read

@@ -159,18 +159,38 @@ stopping that exact process. Remove only `client`, `client.pub`, `known_hosts`,
 directory; inspect leftovers rather than recursively deleting arbitrary paths.
 Inspect the same label again and confirm the credential directory is absent.
 
-## Follow-on acceptance boundary
+## Acceptance scope and publication boundary
 
 L01 belongs to #26. This fixture covers the independent **L02** foundation;
-L03–L06 product executable/receiver and command acceptance belong to #28;
-L07 Linux file_content is deferred. #29 must not publish support before fixture
-and product acceptance are complete. A passing Go transport test is not a claim
-that the Linux product backend is available.
+L03–L06 product executable/receiver and command acceptance belong to #28.
+L07 Linux file_content is implemented by #30 and included in #31's required
+publication acceptance alongside command. The required subcases in
+[`linux-required.json`](../ci/linux-required.json) include attribute retention
+and rejection, races/faults, disconnects and the packaged distribution example.
+Missing or skipped attribute/race cases cannot pass publication acceptance.
+A passing Go transport test alone does not satisfy product acceptance.
 
-#28 can pass `-ProductTestScript <repository-owned.ps1>`. It receives
+Publication requires the same source SHA and distribution exe/ZIP to pass
+Linux L01–L07, Windows regression for both modules, cleanup/evidence checks and
+the aggregate gate. Execution locations and the distinction between Actions
+and local Windows PC evidence follow [the CI procedure](../../docs/ci.md).
+The [support matrix](../../docs/support.md) and
+[Linux file_content contract](../../docs/linux-file-content.md) define the
+supported scope, trust assumptions and unverified boundaries.
+
+The runner accepts `-ProductTestScript <repository-owned.ps1>`. It receives
 `-FixtureDirectory` (ephemeral `fixture.json`, `client`, `known_hosts`) and
 `-EvidenceDirectory`; the endpoint's Address/Port/User fields match inventory.
 It must invoke the built **Windows product exe**, persist sanitized expectations
 and observations itself, fail on missing/skipped cases, and exit nonzero on
 failure. It shares the common run deadline and finally cleanup; the runner does
 not persist its arbitrary output. Never copy credential files into evidence.
+
+## L07を含む公開検証
+
+`product.ps1`は配布exeによるcommandとfile_contentを同一fixtureで実行する。
+`tests/ci/linux-required.json`の全サブケースが必須で、属性/競合のskipは成功に含めない。
+`file-content.ps1`を単独実行する場合も`-DistributionDirectory`に展開済み配布物を指定する。
+配布サンプル新規→同値→差分はその同梱JSONを使用する。
+API-cases/commit-disconnectはテスト限定注入、product-bytes/distribution-exampleは無改変製品経路。
+清掃・許可リスト証跡回収・600秒の全体期限は既存run.ps1を共用する。

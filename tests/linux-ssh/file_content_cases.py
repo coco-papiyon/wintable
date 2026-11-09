@@ -29,7 +29,7 @@ def cases(source):
     assert read(foreign) == b'foreign'
     assert (before.st_uid, before.st_gid, before.st_mode, before.st_mtime_ns, before.st_ino) == (after.st_uid, after.st_gid, after.st_mode, after.st_mtime_ns, after.st_ino)
     assert not [x for x in os.listdir('/home/runner') if x.startswith('.wintable-')]
-    print('foreign UID retention denied before commit; original unchanged; temp cleaned')
+    print('PASS foreign-owner')
     import struct
     acl = struct.pack('<I', 2) + b''.join(struct.pack('<HHI', *x) for x in [(1,7,0xffffffff),(2,0,12345),(4,0,0xffffffff),(16,0,0xffffffff),(32,0,0xffffffff)])
     for sg in (0,1):
@@ -49,7 +49,7 @@ def cases(source):
                     assert read(dest) == b'new'
                     assert (s.st_uid, s.st_gid, stat.S_IMODE(s.st_mode)) == (os.geteuid(), os.getegid(), 0o600)
                 assert not [x for x in os.listdir(directory) if x.startswith('.wintable-')]
-                print(f'setgid={sg} defaultACL={default}: verified attributes/rejection and cleanup')
+                print(f'PASS setgid-{sg}-acl-{default}')
             finally:
                 os.umask(old)
     for data in (b"", "日本語😀\r\n\0\n".encode(), b"x" * 1048576):
@@ -62,11 +62,13 @@ def cases(source):
         sys.addaudithook(lambda event, args: events.append(args[0]) if event == "open" and isinstance(args[0], str) and args[0].startswith(".wintable-") else None)
         expect(update(p, data), no)
         assert os.stat(p).st_mtime_ns == s.st_mtime_ns and not events
+    print("PASS bytes-equal")
     os.chmod(p, 0o6750)
     before = os.stat(p)
     expect(update(p, b"mode"), yes)
     after = os.stat(p)
     assert (before.st_uid, before.st_gid, stat.S_IMODE(before.st_mode)) == (after.st_uid, after.st_gid, stat.S_IMODE(after.st_mode))
+    print("PASS mode-retention")
     put(victim, b"victim")
     os.unlink(p)
     os.symlink(victim, p)
@@ -87,6 +89,7 @@ def cases(source):
     expect(update(base + "/link/target", b"bad"), false)
     expect(update(base + "/missing/target", b"bad"), false)
     expect(update("/tmp/rejected-wintable", b"bad"), false)
+    print("PASS type-ancestor-rejections")
     put(p, b"old")
     os.setxattr(p, "user.test", b"x")
     expect(update(p, b"old"), false)
@@ -100,6 +103,7 @@ def cases(source):
     os.chmod(base, 0o500)
     expect(update(p, b"bad"), false)
     os.chmod(base, 0o700)
+    print("PASS acl-xattr-permissions")
     # Inject just before the real atomic API. Replacement must not follow link.
     replace = os.replace
     def swap(src, dst, **kw):
@@ -112,6 +116,7 @@ def cases(source):
         assert read(victim) == b"victim" and read(p) == b"whole" and not os.path.islink(p)
     finally:
         os.replace = replace
+    print("PASS target-link-swap")
     # Destination appearing at new-file commit cannot be overwritten.
     os.unlink(p)
     link = os.link
@@ -124,6 +129,7 @@ def cases(source):
         assert read(p) == b"concurrent"
     finally:
         os.link = link
+    print("PASS new-destination-race")
     # Commit/sync/cleanup failures retain the conservative null classification.
     def fail(*a, **kw):
         raise OSError()
@@ -150,6 +156,7 @@ def cases(source):
         expect(update(p, b"newer"), false)
     finally:
         os.fsync = fsync
+    print("PASS commit-cleanup-fsync")
     # Ancestor rename before revalidation is refused; cleanup uses pinned dirfd.
     moved = base + "-moved"
     def move_at_sync(fd):
@@ -167,6 +174,7 @@ def cases(source):
         os.fsync = fsync
         os.rmdir(base)
         os.rename(moved, base)
+    print("PASS ancestor-rename")
     # A substituted temp must never be removed as our own cleanup.
     def substitute(fd):
         if stat.S_ISREG(os.fstat(fd).st_mode):
@@ -186,4 +194,5 @@ def cases(source):
     finally:
         os.fsync = fsync
     assert not [x for x in os.listdir(base) if x.startswith(".wintable-")]
+    print("PASS temp-substitution")
     print("file-content API cases passed")

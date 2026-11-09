@@ -30,3 +30,8 @@ L07の設計・制約・検証層は [Linux file_content](linux-file-content.md)
 常設self-hosted runnerや追加VM契約は不要。candidate artifactだけでは公開しない。
 過去の個別実証は [Issue #28](validation/issue28/README.md)、
 実行・導入・復旧手順は [CI](ci.md) を参照。
+
+L07の公開条件には、属性保持/拒否・0600・ACL/xattr拒否・同期競合/障害と
+配布サンプルの新規→同値→差分を含める。詳細は
+[Linux file_contentの保証境界と手順](linux-file-content.md)を参照。
+属性/競合試験のSKIPや準備失敗は対応確認に数えない。

@@ -36,6 +36,12 @@ try {
     $package="$output/candidate/package"
     & "$PSScriptRoot/check-package.ps1" -Directory $package -SourceSHA $sha
     & "$repo/scripts/verify-package.ps1" -Zip "$package.zip" -ExpectedSHA256 (Get-FileHash "$package.zip").Hash
+    $expanded="$output/expanded"
+    Expand-Archive -LiteralPath "$package.zip" -DestinationPath $expanded
+    & "$PSScriptRoot/check-package.ps1" -Directory $expanded -SourceSHA $sha
+    # Keep the original ZIP next to the extracted package for the common gate.
+    Copy-Item -LiteralPath "$package.zip" -Destination "$expanded.zip"
+    $package=$expanded
     if ($windowsExecution -eq 'github-actions') {
         Invoke-Gh @('run','download',$RunId,'--repo',$repository,'--name','windows-evidence','--dir',"$output/evidence") | Out-Null
     } else {
