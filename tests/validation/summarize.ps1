@@ -4,7 +4,7 @@ param([Parameter(Mandatory)][string]$EvidenceDirectory)
 $ErrorActionPreference = 'Stop'
 $root = [IO.Path]::GetFullPath($EvidenceDirectory)
 $manifest = Get-Content "$root/manifest.json" -Raw | ConvertFrom-Json
-$rows = @(1..18 | ForEach-Object {
+$rows = @(1..19 | ForEach-Object {
     [pscustomobject]@{ scenario=('V-{0:00}' -f $_); status='unconfirmed'; evidence='manifest.json; ssh/manifest.json'; note='Subcase coverage review still required' }
 })
 # V-13 is an actual binary/SSH check, independently of Go fixture test success.
@@ -28,7 +28,7 @@ if (Test-Path -LiteralPath $controllerFile) {
 }
 $rows | Export-Csv "$root/scenarios.csv" -NoTypeInformation -Encoding utf8NoBOM
 # Preserve individual PASS/FAIL/SKIP records: a parent PASS never erases SKIP.
-$tests = @(foreach ($relative in 'test.log','wrappers.log','native-container.log','ssh/cli-test.log','ssh/command-test.log','ssh/test.log') {
+$tests = @(foreach ($relative in 'test.log','wrappers.log','native-container.log','ssh/cli-test.log','ssh/command-test.log','ssh/test.log','ssh/fetch-native.log') {
     if (!(Test-Path -LiteralPath "$root/$relative")) { continue }
     foreach ($line in Get-Content "$root/$relative") {
         if ($line -match '^\s*--- (PASS|FAIL|SKIP): (\S+)') {

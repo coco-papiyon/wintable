@@ -75,7 +75,10 @@ func ValidateWrapper(finalLine string) error {
 
 // Prepared owns the exact serialized bytes. Request returns a defensive copy;
 // transport must send Stdin verbatim and must never marshal arguments again.
-type Prepared struct{ data []byte }
+type Prepared struct {
+	data             []byte
+	FetchDestination string
+}
 
 func (p Prepared) JSON() []byte { return append([]byte(nil), p.data...) }
 func (p Prepared) Request(finalLine string) (transport.Request, error) {

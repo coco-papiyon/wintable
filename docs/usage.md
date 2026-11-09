@@ -48,3 +48,7 @@ Windows対象のcommandはCRT規則でargvを解釈する絶対パス.exe専用�
 
 接続期限10秒、タスク期限は既定60秒（`--timeout`で指定）です。失敗ホストの後続タスクはskipped、他ホストは続行します。自動再試行はしません。タイムアウト・切断・Ctrl+CでSSHを閉じても対象プロセスの停止は保証できません。changed=nullなら対象のプロセス、出力ファイル、サービス状態等を別接続で調査し、処理がまだ動いていないか確認してから手動再実行してください。commandの二重実行は副作用を生む場合があります。
 
+
+## リモートファイルの取得
+
+fetchのsrcは対象OSの絶対パス、destはWindows制御端末の保存ルートです。[fetch利用例・保存名・上書き仕様](fetch-module.md)と[タスク例](../examples/fetch.json)を参照してください。inventoryの各host.vars.fetch_srcを設定して実行します。

@@ -1,5 +1,7 @@
 # Issue #39: Windows保存確定方式の成立確認（未通過）
 
+**この文書はcommit `936abdf` 時点の初回調査記録。** その後ユーザーは検査後の差し替えを上書きするリスクを明示的に許容した。現在の製品実装・仕様は [fetch-module.md](../../docs/fetch-module.md) を参照。以下の未実装・未確認の記述は当時の状況であり、現在の製品状態ではない。
+
 このディレクトリは **却下した保存方式の再現用コード**。fetch製品実装でも受入試験でもない。schema・backend・engine・transportには登録していない。公開機能はcommand / file_contentのままである。
 
 ## 基準

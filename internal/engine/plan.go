@@ -7,6 +7,7 @@ import (
 	"github.com/coco-papiyon/wintable/internal/inventory"
 	"github.com/coco-papiyon/wintable/internal/module"
 	"github.com/coco-papiyon/wintable/internal/transport"
+	"strings"
 )
 
 type TaskPlan struct {
@@ -42,6 +43,7 @@ func build(b *config.Bundle, limit string, limitSet bool, backends module.Backen
 		return nil, e
 	}
 	p := &Plan{}
+	fetchPaths := []string{}
 	for _, h := range hosts {
 		hp := HostPlan{Name: h}
 		connection := b.Inventory["hosts"].(map[string]any)[h].(map[string]any)
@@ -90,6 +92,15 @@ func build(b *config.Bundle, limit string, limitSet bool, backends module.Backen
 			payload, e := backend.Prepare(h, i+1, kind, args)
 			if e != nil {
 				return nil, e
+			}
+			if kind == "fetch" {
+				path := strings.ToLower(payload.FetchDestination)
+				for _, other := range fetchPaths {
+					if path == other || strings.HasPrefix(path, other+`\`) || strings.HasPrefix(other, path+`\`) {
+						return nil, fmt.Errorf("input_error: conflicting fetch destinations")
+					}
+				}
+				fetchPaths = append(fetchPaths, path)
 			}
 			hp.Tasks = append(hp.Tasks, TaskPlan{t["name"].(string), t["module"].(string), payload, &backend})
 		}

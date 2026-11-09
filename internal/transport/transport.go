@@ -2,7 +2,10 @@
 // It does not import the engine, CLI, modules or result renderer.
 package transport
 
-import "context"
+import (
+	"context"
+	"io"
+)
 
 // Host is validated connection information. Never serialize it into task results.
 type Host struct {
@@ -59,4 +62,17 @@ type Connector interface {
 type Session interface {
 	Run(context.Context, Request) (Response, error)
 	Close() error
+}
+
+// StreamSession transfers stdout directly to a bounded streaming consumer.
+// No stream bytes are captured in Response or diagnostics. Consumer failure
+// aborts the SSH connection; completion still requires EOF and remote exit.
+type StreamSession interface {
+	Session
+	Stream(context.Context, Request, func(io.Reader) error) (Response, error)
+}
+
+type StreamingConnector interface {
+	Connector
+	SupportsStream() bool
 }

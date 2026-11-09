@@ -291,6 +291,10 @@ func LoadTasks(path string) (map[string]any, error) {
 			g := v.obj(t["args"], p+".args", "path", "content")
 			v.str(g["path"], p+".args.path", false)
 			v.str(g["content"], p+".args.content", true)
+		case "fetch":
+			g := v.obj(t["args"], p+".args", "src", "dest")
+			v.str(g["src"], p+".args.src", false)
+			v.str(g["dest"], p+".args.dest", false)
 		default:
 			v.fail(p+".module", "unknown module")
 		}
