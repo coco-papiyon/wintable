@@ -22,6 +22,8 @@ func DefaultBackends() Backends {
 	b := WindowsBackends()
 	line := LinuxCommandWrapper()
 	b[Key{"linux", "command"}] = Backend{Prepare: PrepareLinuxCommand, Command: line, LaunchLine: line, ValidateLaunch: ValidateLinuxWrapper, Decode: DecodeLinuxCommand}
+	line = LinuxFileContentWrapper()
+	b[Key{"linux", "file_content"}] = Backend{Prepare: PrepareLinuxFileContent, Command: line, LaunchLine: line, ValidateLaunch: ValidateLinuxWrapper, Decode: DecodeLinuxFileContent}
 	return b
 }
 
