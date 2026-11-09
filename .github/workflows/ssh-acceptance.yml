@@ -1,4 +1,4 @@
-name: Windows controlled SSH acceptance
+name: Standard runner SSH candidate
 on:
   push:
     branches: [main, 'feature/issue_#29']
@@ -18,6 +18,7 @@ defaults:
     shell: pwsh
 jobs:
   build:
+    if: github.event.repository.private == false
     runs-on: windows-2022
     timeout-minutes: 20
     steps:
@@ -33,6 +34,7 @@ jobs:
           ./tests/ci/package.ps1
           ./tests/ci/check-package.ps1 -Directory dist/package -SourceSHA '${{ github.sha }}'
           ./tests/ci/test-gate.ps1
+          ./tests/ci/test-run.ps1
           ./tests/validation/test-summary.ps1
           New-Item dist/shared -ItemType Directory | Out-Null
           Copy-Item dist/package dist/shared/package -Recurse
@@ -43,16 +45,18 @@ jobs:
           name: candidate-audit
           path: dist/package-audit/audit.json
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 3
+          overwrite: true
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: candidate
           path: dist/shared/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 3
+          overwrite: true
   windows:
     needs: build
-    runs-on: [self-hosted, Windows, X64, wintable-windows-ssh]
+    runs-on: windows-2022
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -67,9 +71,13 @@ jobs:
         with:
           name: candidate
           path: dist
-      - run: |
+      - name: Windows container capability
+        timeout-minutes: 5
+        run: ./tests/ci/hosted-windows.ps1 -OutputFile .cache/ci/windows-capability.json
+      - name: Windows real SSH acceptance
+        run: |
           $env:WINTABLE_DISTRIBUTION_ZIP="$pwd/dist/package.zip"
-          ./tests/validation/run.ps1 -DistributionDirectory "$pwd/dist/package" -OutputDirectory "$pwd/.cache/ci/windows"
+          ./tests/validation/run.ps1 -DistributionDirectory "$pwd/dist/package" -Isolation process -OutputDirectory "$pwd/.cache/ci/windows"
       - if: always()
         run: ./tests/ci/export-evidence.ps1 -Kind windows -InputDirectory .cache/ci/windows -OutputDirectory .cache/upload
       - if: always()
@@ -78,65 +86,16 @@ jobs:
           name: windows-evidence
           path: .cache/upload/
           if-no-files-found: error
-          retention-days: 14
-  linux:
-    needs: build
-    runs-on: [self-hosted, Windows, X64, wintable-linux-ssh]
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
-        with:
-          go-version: '1.27.3'
-          cache: false
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          name: candidate
-          path: dist
-      - run: |
-          ./tests/ci/check-package.ps1 -Directory dist/package -SourceSHA '${{ github.sha }}'
-          Copy-Item dist/package/wintable.exe dist/wintable.exe
-          ./tests/linux-ssh/run.ps1 -DockerContext desktop-linux -ProductTestScript ./tests/linux-ssh/product.ps1 -OutputDirectory .cache/ci/linux
-      - if: always()
-        run: ./tests/ci/export-evidence.ps1 -Kind linux -InputDirectory .cache/ci/linux -OutputDirectory .cache/upload
+          retention-days: 3
+          overwrite: true
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: linux-evidence
-          path: .cache/upload/
+          name: hosted-windows-capabilities
+          path: .cache/ci/windows-capability.json
           if-no-files-found: error
-          retention-days: 14
-  publication-gate:
-    if: always()
-    needs: [build, windows, linux]
-    runs-on: windows-2022
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          name: candidate
-          path: dist
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with:
-          pattern: '*-evidence'
-          path: .cache/evidence
-          merge-multiple: true
-      - run: |
-          ./tests/ci/gate.ps1 -EvidenceDirectory .cache/evidence -DistributionDirectory dist/package -SourceSHA '${{ github.sha }}' -WindowsJob '${{ needs.windows.result }}' -LinuxJob '${{ needs.linux.result }}'
-          Copy-Item dist/package.zip dist/wintable-windows-amd64.zip
-          'Both OS targets passed. Mixed real SSH E2E: unconfirmed.' >> $env:GITHUB_STEP_SUMMARY
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: validated-distribution
-          path: |
-            dist/wintable-windows-amd64.zip
-            .cache/evidence/publication.json
-          if-no-files-found: error
-          retention-days: 14
+          retention-days: 3
+          overwrite: true
+      - name: Remaining acceptance
+        run: |
+          'Windows real SSH passed. Complete Linux acceptance on an existing Windows PC with tests/ci/complete-local.ps1; this candidate is not yet a validated distribution.' >> $env:GITHUB_STEP_SUMMARY

@@ -68,7 +68,7 @@ hostの `os` はリテラル `windows` / `linux` のみ。省略は `windows`。
 
 inventory/tasksのversion=1、結果形式は維持する。Linux command backendを実装済み。
 対象はDebian 13 amd64、OpenSSH、POSIX互換/bin/sh、/usr/bin/python3のCPython 3.13系。
-Windows制御端末から使用する。Pythonは事前導入が必要で自動導入しない。Linux file_contentは未対応。CIでの対応公開は両OS・同一SHAの必須試験合格を条件とし、runner未登録の現状では未確認。
+Windows制御端末から使用する。Pythonは事前導入が必要で自動導入しない。Linux file_contentは未対応。対応公開は同一SHAの両OS必須試験と集約ゲート合格を条件とする。標準runnerを先に検証し、Linux実SSH等は既存PCで必要時に実行する。手順は [CI](docs/ci.md) を参照。
 実行契約と検証範囲は [Linux command](docs/linux-command.md) を参照。
 詳細は [backend境界](docs/backend-boundary.md) を参照。
 

@@ -14,7 +14,7 @@ try {
         'synthetic' | Set-Content "$root/package/$path"
     }
     Save @{source_sha='source';go='go version go1.27.3 windows/amd64';files=@($paths | ForEach-Object {@{path=$_;sha256=(Get-FileHash "$root/package/$_").Hash}})} 'package/distribution.json'
-    foreach ($mode in 'valid','skip','missing','duplicate','null-exit','wrong-source','wrong-binary','versions','cleanup','deadline','job-failed','job-skipped','job-cancelled','missing-artifact','windows-missing','zip-missing','zip-failed','zip-not-removed','zip-wrong-hash') {
+    foreach ($mode in 'valid','valid-hybrid','missing-provenance','skip','missing','duplicate','null-exit','wrong-source','wrong-binary','versions','cleanup','deadline','job-failed','job-skipped','job-cancelled','missing-artifact','windows-missing','zip-missing','zip-failed','zip-not-removed','zip-wrong-hash') {
         $wc=Get-Content "$PSScriptRoot/../validation/coverage.json" -Raw | ConvertFrom-Json
         foreach ($file in @($wc | ForEach-Object {$_.checks.PSObject.Properties.Name}) | Sort-Object -Unique) {
             $names=@($wc | ForEach-Object {$_.checks.PSObject.Properties | Where-Object Name -ceq $file | ForEach-Object Value}) | Sort-Object -Unique
@@ -64,8 +64,11 @@ try {
         Save $l 'linux/manifest.json'; Save $e 'linux/document-example.json'; Save $v 'linux/version-comparison.json'
         Save @{Hash=$hash} 'linux/product-hash.json'
         if ($mode -eq 'missing-artifact') { Remove-Item -LiteralPath "$root/linux/product-hash.json" }
-        $output=& pwsh -NoProfile -File "$PSScriptRoot/gate.ps1" -EvidenceDirectory $root -DistributionDirectory "$root/package" -SourceSHA source -WindowsJob success -LinuxJob $job 2>&1
-        if (($LASTEXITCODE -eq 0) -ne ($mode -eq 'valid')) { throw "Incorrect gate verdict for ${mode}: $output" }
+        $provenance=@()
+        if ($mode -in 'valid-hybrid','missing-provenance') { $provenance=@('-WindowsExecution','github-actions') }
+        if ($mode -eq 'valid-hybrid') { $provenance+=@('-WorkflowRunId','123') }
+        $output=& pwsh -NoProfile -File "$PSScriptRoot/gate.ps1" -EvidenceDirectory $root -DistributionDirectory "$root/package" -SourceSHA source -WindowsJob success -LinuxJob $job @provenance 2>&1
+        if (($LASTEXITCODE -eq 0) -ne ($mode -in 'valid','valid-hybrid')) { throw "Incorrect gate verdict for ${mode}: $output" }
         Write-Host "PASS gate: $mode"
     }
 } finally {

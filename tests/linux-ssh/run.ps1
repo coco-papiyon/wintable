@@ -10,6 +10,7 @@ param(
     [ValidateSet('none','partial','startup','test','ready-timeout','timeout','cleanup')]
     [string]$Fault = 'none',
     # #28 may supply a fixed, repository-owned product acceptance script.
+    [string]$ProductDistributionDirectory,
     [string]$ProductTestScript
 )
 $ErrorActionPreference = 'Stop'
@@ -179,7 +180,9 @@ try {
     $manifest.cases=@($events | Where-Object { $_.Action -in 'pass','fail','skip' -and $_.Test } | Select-Object Test,Action,Elapsed)
     if ($test.code -or @($events | Where-Object Action -eq 'skip').Count -or @($expected | Where-Object {$_ -notin $passed}).Count) { throw 'required Linux SSH acceptance failed or skipped' }
     if ($ProductTestScript) {
-        $product=Invoke-Bounded pwsh @('-NoProfile','-File',([IO.Path]::GetFullPath($ProductTestScript)),'-FixtureDirectory',$secret,'-EvidenceDirectory',$output) 240 -AllowFailure
+        $productArguments=@('-NoProfile','-File',([IO.Path]::GetFullPath($ProductTestScript)),'-FixtureDirectory',$secret,'-EvidenceDirectory',$output)
+        if ($ProductDistributionDirectory) { $productArguments+=@('-DistributionDirectory',([IO.Path]::GetFullPath($ProductDistributionDirectory))) }
+        $product=Invoke-Bounded pwsh $productArguments 240 -AllowFailure
         $manifest.product=@{exit_code=$product.code}; if ($product.code) { throw 'product acceptance failed' }
     }
     $manifest.status='passed'

@@ -1,7 +1,7 @@
-param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$EvidenceDirectory)
+param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$EvidenceDirectory,[string]$DistributionDirectory)
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path "$PSScriptRoot/../..").Path
-$package="$repo/dist/package"
+$package=if ($DistributionDirectory) { $DistributionDirectory } else { "$repo/dist/package" }
 & "$repo/tests/ci/check-package.ps1" -Directory $package -SourceSHA (& git -C $repo rev-parse HEAD)
 $endpoint=Get-Content "$FixtureDirectory/fixture.json" -Raw | ConvertFrom-Json
 $inventory=Get-Content "$package/examples/linux-inventory.json" -Raw | ConvertFrom-Json

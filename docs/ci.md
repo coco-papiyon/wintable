@@ -1,87 +1,90 @@
-# Windows制御の実SSH CIと配布
+# 標準runnerと必要時のローカル実SSH検証
 
-`.github/workflows/ssh-acceptance.yml` はpushされたSHAを全ジョブで明示checkoutする。
-固定Go 1.27.3でWindows amd64 exeを一度buildし、配布manifestとSHA-256を付ける。
-Windows対象ジョブとLinux対象ジョブは同じartifactを取得し再buildしない。
-artifactには配布ディレクトリと生成済みZIPを含める。WindowsのZIP導入検査で使った
-ZIPハッシュを最終ゲートで照合し、検証後に再梱包せず同じZIPを合格artifactへコピーする。
-配布候補には埋込Windows/Python receiverを含むexe、README、docs、examplesを同梱し、
-ZIP展開後の全ファイルhashとexe helpを検査する。ランタイムの外部Pythonソース配布は不要。
-候補作成は既存の `scripts/distribution.ps1` を再利用し、依存脆弱性監査、MITライセンス、
-Goと全依存のライセンス・通知、配布ZIP検査を維持する。監査の失敗も公開を拒否する。
+追加のVM契約・larger runner・常設self-hosted runnerを使わない。
+公開リポジトリのGitHub標準runnerによる実行を使用する。
+[GitHubの料金条件](https://docs.github.com/en/actions/concepts/billing-and-usage)に従い、
+このworkflowはprivateリポジトリでは起動しない。artifact保存容量は別途プランの上限を確認する。
+保存期間は3日とし、不要になったartifactはGitHub上で削除できる。
 
-## runnerの用意
+## GitHub Actionsで実行する範囲
 
-GitHub Actionsが有効であることに加え、専用のWindows amd64 self-hosted runnerが必要。
-PowerShell 7.3以上、Go 1.27.3取得経路、Docker 28以上、OpenSSH clientを用意する。
-Windows用はHyper-V/Windows containersとOpenSSHサーバーバイナリを用意し
-`wintable-windows-ssh`、Linux containers用は`desktop-linux` contextを用意し
-`wintable-linux-ssh`ラベルを付ける。Windows/X64既定ラベルも必要。
-用途別runnerを分離し、同じDocker daemonをモード切替する並行ジョブは登録しない。
-使い捨てrunnerを推奨する。workflowはfork PRのコードを自動実行しない。
-Issue #29実装時点のAPI確認ではrunner登録0件。登録と実行成功を文書だけで代替しない。
+`.github/workflows/ssh-acceptance.yml` のbuild/windowsは標準 `windows-2022` を使う。
+固定Go 1.27.3で監査・license・ZIP内容検査を含む既存配布処理を実行し、
+`candidate` artifactへ `package/` と生成済み `package.zip` を保存する。
+Windows jobはそのexeとZIPを使い、V-01〜V-18・両module・非管理者ZIP導入を実行する。
+Windows Server 2022の固定base digestを維持し、Dockerの **process isolation** を指定する。
+Hyper-Vのnested virtualizationは要求しない。
 
-Windows runnerからLinux Dockerへの接続はローカルLinux containersを既定経路とする。
-Linux試験の成功はWindowsからloopback SSHへ実到達した証跡を必要とする。
-専用remote Linux Dockerホストに変更する場合は
-[fixture手順](../tests/linux-ssh/README.md#dedicated-remote-linux-docker-host)に従い、
-事前検証した管理host鍵・公開鍵認証とloopbackトンネルを使う。
-workflowのLinux呼出しに `-DockerContext <alias> -TunnelHost <same-alias>` を設定する。
-未検証ssh-keyscan・自動信頼・公開SSHポートは使わない。remote方式は未実証。
+実行前の `Windows container capability` stepは、Dockerサービスと固定imageの
+process-isolated container起動を実測し、`hosted-windows-capabilities` に結果と清掃状態を保存する。
+標準runnerのimage変更等で利用できなければjobを失敗にし、未実行を合格にはしない。
+[公式runner image](https://github.com/actions/runner-images/blob/main/images/windows/Windows2022-Readme.md)
+のDocker搭載だけを実SSH成功の証拠とは扱わない。
 
-## 必須検査と公開条件
+成功時の `windows-evidence` は固定ファイル名の許可リストで抽出する。
+秘密鍵、fixture directory、Docker build context、SSH設定、環境dumpを一括uploadしない。
+通常のPR/push CIと監査も維持する。fork PRをself-hosted PCで自動実行する構成はない。
 
-| 試験基準 | 検証層・証跡 |
-| --- | --- |
-| L01 OS/全件preflight | Windows全体Go検査のTestHostOS/TestOSSchemaBoundaries/TestOSPreflightNoConnections、backend境界検査。未対応Linux file_contentは全ホスト接続0 |
-| L02 SSH基盤 | test.jsonl、固定独立probe。UTF-8分割read・2MiB/EOF・両stream・拒否・timeout/cancel/切断・再送0 |
-| L03 command | product-argv/product-exits、Windows製品exe→sshd→receiver。文書同梱whoami例も実行 |
-| L04 receiver | raw-invalid/raw-EOF/raw-runtime/raw-E2BIG。生receiverの不正入力・runtime shimであり製品CLI試験とは区別 |
-| L05 共通実行契約 | TestMixedBackends等の模擬混在、個別実SSHの接続再利用/失敗後skip/中断。混在実機E2Eは未確認 |
-| L06 境界 | raw-boundaries、product-output、合成TestLinuxDecoder、固定起動長検査。CLI到達境界と生receiver合成を区別 |
-| Windows V-01〜V-18 | 既存coverage.json/summarize.ps1。配布exeのclean controller・command/file_content回帰を維持 |
+## 既存Windows PCで必要時に実行する範囲
 
-最終ジョブはalways実行し、両試験jobのsuccess、同一SHA/バイナリ、必須サブケースの
-一意なPASS、版照合、有限期限、清掃成功を検査する。親PASSで子SKIPを補わない。
-失敗・取消・未実行・欠落artifact・null終了値・重複は公開不可。
-合格時だけ`validated-distribution`を生成する。GitHub Releaseへの自動投稿は行わない。
-Windowsでは同じ候補をZIP化し、既存の非管理者・日本語空白パス・Go/WSL/Pythonなしの
-導入検査も実行する。`zip-controller.log` の完了マーカー、終了0、コンテナ清掃が必須。
-公開者はこのworkflowの同一SHAの`publication-gate`合格とartifactを使う。
-branch protectionの必須チェックにも同名jobを設定する。実装時点で保護設定は未変更。
+Windows標準runnerから固定Linux Dockerへ到達する経路を確保するために、
+追加VMや公開SSH・外部中継サービスを契約しない。Linux実SSHは既存PCで必要時に実行する。
+この実行を「GitHub Actions上のLinux実SSH」とは呼ばない。
+PCをGitHub runnerとして登録したり、常駐サービスを入れたりする必要はない。
 
-## 証跡と期限
-
-Linuxはready60秒、全体600秒、finally清掃90秒。jobは15分。
-Windows jobは35分、Go/コンテナ操作は既存ランナーの個別有限期限を持つ。
-バージョン、hash、期待/実測、終了値、開始終了、資源と清掃を保存する。
-`export-evidence.ps1` は固定ファイル名の許可リストだけを14日保存し、
-fixtureディレクトリ・鍵・SSH設定・環境dump・任意コマンド出力をuploadしない。
-試験入力は固定の合成値だけ。資格情報をサンプルへ書き込まない。
-候補artifactは7日、合格配布artifactと結果は14日保存する。
-
-強制中断ではfinallyが完了する保証はない。Linuxは
-[実行ID別回収手順](../tests/linux-ssh/README.md#evidence-ownership-and-recovery)を使う。
-Windowsはmanifestのimage/container名をDocker inspectで照合してその実行分のみ削除し、
-証跡フォルダのclient秘密鍵が残っていればそのファイルのみ削除する。
-共有pruneは使わない。清掃証跡のないrunは再利用せず不合格とする。
-
-## ローカル再現
+1. GitHub Actionsの共通buildとWindows jobの成功を待つ。
+2. 実行対象SHAをクリーンにcheckoutする。PowerShell 7.3以上、Go 1.27.3、認証済みgh、
+   Docker 28以上の `desktop-linux` contextとOpenSSH clientを用意する。
+3. 次を実行する。run IDは成功した同じSHAの `Standard runner SSH candidate` workflowのID。
 
 ```powershell
-./tests/ci/package.ps1 # dist/packageは新規ディレクトリ
-Copy-Item dist/package/wintable.exe dist/wintable.exe
-./tests/ci/test-gate.ps1
-./tests/validation/test-summary.ps1
-# Windows containersモード
-$env:WINTABLE_DISTRIBUTION_ZIP="$pwd/dist/package.zip"
-./tests/validation/run.ps1 -DistributionDirectory "$pwd/dist/package" -OutputDirectory .cache/ci/windows
-# 専用Linux containers環境で、同じcheckoutと配布物を使う
-./tests/linux-ssh/run.ps1 -DockerContext desktop-linux -ProductTestScript ./tests/linux-ssh/product.ps1 -OutputDirectory .cache/ci/linux
-./tests/ci/gate.ps1 -EvidenceDirectory .cache/ci -DistributionDirectory dist/package -SourceSHA (git rev-parse HEAD) -WindowsJob success -LinuxJob success
+./tests/ci/complete-local.ps1 -RunId <run-id> -DockerContext desktop-linux
 ```
 
-文書例は`examples/linux-inventory.json`と`examples/linux-command.json`。
-接続先、user、Windows制御側の鍵パスを実環境へ変更して実行する。
-混在例は`mixed-inventory.json`/`mixed-command.json`。`${exe}`をhost変数に持ち、
-共通taskをOS別絶対パスへ展開する。os省略はWindows、os付きv1は旧CLIでは未知キー終了2。
+helperは実際のActions APIでrepository/workflow/head SHAと両job結果を検査し、
+同じrunのcandidateとWindows証跡を取得する。ローカルでexeを再buildしない。
+固定Debian image/CPython 3.13.5の実SSHと配布exeの日本語文書例を実行し、
+`tests/ci/gate.ps1` で両OS証跡・同一SHA・exe/ZIPハッシュ・全必須ケース・清掃を照合する。
+旧SHA、汚れた作業ツリー、別workflow、欠落artifact、実テスト失敗、skip/欠落/重複は拒否する。
+artifactが失効した場合は、同じSHAのworkflow全体を再実行してから新しい結果を使う。
+
+成功時は新規 `.cache/local-acceptance/<id>/` 以下へ次を保存する。
+
+- `validated-distribution.zip`: Windowsで検証したZIPのバイト列をそのままコピーしたもの。
+- `evidence/publication.json`: 必須検証の集約、SHAとハッシュ、Windows/Linuxの実行場所。
+- `evidence/execution.json`: CI run URL/attemptとローカル実行の区別。
+- `evidence/windows/`、`evidence/linux/`: 許可リストの証跡。任意の実タスク入力を混ぜない。
+
+候補artifactだけでは公開条件を満たさない。このhelperが成功した同じZIP・ハッシュ・証跡を
+人手で確認して公開する。GitHub Releaseへの自動投稿は行わない。
+
+## 標準Windows containerが利用できなかった場合
+
+能力確認step自体が失敗した場合だけ、既存PCでWindowsも実行できる。
+通常の実SSHテスト失敗をローカル実行で上書きして合格にはしない。
+
+```powershell
+./tests/ci/complete-local.ps1 -RunId <run-id> -WindowsLocal `
+  -WindowsDockerContext desktop-windows -DockerContext desktop-linux
+```
+
+Windows用には既存のHyper-V/Windows containers環境とOpenSSH serverバイナリが必要。
+その後にLinux contextを使用する。同時稼働を前提にせず、必要なモード切替は既存環境で準備する。
+helperはDockerのグローバルcontextやモードを切り替えず、環境変数を復元する。
+CIの能力確認artifactが同じSHAで `unavailable` を記録していることを必須とする。
+
+## 必須検査と範囲
+
+| 基準 | 検証 |
+| --- | --- |
+| L01 | TestHostOS / TestOSSchemaBoundaries / TestOSPreflightNoConnections。Linux file_contentは全ホスト接続前拒否 |
+| L02 | 固定独立probeの2MiB/EOF/両stream/鍵拒否/期限・中断/再送なし |
+| L03〜L04 | Windows製品exeのargv/出力/終了値、raw receiverの不正入力・runtime・E2BIG、文書例 |
+| L05〜L06 | 模擬混在、個別実SSH、合成境界、固定起動長。層別に記録 |
+| Windows V-01〜V-18 | 既存coverage/summarizeとZIP導入。期待値を緩めない |
+
+混在単一runの実機E2E、専用remote Docker/tunnelは未確認。
+Windows制御・Debian 13 amd64/CPython 3.13のみ。Linux file_contentは未対応。
+切断後の子孫停止は保証しない。対応範囲は [support.md](support.md) を参照。
+Linuxはready60秒、試験600秒、清掃90秒。Windows jobは35分、能力確認は5分。
+強制中断時はfixture READMEの実行ID別回収手順を使い、共有Docker資源のpruneは行わない。

@@ -3,6 +3,7 @@
 param(
     [string]$OutputDirectory,
     [string]$DistributionDirectory,
+    [ValidateSet('hyperv','process')][string]$Isolation = 'hyperv',
     [string]$BaseImage = 'mcr.microsoft.com/windows/servercore@sha256:b52799a67fa596d4bddcd82ae1dab0077a84767fbc33c7342b72b53ecc71ad09'
 )
 $ErrorActionPreference = 'Stop'
@@ -49,7 +50,7 @@ try {
     }
     Invoke-Check module_binary @('test','-c','-o',"$output/module.test.exe",'./internal/module')
     $nativeName = 'wintable-native-' + [Guid]::NewGuid().ToString('N').Substring(0,12)
-    $nativeArgs = @('run','--name',$nativeName,'--isolation','hyperv','--mount',"type=bind,source=$output,target=C:/validation,readonly",$BaseImage,'C:/validation/module.test.exe','-test.run=^TestFileContentWindows$','-test.v','-test.timeout=3m')
+    $nativeArgs = @('run','--name',$nativeName,'--isolation',$Isolation,'--mount',"type=bind,source=$output,target=C:/validation,readonly",$BaseImage,'C:/validation/module.test.exe','-test.run=^TestFileContentWindows$','-test.v','-test.timeout=3m')
     try {
         & docker @nativeArgs 2>&1 | Tee-Object "$output/native-container.log" | Out-Host
         $manifest.checks += @{ name='native_container'; command=('docker ' + ($nativeArgs -join ' ')); exit_code=$LASTEXITCODE; log='native-container.log' }
@@ -58,7 +59,7 @@ try {
         $manifest.native_container_removed = $LASTEXITCODE -eq 0
     }
     $manifest.exe_sha256 = (Get-FileHash "$output/wintable.exe" -Algorithm SHA256).Hash
-    & "$repo/tests/windows-ssh/run.ps1" -BaseImage $BaseImage -OutputDirectory "$output/ssh" -ValidationExecutable "$output/wintable.exe"
+    & "$repo/tests/windows-ssh/run.ps1" -BaseImage $BaseImage -Isolation $Isolation -OutputDirectory "$output/ssh" -ValidationExecutable "$output/wintable.exe"
     $manifest.ssh_fixture = 'completed; see ssh/manifest.json for commands and exit codes'
 } catch {
     $manifest.failure = $_.Exception.Message

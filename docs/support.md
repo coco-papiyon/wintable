@@ -23,8 +23,10 @@ changed=nullは対象状態不明を表す。再送は行わず、状態を確�
 **混在単一runの実機E2Eは未確認**。両コンテナモードの同時稼働を前提にしない。
 L07（Linux file_content）は後続範囲であり、接続前拒否だけを確認する。
 
-対応公開の条件は、同じSHA・同じ製品exeに対する両OSジョブと
-`publication-gate` の合格。`candidate` artifactは試験前の候補であり公開版ではない。
-Issue #29実装時点ではself-hosted runner未登録のためCIでの実到達・両OS合格は未確認。
+対応公開の条件は、同じSHA・同じ製品exeの両OS必須試験と集約ゲートの合格。
+標準GitHub Windows runnerの実測を先に行い、Linux実SSHは既存Windows PCで必要時に実行する。
+標準Windows containerが利用不能なら、その能力確認証跡を条件にWindowsも既存PCで実行する。
+実行場所はpublication.json/execution.jsonへ明記し、ローカル試験をCI実証とは扱わない。
+常設self-hosted runnerや追加VM契約は不要。candidate artifactだけでは公開しない。
 過去の個別実証は [Issue #28](validation/issue28/README.md)、
-CI実行・導入・復旧手順は [CI](ci.md) を参照。
+実行・導入・復旧手順は [CI](ci.md) を参照。

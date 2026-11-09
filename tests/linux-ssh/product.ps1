@@ -1,11 +1,11 @@
-param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$EvidenceDirectory)
+param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$EvidenceDirectory,[string]$DistributionDirectory)
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path "$PSScriptRoot/../..").Path
 Push-Location $repo
 $stage='product-tests'
 try {
     $env:WINTABLE_LINUX_SSH_FIXTURE=$FixtureDirectory
-    $env:WINTABLE_PRODUCT_EXE=Join-Path $repo 'dist/wintable.exe'
+    $env:WINTABLE_PRODUCT_EXE=if ($DistributionDirectory) { Join-Path $DistributionDirectory 'wintable.exe' } else { Join-Path $repo 'dist/wintable.exe' }
     if (!(Test-Path $env:WINTABLE_PRODUCT_EXE)) { throw 'Build product before acceptance' }
     $events = & go test ./internal/module -run '^TestLinuxCommandSSH$' -count=1 -json
     $code=$LASTEXITCODE
@@ -17,7 +17,7 @@ try {
         if (@($parsed | Where-Object { $_.Action -eq 'pass' -and $_.Test -ceq "TestLinuxCommandSSH/$case" }).Count -ne 1) { throw "Missing/duplicate product case: $case" }
     }
     $stage='document-example'
-    & "$PSScriptRoot/document-example.ps1" -FixtureDirectory $FixtureDirectory -EvidenceDirectory $EvidenceDirectory
+    & "$PSScriptRoot/document-example.ps1" -FixtureDirectory $FixtureDirectory -EvidenceDirectory $EvidenceDirectory -DistributionDirectory $DistributionDirectory
     Get-FileHash $env:WINTABLE_PRODUCT_EXE | Select-Object Algorithm,Hash | ConvertTo-Json | Set-Content "$EvidenceDirectory/product-hash.json"
 } catch {
     # Persist only location metadata, never exception text or command output.
