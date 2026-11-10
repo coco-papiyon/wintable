@@ -3,6 +3,13 @@ package module
 import "testing"
 
 func TestDistributionWrapper(t *testing.T) {
+	for _, key := range []Key{{"windows", "powershell"}, {"linux", "shell"}} {
+		b := DefaultBackends()[key]
+		if e := b.Check(); e != nil {
+			t.Fatal(key, e)
+		}
+		t.Logf("%s fixed launch length: %d bytes / %d UTF16", key.Module, len(b.LaunchLine), UTF16Len(b.LaunchLine))
+	}
 	for _, target := range []string{"windows", "linux"} {
 		if e := FetchBackend(target).Check(); e != nil {
 			t.Fatal(e)

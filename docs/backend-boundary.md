@@ -1,5 +1,7 @@
 # OS/module backend境界
 
+`DefaultBackends` は Windows powershell / Linux shell も登録する。共通 `PrepareScript` と OS別固定 receiver を使い、command の直接 argv 実行とは別の契約とする。変数展開後のスクリプトを全件検査し、逆OSは接続前拒否。[終了規則・上限・一時領域](script.md)を参照。
+
 `module.Backends` は `module.Key{OS, Module}` ごとにPrepare、固定Command、
 実際のLaunchLine、そのOS用ValidateLaunch、Decodeを登録する。
 `engine.BuildWithBackends` は全ホストの変数展開と能力・引数・JSONサイズ・固定行の

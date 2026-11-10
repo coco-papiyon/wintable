@@ -1,5 +1,7 @@
 # ドキュメント索引
 
+- [powershell / shell](script.md)：Windows PowerShell 5.1 と Linux /bin/sh のスクリプト実行。
+
 この索引は現行仕様・利用手順と履歴資料の入口です。実装状況のまとめは[モジュール一覧](design/modules.md)、OS/runtimeの保証範囲は[対応表](support.md)を参照してください。
 
 ## 利用・現行仕様

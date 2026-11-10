@@ -31,8 +31,8 @@
 | 用途 | Ansible FQCN（公式） | wintable名 | 状態・優先度と理由 | 互換性・差異 |
 | --- | --- | --- | --- | --- |
 | プロセス | [ansible.windows.win_command](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_command_module.html) | command | 実行対応済み | CRT対応exeのみ。creates/removes/chdirなし |
-| PowerShell | [ansible.windows.win_powershell](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_powershell_module.html) | powershell | 保留：任意コードの結果契約が必要 | スクリプトのchanged自己申告を現行に導入しない |
-| シェル | [ansible.windows.win_shell](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_shell_module.html) | shell | 保留：引用と実行制限の再設計 | commandでシェル構文を解釈しない |
+| PowerShell | [ansible.windows.win_powershell](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_powershell_module.html) | powershell | 実装済み：[仕様](../script.md) | スクリプトのchanged自己申告を現行に導入しない |
+| シェル（Linux） | ansible.builtin.shell（用途比較） | shell | 実装済み：[仕様](../script.md) | Linux /bin/sh専用。Windowsではpowershellを指定 |
 | 内容配置・転送 | [ansible.windows.win_copy](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_copy_module.html) | file_content / copy | 前者は実行対応済み、後者P2候補 | contentのみ。バイナリ・ディレクトリ転送は別設計 |
 | ファイル・ディレクトリ | [ansible.windows.win_file](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_file_module.html) | file | Windows/LinuxとWindowsローカルで実装済み | [directory作成のみ](modules/file-module.md)。touch・削除は非対応 |
 | テンプレート | [ansible.windows.win_template](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_template_module.html) | template | 保留：描画言語と秘密管理が必要 | 現行の文字列変数置換はJinja2ではない |
@@ -152,7 +152,7 @@ feature/optional_feature案は `names:string配列`必須、`state:string=presen
 
 reboot案は `timeout_seconds:integer=600`、`message:string="wintable reboot"`、stateなし。管理権限と再起動権限が必要。再起動要求後にSSH再接続しboot識別変更と準備完了を確認してtrueとする。要求前拒否はfalse、要求後の再接続期限超過はnull。常に実行する非冪等操作として明示する。再起動禁止環境/起動識別不変/鍵変更/接続復帰を検証する。現行engineの一接続・失敗停止モデルを拡張する必要があるため最後に設計を確定する。
 
-user/acl/template/powershell/shell/scheduled_task/updatesは採用未決定。順に秘密の非露出と更新比較、ACE継承と拒否優先、テンプレート言語と制御側読取、任意コードの結果検証、引用・シェル境界、実行主体と資格情報、長時間ジョブと再開点が未確定である。これらを調査して個別Issueで引数と受入試験を決定するまで、現行対応やP1/P2の確約に含めない。
+user/acl/template/scheduled_task/updatesは採用未決定。順に秘密の非露出と更新比較、ACE継承と拒否優先、テンプレート言語と制御側読取、実行主体と資格情報、長時間ジョブと再開点が未確定である。これらを調査して個別Issueで引数と受入試験を決定するまで、現行対応やP1/P2の確約に含めない。
 
 推奨順序は、file_contentの取り込みと安全置換の検証→P1のfile/service/registry/environment→読取結果基盤とfacts/stat/ping→転送・ハッシュ基盤とP2→再起動要求の結果契約→機能管理と再接続基盤。各段階でWindows 11 SSHとフルServer 2022の試験範囲を明示し、コンテナ試験だけで全環境合格としない。
 
@@ -161,3 +161,7 @@ Linux command backendは [Linux command仕様](../linux-command.md)、Linux file
 ## fetch（Issue #39で追加）
 
 Windows/Linux対象からWindows制御端末への取得を追加した。引数はsrc/dest。通常captureとは独立したstreamを使い、最大1GiB、通常ファイル限定。download候補（URLから対象ホストへ取得）とは方向が異なる。ユーザー承認により検査後に差し替えられた保存先の上書きを許容し、リンク先を辿らず名前entryを置換する。[利用仕様と制約](../fetch-module.md)を参照。
+
+## powershell / shell（Issue #43）
+
+Windows PowerShell 5.1 と Linux /bin/sh のスクリプト実行を実装。引数・終了値・清掃・変数展開・OS別制約は [仕様](../script.md) を参照。冪等性を自動判定せず、成功は changed=true。

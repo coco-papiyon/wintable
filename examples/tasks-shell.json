@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "hosts": "all",
+  "tasks": [
+    {"name": "POSIX script", "module": "shell", "args": {"script": "message='日本語'; printf '%s\\n' \"$message\" | cat"}}
+  ]
+}

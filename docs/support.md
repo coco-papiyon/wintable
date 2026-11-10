@@ -1,5 +1,7 @@
 # 対応範囲
 
+Windows対象の `powershell`（PowerShell 5.1）と Linux対象の `shell`（/bin/sh）を実装。OS別の選択が必須で混在対象への自動切替はない。[制約と検証範囲](script.md)を参照。
+
 制御端末は Windows 11 / Windows Server 2022以降の amd64 のみ。
 Linux制御端末、ARM64、第二Linuxディストリビューションは保証対象外。
 
@@ -14,7 +16,7 @@ OpenSSHと通常の実行ユーザーを用意する。CLIはPythonの自動導�
 CIはCPython 3.13.5を固定する。Pythonの別実装・別系列は拒否する。
 SSH公開鍵認証と事前配備したknown_hostsが必須。秘密鍵・known_hostsパスはWindows制御側、
 executableは対象OS側の絶対パス。Linux commandはPATH探索せず、argvをshell展開しない。
-sudo/become、package/systemd、再起動、汎用shellは対象外。
+sudo/become、package/systemd、再起動、任意のシェル選択は対象外。
 
 通信切断・timeout・cancel後の子孫プロセス停止は保証しない。
 changed=nullは対象状態不明を表す。再送は行わず、状態を確認してから再実行する。

@@ -297,6 +297,12 @@ func LoadTasks(path string) (map[string]any, error) {
 			}
 		}
 		switch module {
+		case "powershell", "shell":
+			g := v.obj(t["args"], p+".args", "script")
+			s := v.str(g["script"], p+".args.script", false)
+			if strings.ContainsRune(s, 0) {
+				v.fail(p+".args.script", "invalid script")
+			}
 		case "command":
 			g := v.obj(t["args"], p+".args", "executable", "argv")
 			v.str(g["executable"], p+".args.executable", false)
