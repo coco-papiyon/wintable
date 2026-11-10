@@ -30,6 +30,8 @@ func DefaultBackends() Backends {
 	b[Key{"linux", "file_content"}] = Backend{Prepare: PrepareLinuxFileContent, Command: line, LaunchLine: line, ValidateLaunch: ValidateLinuxWrapper, Decode: DecodeLinuxFileContent}
 	b[Key{"windows", "fetch"}] = FetchBackend("windows")
 	b[Key{"linux", "fetch"}] = FetchBackend("linux")
+	b[Key{"windows", "file"}] = FileBackend("windows")
+	b[Key{"linux", "file"}] = FileBackend("linux")
 	return b
 }
 

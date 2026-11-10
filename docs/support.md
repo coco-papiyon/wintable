@@ -43,3 +43,13 @@ fetchは最大1GiB、Windows制御端末のNTFS保存限定です。第三者に
 ## ローカルcommand委譲
 
 `delegate_to: "localhost"` を指定したcommandはWindows制御端末上で実行します。`become` は省略または `false` のみで昇格しません。元ホストごとに変数展開・実行し、結果も元ホストに所属します。全taskが委譲ならSSH接続属性・鍵・known_hostsは不要です。絶対exeとargv、出力上限、期限・中断時の子孫清掃などは[ローカルcommandの仕様](local-command.md)を参照してください。
+
+## fileの対応範囲
+
+| 経路 | 実装 | 通常確認 |
+| --- | --- | --- |
+| Windows SSH | PowerShell/C# receiver | 実SSHは配布時に確認 |
+| Linux SSH | Python receiver | Debian fixtureのreceiverと製品CLI |
+| Windows localhost | 共通receiverとJob Object | Windows実プロセスとCLI |
+
+stateはdirectoryのみです。パス・リンク・競合時の保証範囲は[file仕様](design/modules/file-module.md)を参照してください。

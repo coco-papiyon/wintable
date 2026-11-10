@@ -31,3 +31,7 @@ SSH、順序、forks、timeout/cancel、結果描画は共用する。
 ## ローカルcommand委譲
 
 `delegate_to: "localhost"` を指定したcommandはWindows制御端末上で実行します。`become` は省略または `false` のみで昇格しません。元ホストごとに変数展開・実行し、結果も元ホストに所属します。全taskが委譲ならSSH接続属性・鍵・known_hostsは不要です。絶対exeとargv、出力上限、期限・中断時の子孫清掃などは[ローカルcommandの仕様](local-command.md)を参照してください。
+
+## file backend
+
+DefaultBackendsはWindows/Linuxのfileも登録します。FileBackendのOS別Prepareと固定receiverが全件事前検証・stdin転送・厳密な応答解釈を共有します。Windowsのlocalhost委譲も同じreceiverをJob Object内で実行します。詳細は[file仕様](design/modules/file-module.md)。

@@ -10,3 +10,7 @@ import (
 func RunLocalCommand(context.Context, Prepared, bool) result.TaskResult {
 	return result.TaskResult{Status: result.Failed, Error: result.PublicError("internal_error")}
 }
+
+func RunLocalFile(context.Context, Prepared) result.TaskResult {
+	return result.TaskResult{Status: result.Failed, Error: result.PublicError("internal_error")}
+}

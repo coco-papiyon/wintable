@@ -94,3 +94,7 @@ fetchの通信失敗時は、ローカル確定前ならchanged=false、確定�
 ## ローカルcommand委譲
 
 `delegate_to: "localhost"` を指定したcommandはWindows制御端末上で実行します。`become` は省略または `false` のみで昇格しません。元ホストごとに変数展開・実行し、結果も元ホストに所属します。全taskが委譲ならSSH接続属性・鍵・known_hostsは不要です。絶対exeとargv、出力上限、期限・中断時の子孫清掃などは[ローカルcommandの仕様](docs/local-command.md)を参照してください。
+
+## fileによるディレクトリ作成
+
+Windows/LinuxのSSH対象とWindowsローカル委譲にfileを追加しました。stateはdirectoryのみで、親を作成し、再実行時はchanged=falseです。[仕様](docs/design/modules/file-module.md)、[Linux例](examples/linux-file.json)、[Windows例](examples/windows-file.json)、[ローカル例](examples/local-file.json)を参照してください。

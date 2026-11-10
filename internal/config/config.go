@@ -287,8 +287,8 @@ func LoadTasks(path string) (map[string]any, error) {
 		v.str(t["name"], p+".name", false)
 		module := v.str(t["module"], p+".module", false)
 		if x, ok := t["delegate_to"]; ok {
-			if v.str(x, p+".delegate_to", false) != "localhost" || module != "command" {
-				v.fail(p+".delegate_to", "expected localhost for command only")
+			if v.str(x, p+".delegate_to", false) != "localhost" || (module != "command" && module != "file") {
+				v.fail(p+".delegate_to", "expected localhost for command or file")
 			}
 		}
 		if x, ok := t["become"]; ok {
@@ -307,6 +307,12 @@ func LoadTasks(path string) (map[string]any, error) {
 			g := v.obj(t["args"], p+".args", "executable", "argv")
 			v.str(g["executable"], p+".args.executable", false)
 			v.strings(g["argv"], p+".args.argv", true)
+		case "file":
+			g := v.obj(t["args"], p+".args", "path", "state")
+			v.str(g["path"], p+".args.path", false)
+			if v.str(g["state"], p+".args.state", false) != "directory" {
+				v.fail(p+".args.state", "expected directory")
+			}
 		case "file_content":
 			g := v.obj(t["args"], p+".args", "path", "content")
 			v.str(g["path"], p+".args.path", false)

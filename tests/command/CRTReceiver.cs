@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 public class CRTReceiver {
  [DllImport("msvcrt.dll", CallingConvention=CallingConvention.Cdecl)]
  static extern int __wgetmainargs(out int count, out IntPtr args, out IntPtr env, int glob, ref int startup);
+ [DllImport("kernel32.dll", SetLastError=true)]
+ static extern bool IsProcessInJob(IntPtr process, IntPtr job, out bool result);
  public static int Main() {
   int count, startup=0;IntPtr args,env;
   if(__wgetmainargs(out count,out args,out env,0,ref startup)!=0)return 99;
@@ -20,13 +22,14 @@ public class CRTReceiver {
    Console.OpenStandardOutput().Write(data,0,n);task.Wait();return 0;
   }
   if(values.Length>0 && (values[0]=="--tree" || values[0]=="--orphan")) {
-   var child=System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName,"--wait \""+values[1]+".started\""){UseShellExecute=false,CreateNoWindow=true});
+   var child=System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName,"--wait \""+values[1]+".started\" \""+values[1]+".release\""){UseShellExecute=false,CreateNoWindow=true});
    File.WriteAllText(values[1],child.Id.ToString());
    if(values[0]=="--tree")System.Threading.Thread.Sleep(60000);
+   else { var deadline=DateTime.UtcNow.AddSeconds(10); while(!File.Exists(values[1]+".release") && DateTime.UtcNow<deadline)System.Threading.Thread.Sleep(10); }
    return 0;
   }
   if(values.Length>0 && values[0]=="--marker") { File.WriteAllText(values[1],"executed");return 0; }
-  if(values.Length>0 && values[0]=="--wait") { File.AppendAllText(values[1],"started\n");System.Threading.Thread.Sleep(60000);return 0; }
+  if(values.Length>0 && values[0]=="--wait") { File.AppendAllText(values[1],"started\n"); if(values.Length>2) { bool inJob; if(!IsProcessInJob(new IntPtr(-1),IntPtr.Zero,out inJob))throw new System.ComponentModel.Win32Exception(); File.WriteAllText(values[1]+".job",inJob?"true":"false"); var deadline=DateTime.UtcNow.AddSeconds(10); while(!File.Exists(values[2]) && DateTime.UtcNow<deadline)System.Threading.Thread.Sleep(10); } System.Threading.Thread.Sleep(60000);return 0; }
   if(values.Length>0 && values[0]=="--assert-absent")return File.Exists(values[1])?98:0;
   if(values.Length>0 && values[0]=="--exit")return Int32.Parse(values[1]);
   if(values.Length>0 && values[0]=="--codepage") {

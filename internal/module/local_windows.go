@@ -3,6 +3,7 @@ package module
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"os"
 	"sync"
@@ -16,6 +17,9 @@ import (
 // RunLocalCommand starts the validated executable without a shell or elevation.
 // The suspended process joins a kill-on-close job before any user code runs.
 func RunLocalCommand(ctx context.Context, p Prepared, output bool) result.TaskResult {
+	return runLocalProcess(ctx, p, output, nil)
+}
+func runLocalProcess(ctx context.Context, p Prepared, output bool, stdin []byte) result.TaskResult {
 	fail := func(code string) result.TaskResult {
 		row := result.TaskResult{Status: result.Failed, Error: result.PublicError("task_failed")}
 		if code == "deadline_exceeded" || code == "internal_error" {
@@ -54,7 +58,7 @@ func RunLocalCommand(ctx context.Context, p Prepared, output bool) result.TaskRe
 		return fail("start_failed")
 	}
 	defer in.Close()
-	iw.Close()
+	defer iw.Close()
 	out, ow, err := os.Pipe()
 	if err != nil {
 		return fail("start_failed")
@@ -111,6 +115,7 @@ func RunLocalCommand(ctx context.Context, p Prepared, output bool) result.TaskRe
 		return fail("start_failed")
 	}
 	in.Close()
+	go func() { defer iw.Close(); _, _ = iw.Write(stdin) }()
 	ow.Close()
 	ew.Close()
 	a, b := result.NewCapture(output), result.NewCapture(output)
@@ -141,6 +146,17 @@ func RunLocalCommand(ctx context.Context, p Prepared, output bool) result.TaskRe
 				break
 			}
 			time.Sleep(time.Millisecond)
+		}
+	}
+	// TerminateJobObject initiates process termination asynchronously. The
+	// accounting count can reach zero before each process handle is signaled,
+	// so wait for the job object's completion signal before returning.
+	if cleanupErr == nil {
+		state, err := windows.WaitForSingleObject(job, 10000)
+		if err != nil {
+			cleanupErr = err
+		} else if state != windows.WAIT_OBJECT_0 {
+			cleanupErr = errors.New("job termination timed out")
 		}
 	}
 	readers.Wait()
