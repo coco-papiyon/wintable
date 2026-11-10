@@ -13,6 +13,9 @@
     "TestLinuxOpenSSH/disconnect"
   ],
   "product.jsonl": [
+    "TestLinuxFileSSH",
+    "TestLinuxFileSSH/receiver",
+    "TestLinuxFileSSH/product",
     "TestLinuxCommandSSH",
     "TestLinuxCommandSSH/raw-invalid",
     "TestLinuxCommandSSH/raw-boundaries",

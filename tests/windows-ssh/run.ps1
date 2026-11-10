@@ -4,7 +4,7 @@ param(
     [string]$BaseImage = 'mcr.microsoft.com/windows/servercore:ltsc2022',
     [ValidateSet('hyperv','process')][string]$Isolation = 'hyperv',
     [string]$OpenSSHDirectory = "$env:WINDIR\System32\OpenSSH",
-    [string]$ModuleTestPattern = '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows|FetchSSH)$',
+    [string]$ModuleTestPattern = '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows|FetchSSH|FileSSH)$',
     [string]$OutputDirectory,
     [string]$ValidationExecutable
 )
@@ -46,10 +46,10 @@ $oldFixture = $env:WINTABLE_SSH_FIXTURE
 $oldExecutable = $env:WINTABLE_VALIDATION_EXE
 $regularModulePattern = $ModuleTestPattern
 $interruptionPattern = $null
-if ($ModuleTestPattern -ceq '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows|FetchSSH)$') {
+if ($ModuleTestPattern -ceq '^Test(Command(Windows|SSHLaunchAndDisconnect)|FileContentSSH(LaunchAndDisconnect)?|FileContentLinkSwapWindows|FetchSSH|FileSSH)$') {
     # A cut connection need not terminate its remote descendants. Complete
     # ordinary receiver/size observations before leaving such processes behind.
-    $regularModulePattern = '^Test(CommandWindows|FileContentSSH|FileContentLinkSwapWindows|FetchSSH)$'
+    $regularModulePattern = '^Test(CommandWindows|FileContentSSH|FileContentLinkSwapWindows|FetchSSH|FileSSH)$'
     $interruptionPattern = '^Test(Command|FileContent)SSHLaunchAndDisconnect$'
 }
 $created = $false

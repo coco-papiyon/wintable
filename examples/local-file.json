@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "hosts": "all",
+  "tasks": [{"name": "ローカルディレクトリ作成", "module": "file", "delegate_to": "localhost", "args": {"path": "C:\\Temp\\wintable\\data", "state": "directory"}}]
+}
