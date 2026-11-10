@@ -21,7 +21,7 @@ try {
         if (@($parsed | Where-Object { $_.Action -eq 'pass' -and $_.Test -ceq "TestLinuxCommandSSH/$case" }).Count -ne 1) { throw "Missing/duplicate product case: $case" }
     }
     & "$PSScriptRoot/check-file-content.ps1" -Events $parsed
-    foreach ($case in @('TestLinuxFileSSH','TestLinuxFileSSH/receiver','TestLinuxFileSSH/product','TestLinuxFetchSSH','TestLinuxFetchSSH/empty','TestLinuxFetchSSH/text','TestLinuxFetchSSH/binary-over-1MiB','TestLinuxFetchSSH/failure-preserves-existing','TestLinuxFetchSSH/product-parallel-hosts')) {
+    foreach ($case in @('TestLinuxFileSSH','TestLinuxFileSSH/receiver','TestLinuxFileSSH/search-permissions','TestLinuxFileSSH/product','TestLinuxFetchSSH','TestLinuxFetchSSH/empty','TestLinuxFetchSSH/text','TestLinuxFetchSSH/binary-over-1MiB','TestLinuxFetchSSH/failure-preserves-existing','TestLinuxFetchSSH/product-parallel-hosts')) {
         if (@($parsed | Where-Object { $_.Action -eq 'pass' -and $_.Test -ceq $case }).Count -ne 1) { throw "Missing/duplicate fetch case: $case" }
     }
     # Normal implementation checks use the standalone dist/wintable.exe.

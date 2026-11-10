@@ -50,6 +50,8 @@ func TestLinuxFileSSH(t *testing.T) {
 	}
 	root := "/home/runner/file-module-" + time.Now().Format("150405.000000000")
 	command("import os; os.mkdir('" + root + "'); open('" + root + "/collision','w').write('keep'); os.symlink('" + root + "','" + root + "/link')")
+	command("import os; os.mkdir('" + root + "/search-only'); os.mkdir('" + root + "/search-only/writable'); os.chmod('" + root + "/search-only',0o111); os.chmod('" + root + "/search-only/writable',0o300)")
+	defer command("import os; os.chmod('" + root + "/search-only',0o700); os.chmod('" + root + "/search-only/writable',0o700)")
 	t.Run("receiver", func(t *testing.T) {
 		b := FileBackend("linux")
 		for _, c := range []struct {
@@ -79,6 +81,33 @@ func TestLinuxFileSSH(t *testing.T) {
 			}
 		}
 		command("import os; assert os.path.isdir('" + root + "/日本語 & space/child'); assert not os.path.exists('" + root + "/forbidden'); assert open('" + root + "/collision').read()=='keep'")
+	})
+	t.Run("search-permissions", func(t *testing.T) {
+		// The SSH user owns these directories: mode 0111 permits only search,
+		// and mode 0300 permits creation without directory listing permission.
+		command("import os; assert os.geteuid()!=0; os.mkdir('" + root + "/search-only/writable/baseline')")
+		b := FileBackend("linux")
+		for _, path := range []string{root + "/search-only/writable/baseline/child", root + "/search-only/writable/new/child"} {
+			for i := 0; i < 2; i++ {
+				p, err := b.Prepare("h", 1, "file", map[string]any{"path": path, "state": "directory"})
+				if err != nil {
+					t.Fatal(err)
+				}
+				r, err := s.Run(ctx, b.Request(p))
+				if err != nil {
+					t.Fatal(err)
+				}
+				got := b.Decode(r, false)
+				want := result.Changed
+				if i == 1 {
+					want = result.OK
+				}
+				if got.Status != want || got.Changed == nil || *got.Changed != (i == 0) {
+					t.Fatalf("%s run %d: %+v", path, i, got)
+				}
+			}
+			command("import os; assert os.path.isdir('" + path + "')")
+		}
 	})
 	t.Run("product", func(t *testing.T) {
 		exe := os.Getenv("WINTABLE_PRODUCT_EXE")

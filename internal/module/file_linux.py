@@ -32,7 +32,8 @@ try:
     if any(c in ('', '.', '..') for c in parts):
         raise ValueError()
     r = {'error': 'execution_failed'}
-    flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
+    # Traversal needs search permission, not permission to list directories.
+    flags = os.O_PATH | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
     fd = os.open('/', flags)
     fds.append(fd)
     changed = False
