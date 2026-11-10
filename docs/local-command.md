@@ -8,7 +8,7 @@ taskに `"delegate_to": "localhost"` を指定すると、Windows制御端末の
 
 実行入力は既存Windows commandと同じ絶対パスのCRT互換 `.exe` と `argv` です。PATH検索、`cmd: "hostname"`、暗黙のシェル実行、Ansible YAMLは扱いません。例はWindowsを `C:\Windows` に導入した環境向けです。
 
-委譲先は `localhost` のみで、対象モジュールはcommandのみです。属性を省略したtaskは従来どおりinventoryの対象へSSHで実行します。通常taskと委譲taskは同じ配列に記述でき、元ホスト内の順序、失敗後skip、期限・中断、`--forks` に従います。委譲は選択された元ホストごとに実行するため、複数ホストなら制御端末上でも並行起動します。run_onceではありません。
+委譲先は `localhost` のみで、対象モジュールはcommandと[file](design/modules/file-module.md)です。属性を省略したtaskは従来どおりinventoryの対象へSSHで実行します。通常taskと委譲taskは同じ配列に記述でき、元ホスト内の順序、失敗後skip、期限・中断、`--forks` に従います。委譲は選択された元ホストごとに実行するため、複数ホストなら制御端末上でも並行起動します。run_onceではありません。
 
 変数は元ホストのvarsで展開し、結果のhostとtask_indexも元ホストのままです。元ホストのOSがLinuxでも委譲taskにはWindows commandの検査を適用します。全選択ホスト・全taskの入力検査が完了するまで実行しません。
 

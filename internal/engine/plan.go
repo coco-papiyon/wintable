@@ -87,8 +87,8 @@ func build(b *config.Bundle, limit string, limitSet bool, backends module.Backen
 			local := t["delegate_to"] == "localhost"
 			targetOS := hp.OS
 			if local {
-				if runtime.GOOS != "windows" || kind != "command" {
-					return nil, fmt.Errorf("input_error: localhost command requires Windows controller")
+				if runtime.GOOS != "windows" || (kind != "command" && kind != "file") {
+					return nil, fmt.Errorf("input_error: localhost task requires Windows controller")
 				}
 				targetOS = "windows"
 			}

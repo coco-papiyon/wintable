@@ -56,3 +56,7 @@ fetchのsrcは対象OSの絶対パス、destはWindows制御端末の保存ル�
 ## ローカルcommand委譲
 
 `delegate_to: "localhost"` を指定したcommandはWindows制御端末上で実行します。`become` は省略または `false` のみで昇格しません。元ホストごとに変数展開・実行し、結果も元ホストに所属します。全taskが委譲ならSSH接続属性・鍵・known_hostsは不要です。絶対exeとargv、出力上限、期限・中断時の子孫清掃などは[ローカルcommandの仕様](local-command.md)を参照してください。
+
+## fileディレクトリ作成
+
+moduleをfile、argsをpath（対象OS絶対パス）とstate: directoryにします。Windowsローカルはdelegate_to: localhostを追加します。詳細と安全性は[file仕様](design/modules/file-module.md)、例は[Linux](../examples/linux-file.json)・[Windows](../examples/windows-file.json)・[ローカル](../examples/local-file.json)を参照してください。

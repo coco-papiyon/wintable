@@ -34,7 +34,7 @@
 | PowerShell | [ansible.windows.win_powershell](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_powershell_module.html) | powershell | 保留：任意コードの結果契約が必要 | スクリプトのchanged自己申告を現行に導入しない |
 | シェル | [ansible.windows.win_shell](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_shell_module.html) | shell | 保留：引用と実行制限の再設計 | commandでシェル構文を解釈しない |
 | 内容配置・転送 | [ansible.windows.win_copy](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_copy_module.html) | file_content / copy | 前者は実行対応済み、後者P2候補 | contentのみ。バイナリ・ディレクトリ転送は別設計 |
-| ファイル・ディレクトリ | [ansible.windows.win_file](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_file_module.html) | file | P1候補：配置先を準備 | touch・再帰削除は初期案から除外 |
+| ファイル・ディレクトリ | [ansible.windows.win_file](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_file_module.html) | file | Windows/LinuxとWindowsローカルで実装済み | [directory作成のみ](modules/file-module.md)。touch・削除は非対応 |
 | テンプレート | [ansible.windows.win_template](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_template_module.html) | template | 保留：描画言語と秘密管理が必要 | 現行の文字列変数置換はJinja2ではない |
 | 行編集 | [ansible.windows.win_lineinfile](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_lineinfile_module.html) | line | P2候補：既存設定の局所変更 | 初期案はリテラル完全一致のみ |
 | パッケージ | [ansible.windows.win_package](https://docs.ansible.com/projects/ansible/latest/collections/ansible/windows/win_package_module.html) | package | P2候補：アプリ配布 | MSI限定から開始、任意provider互換なし |

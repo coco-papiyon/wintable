@@ -39,7 +39,7 @@ func (r Runtime) Execute(ctx context.Context, p *Plan, forks int, timeout time.D
 			return nil, result.PublicError("internal_error")
 		}
 		for _, t := range h.Tasks {
-			if (!t.Local && r.Connector == nil) || (t.Local && (t.Module != "command" || t.Backend == nil)) {
+			if (!t.Local && r.Connector == nil) || (t.Local && ((t.Module != "command" && t.Module != "file") || t.Backend == nil)) {
 				return nil, result.PublicError("internal_error")
 			}
 			if t.Module == "fetch" {
@@ -52,7 +52,7 @@ func (r Runtime) Execute(ctx context.Context, p *Plan, forks int, timeout time.D
 				targetOS := h.OS
 				if t.Local {
 					targetOS = "windows"
-					if t.Module != "command" {
+					if t.Module != "command" && t.Module != "file" {
 						return nil, result.PublicError("internal_error")
 					}
 				}
@@ -208,7 +208,12 @@ func (r Runtime) host(ctx context.Context, h HostPlan, timeout time.Duration, ou
 		var runErr error
 		var fetched *result.TaskResult
 		if t.Local {
-			local := module.RunLocalCommand(taskCtx, t.Payload, output)
+			var local result.TaskResult
+			if t.Module == "file" {
+				local = module.RunLocalFile(taskCtx, t.Payload)
+			} else {
+				local = module.RunLocalCommand(taskCtx, t.Payload, output)
+			}
 			fetched = &local
 		} else if t.Module == "fetch" {
 			local := module.RunFetch(taskCtx, t.Payload, s, request.Command)
