@@ -138,6 +138,37 @@ func TestLocalCommandWindows(t *testing.T) {
 				<-done
 				t.Fatal("child did not start")
 			}
+			var handle windows.Handle
+			if mode == "--orphan" {
+				// Keep the exact child process object alive while RunLocalCommand
+				// tears down the job; reopening by PID afterward could observe a
+				// different process if Windows reuses the identifier.
+				handle, err = windows.OpenProcess(windows.SYNCHRONIZE, false, uint32(pid))
+				if err != nil {
+					stop()
+					<-done
+					t.Fatalf("open child process: %v", err)
+				}
+				defer windows.CloseHandle(handle)
+				var membership []byte
+				for deadline := time.Now().Add(time.Second); time.Now().Before(deadline); {
+					membership, _ = os.ReadFile(marker + ".started.job")
+					if len(membership) > 0 {
+						break
+					}
+					time.Sleep(time.Millisecond)
+				}
+				if string(membership) != "true" {
+					stop()
+					<-done
+					t.Fatalf("descendant job membership: %q", membership)
+				}
+				if err := os.WriteFile(marker+".release", []byte("release"), 0600); err != nil {
+					stop()
+					<-done
+					t.Fatal(err)
+				}
+			}
 			if mode == "--tree" {
 				stop()
 			}
@@ -148,9 +179,13 @@ func TestLocalCommandWindows(t *testing.T) {
 			if mode == "--tree" && (row.Error == nil || row.Error.Code != "deadline_exceeded") {
 				t.Fatal(row)
 			}
-			handle, err := windows.OpenProcess(windows.SYNCHRONIZE, false, uint32(pid))
+			if mode == "--tree" {
+				handle, err = windows.OpenProcess(windows.SYNCHRONIZE, false, uint32(pid))
+				if err == nil {
+					defer windows.CloseHandle(handle)
+				}
+			}
 			if err == nil {
-				defer windows.CloseHandle(handle)
 				state, e := windows.WaitForSingleObject(handle, 0)
 				if e != nil || state != windows.WAIT_OBJECT_0 {
 					t.Fatalf("descendant still alive: %v %d", e, state)

@@ -3,6 +3,7 @@ package module
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"os"
 	"sync"
@@ -145,6 +146,17 @@ func runLocalProcess(ctx context.Context, p Prepared, output bool, stdin []byte)
 				break
 			}
 			time.Sleep(time.Millisecond)
+		}
+	}
+	// TerminateJobObject initiates process termination asynchronously. The
+	// accounting count can reach zero before each process handle is signaled,
+	// so wait for the job object's completion signal before returning.
+	if cleanupErr == nil {
+		state, err := windows.WaitForSingleObject(job, 10000)
+		if err != nil {
+			cleanupErr = err
+		} else if state != windows.WAIT_OBJECT_0 {
+			cleanupErr = errors.New("job termination timed out")
 		}
 	}
 	readers.Wait()
