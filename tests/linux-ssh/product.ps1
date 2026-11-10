@@ -11,7 +11,7 @@ try {
         # file_content's CLI regression also exercises the checked-in examples.
         Copy-Item -LiteralPath "$repo/examples" -Destination "$repo/dist" -Recurse -Force
     }
-    $events = & go test ./internal/module -run '^TestLinux(CommandSSH|FileContentSSH|FetchSSH)$' -count=1 -json
+    $events = & go test ./internal/module -run '^TestLinux(CommandSSH|FileContentSSH|FetchSSH|ShellSSH)$' -count=1 -json
     $code=$LASTEXITCODE
     $events | Set-Content "$EvidenceDirectory/product.jsonl" -Encoding utf8NoBOM
     $parsed=@($events | ForEach-Object { $_ | ConvertFrom-Json })
@@ -23,6 +23,9 @@ try {
     & "$PSScriptRoot/check-file-content.ps1" -Events $parsed
     foreach ($case in @('TestLinuxFetchSSH','TestLinuxFetchSSH/empty','TestLinuxFetchSSH/text','TestLinuxFetchSSH/binary-over-1MiB','TestLinuxFetchSSH/failure-preserves-existing','TestLinuxFetchSSH/product-parallel-hosts')) {
         if (@($parsed | Where-Object { $_.Action -eq 'pass' -and $_.Test -ceq $case }).Count -ne 1) { throw "Missing/duplicate fetch case: $case" }
+    }
+    foreach ($case in @('TestLinuxShellSSH','TestLinuxShellSSH/raw-invalid','TestLinuxShellSSH/raw-boundaries','TestLinuxShellSSH/output','TestLinuxShellSSH/early-exit','TestLinuxShellSSH/product','TestLinuxShellSSH/interruption','TestLinuxShellSSH/interruption/timeout','TestLinuxShellSSH/interruption/cancel','TestLinuxShellSSH/interruption/disconnect')) {
+        if (@($parsed | Where-Object { $_.Action -eq 'pass' -and $_.Test -ceq $case }).Count -ne 1) { throw "Missing/duplicate shell case: $case" }
     }
     # Normal implementation checks use the standalone dist/wintable.exe.
     # Packaged documentation examples remain mandatory for distribution checks.

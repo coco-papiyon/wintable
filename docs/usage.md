@@ -1,5 +1,7 @@
 # Windows版の導入と利用
 
+スクリプト実行は [powershell / shell](script.md) を参照。Windows対象には `module: "powershell"`、Linux対象には `module: "shell"` と `args.script` を指定する。JSON例は `examples/tasks-powershell.json` / `examples/tasks-shell.json`。
+
 この導入手順と標準サンプルはWindows amd64制御端末・Windows対象向けです。Linux対象にはhostの`os: "linux"`とLinux形式のmodule引数を指定します。Linuxの対象環境・準備・制限は[Linux command](linux-command.md)、[Linux file_content](linux-file-content.md)、[対応表](support.md)を参照してください。Windows対象はcmd.exe既定のOpenSSH ServerとPowerShell 5.1以上が必要です。制御側のZIP展開と実行にGo、WSL、Python、管理者権限は不要です。対象側のSSH Server導入・サービス設定には管理者権限が必要な場合があります。Windows実証環境は固定Server Core LTSC 2022コンテナです。Windows 11/フルServerの全シナリオ合格は主張しません。
 
 ## 導入・更新

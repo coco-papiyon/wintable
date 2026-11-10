@@ -1,5 +1,7 @@
 # wintable
 
+- [powershell / shell：OS別スクリプト実行・終了規則・制約](docs/script.md)
+
 Windowsを制御端末として使うGo製構成管理CLIです。JSON v1の厳密な入力検証、全件事前検証、SSH公開鍵接続、結果集計・描画に加え、Windows/Linux対象向け`command`と`file_content`、Windows制御端末への`fetch`を実装しています。対象OS・runtime・実証範囲は[対応表](docs/support.md)を参照してください。
 
 - [ZIPの導入・SSH準備・利用手順](docs/usage.md)

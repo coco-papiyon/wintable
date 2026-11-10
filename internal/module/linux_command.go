@@ -20,6 +20,10 @@ func LinuxCommandWrapper() string {
 
 func DefaultBackends() Backends {
 	b := WindowsBackends()
+	linePS := PowerShellWrapper()
+	b[Key{"windows", "powershell"}] = Backend{Prepare: PrepareScript, Command: linePS, LaunchLine: WrapperLaunchLine(linePS), ValidateLaunch: ValidateWrapper, Decode: DecodeCommand}
+	lineSH := LinuxShellWrapper()
+	b[Key{"linux", "shell"}] = Backend{Prepare: PrepareScript, Command: lineSH, LaunchLine: lineSH, ValidateLaunch: ValidateLinuxWrapper, Decode: DecodeLinuxCommand}
 	line := LinuxCommandWrapper()
 	b[Key{"linux", "command"}] = Backend{Prepare: PrepareLinuxCommand, Command: line, LaunchLine: line, ValidateLaunch: ValidateLinuxWrapper, Decode: DecodeLinuxCommand}
 	line = LinuxFileContentWrapper()
